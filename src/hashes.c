@@ -9,6 +9,7 @@
 #include "event.h"
 #include "hashes.h"
 
+#include "convert.h"
 #include "debugfile.h"
 #include "filehandling.h"
 #include "hlfmt.h"
@@ -63,13 +64,13 @@ int sort_by_salt (const void *v1, const void *v2)
 
   if (res2 != 0) return (res2);
 
-  for (int n = 0; n < 16; n++)
+  for (int n = 0; n < 64; n++)
   {
     if (s1->salt_buf[n] > s2->salt_buf[n]) return  1;
     if (s1->salt_buf[n] < s2->salt_buf[n]) return -1;
   }
 
-  for (int n = 0; n < 8; n++)
+  for (int n = 0; n < 64; n++)
   {
     if (s1->salt_buf_pc[n] > s2->salt_buf_pc[n]) return  1;
     if (s1->salt_buf_pc[n] < s2->salt_buf_pc[n]) return -1;
@@ -247,7 +248,7 @@ void check_hash (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, pl
 
   // plain
 
-  u32 plain_buf[16] = { 0 };
+  u32 plain_buf[64] = { 0 };
 
   u8 *plain_ptr = (u8 *) plain_buf;
   int plain_len = 0;
@@ -1515,11 +1516,121 @@ int hashes_init_stage4 (hashcat_ctx_t *hashcat_ctx)
   return 0;
 }
 
+int hashes_init_selftest (hashcat_ctx_t *hashcat_ctx)
+{
+  folder_config_t *folder_config = hashcat_ctx->folder_config;
+  hashconfig_t    *hashconfig    = hashcat_ctx->hashconfig;
+  hashes_t        *hashes        = hashcat_ctx->hashes;
+
+  if (hashconfig->st_hash == NULL) return 0;
+
+  void   *st_digests_buf    = NULL;
+  salt_t *st_salts_buf      = NULL;
+  void   *st_esalts_buf     = NULL;
+  void   *st_hook_salts_buf = NULL;
+
+  st_digests_buf = (void *) hccalloc (1, hashconfig->dgst_size);
+
+  st_salts_buf = (salt_t *) hccalloc (1, sizeof (salt_t));
+
+  if (hashconfig->esalt_size)
+  {
+    st_esalts_buf = (void *) hccalloc (1, hashconfig->esalt_size);
+  }
+
+  if (hashconfig->hook_salt_size)
+  {
+    st_hook_salts_buf = (void *) hccalloc (1, hashconfig->hook_salt_size);
+  }
+
+  hash_t hash;
+
+  hash.digest    = st_digests_buf;
+  hash.salt      = st_salts_buf;
+  hash.esalt     = st_esalts_buf;
+  hash.hook_salt = st_hook_salts_buf;
+  hash.cracked   = 0;
+  hash.hash_info = NULL;
+  hash.pw_buf    = NULL;
+  hash.pw_len    = 0;
+
+  int parser_status;
+
+  if (hashconfig->hash_mode == 2500)
+  {
+    char *tmpdata = (char *) hcmalloc (sizeof (hccapx_t));
+
+    const int st_hash_len = strlen (hashconfig->st_hash);
+
+    for (int i = 0, j = 0; j < st_hash_len; i += 1, j += 2)
+    {
+      const u8 c = hex_to_u8 ((u8 *) hashconfig->st_hash + j);
+
+      tmpdata[i] = c;
+    }
+
+    parser_status = hashconfig->parse_func ((u8 *) tmpdata, sizeof (hccapx_t), &hash, hashconfig);
+
+    hcfree (tmpdata);
+
+    wpa_t *wpa = (wpa_t *) st_esalts_buf;
+
+    wpa->nonce_error_corrections = 3;
+  }
+  else if (hashconfig->opts_type & OPTS_TYPE_BINARY_HASHFILE)
+  {
+    char *tmpfile = (char *) hcmalloc (HCBUFSIZ_TINY);
+
+    snprintf (tmpfile, HCBUFSIZ_TINY - 1, "%s/selftest.hash", folder_config->session_dir);
+
+    FILE *fp = fopen (tmpfile, "wb");
+
+    const int st_hash_len = strlen (hashconfig->st_hash);
+
+    for (int i = 0; i < st_hash_len; i += 2)
+    {
+      const u8 c = hex_to_u8 ((u8 *) hashconfig->st_hash + i);
+
+      fputc (c, fp);
+    }
+
+    fclose (fp);
+
+    parser_status = hashconfig->parse_func ((u8 *) tmpfile, strlen (tmpfile), &hash, hashconfig);
+
+    unlink (tmpfile);
+
+    hcfree (tmpfile);
+  }
+  else
+  {
+    parser_status = hashconfig->parse_func ((u8 *) hashconfig->st_hash, strlen (hashconfig->st_hash), &hash, hashconfig);
+  }
+
+  if (parser_status == PARSER_OK)
+  {
+    // nothing to do
+  }
+  else
+  {
+    event_log_error (hashcat_ctx, "Self-test hash parsing error: %s", strparser (parser_status));
+
+    return -1;
+  }
+
+  hashes->st_digests_buf    = st_digests_buf;
+  hashes->st_salts_buf      = st_salts_buf;
+  hashes->st_esalts_buf     = st_esalts_buf;
+  hashes->st_hook_salts_buf = st_hook_salts_buf;
+
+  return 0;
+}
+
 void hashes_destroy (hashcat_ctx_t *hashcat_ctx)
 {
   hashconfig_t   *hashconfig   = hashcat_ctx->hashconfig;
+  hashes_t       *hashes       = hashcat_ctx->hashes;
   user_options_t *user_options = hashcat_ctx->user_options;
-  hashes_t *hashes             = hashcat_ctx->hashes;
 
   hcfree (hashes->digests_buf);
   hcfree (hashes->digests_shown);
@@ -1556,6 +1667,11 @@ void hashes_destroy (hashcat_ctx_t *hashcat_ctx)
 
   hcfree (hashes->out_buf);
   hcfree (hashes->tmp_buf);
+
+  hcfree (hashes->st_digests_buf);
+  hcfree (hashes->st_salts_buf);
+  hcfree (hashes->st_esalts_buf);
+  hcfree (hashes->st_hook_salts_buf);
 
   memset (hashes, 0, sizeof (hashes_t));
 }

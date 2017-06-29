@@ -77,10 +77,8 @@ but this is nededed for VS compiler which doesn't have inline keyword but has __
 // do not try to simply change this, it will not work
 
 #define PW_MIN              0
-#define PW_MAX              54
-#define PW_MAX1             (PW_MAX + 1)
-#define PW_DICTMAX          31
-#define PW_DICTMAX1         (PW_DICTMAX + 1)
+#define PW_MAX              256
+#define PW_MAX_OLD          55
 
 #define HCBUFSIZ_TINY       0x1000
 #define HCBUFSIZ_LARGE      0x50000

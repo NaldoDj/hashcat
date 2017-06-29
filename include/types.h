@@ -129,12 +129,14 @@ typedef enum event_identifier
   EVENT_POTFILE_NUM_CRACKED       = 0x000000b3,
   EVENT_POTFILE_REMOVE_PARSE_POST = 0x000000b4,
   EVENT_POTFILE_REMOVE_PARSE_PRE  = 0x000000b5,
-  EVENT_SET_KERNEL_POWER_FINAL    = 0x000000c0,
-  EVENT_WEAK_HASH_POST            = 0x000000d0,
-  EVENT_WEAK_HASH_PRE             = 0x000000d1,
-  EVENT_WEAK_HASH_ALL_CRACKED     = 0x000000d2,
-  EVENT_WORDLIST_CACHE_GENERATE   = 0x000000e0,
-  EVENT_WORDLIST_CACHE_HIT        = 0x000000e1,
+  EVENT_SELFTEST_FINISHED         = 0x000000c0,
+  EVENT_SELFTEST_STARTING         = 0x000000c1,
+  EVENT_SET_KERNEL_POWER_FINAL    = 0x000000d0,
+  EVENT_WEAK_HASH_POST            = 0x000000e0,
+  EVENT_WEAK_HASH_PRE             = 0x000000e1,
+  EVENT_WEAK_HASH_ALL_CRACKED     = 0x000000e2,
+  EVENT_WORDLIST_CACHE_GENERATE   = 0x000000f0,
+  EVENT_WORDLIST_CACHE_HIT        = 0x000000f1,
 
   // there will be much more event types soon
 
@@ -168,15 +170,16 @@ typedef enum status_rc
 {
   STATUS_INIT               = 0,
   STATUS_AUTOTUNE           = 1,
-  STATUS_RUNNING            = 2,
-  STATUS_PAUSED             = 3,
-  STATUS_EXHAUSTED          = 4,
-  STATUS_CRACKED            = 5,
-  STATUS_ABORTED            = 6,
-  STATUS_QUIT               = 7,
-  STATUS_BYPASS             = 8,
-  STATUS_ABORTED_CHECKPOINT = 9,
-  STATUS_ABORTED_RUNTIME    = 10,
+  STATUS_SELFTEST           = 2,
+  STATUS_RUNNING            = 3,
+  STATUS_PAUSED             = 4,
+  STATUS_EXHAUSTED          = 5,
+  STATUS_CRACKED            = 6,
+  STATUS_ABORTED            = 7,
+  STATUS_QUIT               = 8,
+  STATUS_BYPASS             = 9,
+  STATUS_ABORTED_CHECKPOINT = 10,
+  STATUS_ABORTED_RUNTIME    = 11,
 
 } status_rc_t;
 
@@ -233,8 +236,9 @@ typedef enum kern_run
   KERN_RUN_2     = 2000,
   KERN_RUN_23    = 2500,
   KERN_RUN_3     = 3000,
-  KERN_RUN_INIT2 = 4000,
-  KERN_RUN_LOOP2 = 5000
+  KERN_RUN_4     = 4000,
+  KERN_RUN_INIT2 = 5000,
+  KERN_RUN_LOOP2 = 6000
 
 } kern_run_t;
 
@@ -286,6 +290,7 @@ typedef enum rule_functions
 
   RULE_OP_REJECT_LESS            = '<',
   RULE_OP_REJECT_GREATER         = '>',
+  RULE_OP_REJECT_EQUAL           = '_',
   RULE_OP_REJECT_CONTAIN         = '!',
   RULE_OP_REJECT_NOT_CONTAIN     = '/',
   RULE_OP_REJECT_EQUAL_FIRST     = '(',
@@ -293,6 +298,7 @@ typedef enum rule_functions
   RULE_OP_REJECT_EQUAL_AT        = '=',
   RULE_OP_REJECT_CONTAINS        = '%',
   RULE_OP_REJECT_MEMORY          = 'Q',
+  RULE_LAST_REJECTED_SAVED_POS   = 'p',
 
   RULE_OP_MANGLE_SWITCH_FIRST    = 'k',
   RULE_OP_MANGLE_SWITCH_LAST     = 'K',
@@ -321,63 +327,67 @@ typedef enum salt_type
 
 typedef enum opti_type
 {
-  OPTI_TYPE_ZERO_BYTE         = (1 <<  1),
-  OPTI_TYPE_PRECOMPUTE_INIT   = (1 <<  2),
-  OPTI_TYPE_PRECOMPUTE_MERKLE = (1 <<  3),
-  OPTI_TYPE_PRECOMPUTE_PERMUT = (1 <<  4),
-  OPTI_TYPE_MEET_IN_MIDDLE    = (1 <<  5),
-  OPTI_TYPE_EARLY_SKIP        = (1 <<  6),
-  OPTI_TYPE_NOT_SALTED        = (1 <<  7),
-  OPTI_TYPE_NOT_ITERATED      = (1 <<  8),
-  OPTI_TYPE_PREPENDED_SALT    = (1 <<  9),
-  OPTI_TYPE_APPENDED_SALT     = (1 << 10),
-  OPTI_TYPE_SINGLE_HASH       = (1 << 11),
-  OPTI_TYPE_SINGLE_SALT       = (1 << 12),
-  OPTI_TYPE_BRUTE_FORCE       = (1 << 13),
-  OPTI_TYPE_RAW_HASH          = (1 << 14),
-  OPTI_TYPE_SLOW_HASH_SIMD    = (1 << 15),
-  OPTI_TYPE_USES_BITS_8       = (1 << 16),
-  OPTI_TYPE_USES_BITS_16      = (1 << 17),
-  OPTI_TYPE_USES_BITS_32      = (1 << 18),
-  OPTI_TYPE_USES_BITS_64      = (1 << 19)
+  OPTI_TYPE_ZERO_BYTE           = (1 <<  1),
+  OPTI_TYPE_PRECOMPUTE_INIT     = (1 <<  2),
+  OPTI_TYPE_PRECOMPUTE_MERKLE   = (1 <<  3),
+  OPTI_TYPE_PRECOMPUTE_PERMUT   = (1 <<  4),
+  OPTI_TYPE_MEET_IN_MIDDLE      = (1 <<  5),
+  OPTI_TYPE_EARLY_SKIP          = (1 <<  6),
+  OPTI_TYPE_NOT_SALTED          = (1 <<  7),
+  OPTI_TYPE_NOT_ITERATED        = (1 <<  8),
+  OPTI_TYPE_PREPENDED_SALT      = (1 <<  9),
+  OPTI_TYPE_APPENDED_SALT       = (1 << 10),
+  OPTI_TYPE_SINGLE_HASH         = (1 << 11),
+  OPTI_TYPE_SINGLE_SALT         = (1 << 12),
+  OPTI_TYPE_BRUTE_FORCE         = (1 << 13),
+  OPTI_TYPE_RAW_HASH            = (1 << 14),
+  OPTI_TYPE_SLOW_HASH_SIMD_INIT = (1 << 15),
+  OPTI_TYPE_SLOW_HASH_SIMD_LOOP = (1 << 16),
+  OPTI_TYPE_SLOW_HASH_SIMD_COMP = (1 << 17),
+  OPTI_TYPE_USES_BITS_8         = (1 << 18),
+  OPTI_TYPE_USES_BITS_16        = (1 << 19),
+  OPTI_TYPE_USES_BITS_32        = (1 << 20),
+  OPTI_TYPE_USES_BITS_64        = (1 << 21)
 
 } opti_type_t;
 
 typedef enum opts_type
 {
-  OPTS_TYPE_PT_UNICODE        = (1ULL <<  0),
-  OPTS_TYPE_PT_UPPER          = (1ULL <<  1),
-  OPTS_TYPE_PT_LOWER          = (1ULL <<  2),
-  OPTS_TYPE_PT_ADD01          = (1ULL <<  3),
-  OPTS_TYPE_PT_ADD02          = (1ULL <<  4),
-  OPTS_TYPE_PT_ADD80          = (1ULL <<  5),
-  OPTS_TYPE_PT_ADDBITS14      = (1ULL <<  6),
-  OPTS_TYPE_PT_ADDBITS15      = (1ULL <<  7),
-  OPTS_TYPE_PT_GENERATE_LE    = (1ULL <<  8),
-  OPTS_TYPE_PT_GENERATE_BE    = (1ULL <<  9),
-  OPTS_TYPE_PT_NEVERCRACK     = (1ULL << 10), // if we want all possible results
-  OPTS_TYPE_PT_BITSLICE       = (1ULL << 11),
-  OPTS_TYPE_PT_ALWAYS_ASCII   = (1ULL << 12),
-  OPTS_TYPE_ST_UNICODE        = (1ULL << 13),
-  OPTS_TYPE_ST_UPPER          = (1ULL << 14),
-  OPTS_TYPE_ST_LOWER          = (1ULL << 15),
-  OPTS_TYPE_ST_ADD01          = (1ULL << 16),
-  OPTS_TYPE_ST_ADD02          = (1ULL << 17),
-  OPTS_TYPE_ST_ADD80          = (1ULL << 18),
-  OPTS_TYPE_ST_ADDBITS14      = (1ULL << 19),
-  OPTS_TYPE_ST_ADDBITS15      = (1ULL << 20),
-  OPTS_TYPE_ST_GENERATE_LE    = (1ULL << 21),
-  OPTS_TYPE_ST_GENERATE_BE    = (1ULL << 22),
-  OPTS_TYPE_ST_HEX            = (1ULL << 23),
-  OPTS_TYPE_ST_BASE64         = (1ULL << 24),
-  OPTS_TYPE_ST_HASH_MD5       = (1ULL << 25),
-  OPTS_TYPE_HASH_COPY         = (1ULL << 26),
-  OPTS_TYPE_HASH_SPLIT        = (1ULL << 27),
-  OPTS_TYPE_HOOK12            = (1ULL << 28),
-  OPTS_TYPE_HOOK23            = (1ULL << 29),
-  OPTS_TYPE_INIT2             = (1ULL << 30),
-  OPTS_TYPE_LOOP2             = (1ULL << 31),
-  OPTS_TYPE_BINARY_HASHFILE   = (1ULL << 32),
+  OPTS_TYPE_PT_UTF16LE        = (1ULL <<  0),
+  OPTS_TYPE_PT_UTF16BE        = (1ULL <<  1),
+  OPTS_TYPE_PT_UPPER          = (1ULL <<  2),
+  OPTS_TYPE_PT_LOWER          = (1ULL <<  3),
+  OPTS_TYPE_PT_ADD01          = (1ULL <<  4),
+  OPTS_TYPE_PT_ADD02          = (1ULL <<  5),
+  OPTS_TYPE_PT_ADD80          = (1ULL <<  6),
+  OPTS_TYPE_PT_ADDBITS14      = (1ULL <<  7),
+  OPTS_TYPE_PT_ADDBITS15      = (1ULL <<  8),
+  OPTS_TYPE_PT_GENERATE_LE    = (1ULL <<  9),
+  OPTS_TYPE_PT_GENERATE_BE    = (1ULL << 10),
+  OPTS_TYPE_PT_NEVERCRACK     = (1ULL << 11), // if we want all possible results
+  OPTS_TYPE_PT_BITSLICE       = (1ULL << 12),
+  OPTS_TYPE_PT_ALWAYS_ASCII   = (1ULL << 13),
+  OPTS_TYPE_ST_UTF16LE        = (1ULL << 14),
+  OPTS_TYPE_ST_UTF16BE        = (1ULL << 15),
+  OPTS_TYPE_ST_UPPER          = (1ULL << 16),
+  OPTS_TYPE_ST_LOWER          = (1ULL << 17),
+  OPTS_TYPE_ST_ADD01          = (1ULL << 18),
+  OPTS_TYPE_ST_ADD02          = (1ULL << 19),
+  OPTS_TYPE_ST_ADD80          = (1ULL << 20),
+  OPTS_TYPE_ST_ADDBITS14      = (1ULL << 21),
+  OPTS_TYPE_ST_ADDBITS15      = (1ULL << 22),
+  OPTS_TYPE_ST_GENERATE_LE    = (1ULL << 23),
+  OPTS_TYPE_ST_GENERATE_BE    = (1ULL << 24),
+  OPTS_TYPE_ST_HEX            = (1ULL << 25),
+  OPTS_TYPE_ST_BASE64         = (1ULL << 26),
+  OPTS_TYPE_ST_HASH_MD5       = (1ULL << 27),
+  OPTS_TYPE_HASH_COPY         = (1ULL << 28),
+  OPTS_TYPE_HASH_SPLIT        = (1ULL << 29),
+  OPTS_TYPE_HOOK12            = (1ULL << 30),
+  OPTS_TYPE_HOOK23            = (1ULL << 31),
+  OPTS_TYPE_INIT2             = (1ULL << 32),
+  OPTS_TYPE_LOOP2             = (1ULL << 33),
+  OPTS_TYPE_BINARY_HASHFILE   = (1ULL << 34),
 
 } opts_type_t;
 
@@ -522,6 +532,7 @@ typedef enum user_options_defaults
   KERNEL_LOOPS            = 0,
   KEYSPACE                = false,
   LEFT                    = false,
+  LENGTH_LIMIT_DISABLE    = false,
   LIMIT                   = 0,
   LOGFILE_DISABLE         = false,
   LOOPBACK                = false,
@@ -549,6 +560,7 @@ typedef enum user_options_defaults
   RP_GEN_SEED             = 0,
   RUNTIME                 = 0,
   SCRYPT_TMTO             = 0,
+  SELF_TEST_DISABLE       = false,
   SEGMENT_SIZE            = 33554432,
   SEPARATOR               = ':',
   SHOW                    = false,
@@ -601,6 +613,7 @@ typedef enum user_options_map
   IDX_KERNEL_LOOPS             = 'u',
   IDX_KEYSPACE                 = 0xff14,
   IDX_LEFT                     = 0xff15,
+  IDX_LENGTH_LIMIT_DISABLE     = 'L',
   IDX_LIMIT                    = 'l',
   IDX_LOGFILE_DISABLE          = 0xff16,
   IDX_LOOPBACK                 = 0xff17,
@@ -639,23 +652,24 @@ typedef enum user_options_map
   IDX_RULE_BUF_R               = 'k',
   IDX_RUNTIME                  = 0xff30,
   IDX_SCRYPT_TMTO              = 0xff31,
+  IDX_SELF_TEST_DISABLE        = 0xff32,
   IDX_SEGMENT_SIZE             = 'c',
   IDX_SEPARATOR                = 'p',
-  IDX_SESSION                  = 0xff32,
-  IDX_SHOW                     = 0xff33,
+  IDX_SESSION                  = 0xff33,
+  IDX_SHOW                     = 0xff34,
   IDX_SKIP                     = 's',
-  IDX_STATUS                   = 0xff34,
-  IDX_STATUS_TIMER             = 0xff35,
-  IDX_STDOUT_FLAG              = 0xff36,
-  IDX_SPEED_ONLY               = 0xff37,
-  IDX_PROGRESS_ONLY            = 0xff38,
-  IDX_TRUECRYPT_KEYFILES       = 0xff39,
-  IDX_USERNAME                 = 0xff3a,
-  IDX_VERACRYPT_KEYFILES       = 0xff3b,
-  IDX_VERACRYPT_PIM            = 0xff3c,
+  IDX_STATUS                   = 0xff35,
+  IDX_STATUS_TIMER             = 0xff36,
+  IDX_STDOUT_FLAG              = 0xff37,
+  IDX_SPEED_ONLY               = 0xff38,
+  IDX_PROGRESS_ONLY            = 0xff39,
+  IDX_TRUECRYPT_KEYFILES       = 0xff3a,
+  IDX_USERNAME                 = 0xff3b,
+  IDX_VERACRYPT_KEYFILES       = 0xff3c,
+  IDX_VERACRYPT_PIM            = 0xff3d,
   IDX_VERSION_LOWER            = 'v',
   IDX_VERSION                  = 'V',
-  IDX_WEAK_HASH_THRESHOLD      = 0xff3d,
+  IDX_WEAK_HASH_THRESHOLD      = 0xff3e,
   IDX_WORKLOAD_PROFILE         = 'w'
 
 } user_options_map_t;
@@ -664,38 +678,10 @@ typedef enum user_options_map
  * structs
  */
 
-typedef struct
+typedef struct salt
 {
-  u8  digest_length;
-  u8  key_length;
-  u8  fanout;
-  u8  depth;
-  u32 leaf_length;
-  u32 node_offset;
-  u32 xof_length;
-  u8  node_depth;
-  u8  inner_length;
-  u8  reserved[14];
-  u8  salt[16];
-  u8  personnel[16];
-
-} blake2params_t;
-
-typedef struct
-{
-  u64 h[8];
-  u64 t[2];
-  u64 f[2];
-  u32 buflen;
-  u32 outlen;
-  u8  last_node;
-
-} blake2_t;
-
-typedef struct
-{
-  u32 salt_buf[16];
-  u32 salt_buf_pc[16];
+  u32 salt_buf[64];
+  u32 salt_buf_pc[64];
 
   u32 salt_len;
   u32 salt_len_pc;
@@ -814,6 +800,13 @@ typedef struct hashes
   u8          *out_buf; // allocates [HCBUFSIZ_LARGE];
   u8          *tmp_buf; // allocates [HCBUFSIZ_LARGE];
 
+  // selftest buffers
+
+  void        *st_digests_buf;
+  salt_t      *st_salts_buf;
+  void        *st_esalts_buf;
+  void        *st_hook_salts_buf;
+
 } hashes_t;
 
 struct hashconfig
@@ -843,13 +836,16 @@ struct hashconfig
   u32   pw_max;
 
   int (*parse_func) (u8 *, u32, hash_t *, const struct hashconfig *);
+
+  char *st_hash;
+  char *st_pass;
 };
 
 typedef struct hashconfig hashconfig_t;
 
 typedef struct pw
 {
-  u32 i[16];
+  u32 i[64];
 
   u32 pw_len;
 
@@ -871,14 +867,6 @@ typedef struct bs_word
 
 } bs_word_t;
 
-typedef struct comb
-{
-  u32  i[8];
-
-  u32  pw_len;
-
-} comb_t;
-
 typedef struct cpt
 {
   u32    cracked;
@@ -895,18 +883,6 @@ typedef struct plain
   u32  il_pos;
 
 } plain_t;
-
-typedef struct wordl
-{
-  u32  word_buf[16];
-
-} wordl_t;
-
-typedef struct wordr
-{
-  u32  word_buf[1];
-
-} wordr_t;
 
 #include "ext_OpenCL.h"
 
@@ -944,6 +920,7 @@ typedef struct hc_device_param
   u32     kernel_threads_by_wgs_kernel2;
   u32     kernel_threads_by_wgs_kernel23;
   u32     kernel_threads_by_wgs_kernel3;
+  u32     kernel_threads_by_wgs_kernel4;
   u32     kernel_threads_by_wgs_kernel_init2;
   u32     kernel_threads_by_wgs_kernel_loop2;
   u32     kernel_threads_by_wgs_kernel_mp;
@@ -978,9 +955,12 @@ typedef struct hc_device_param
   size_t  size_shown;
   size_t  size_results;
   size_t  size_plains;
+  size_t  size_st_digests;
+  size_t  size_st_salts;
+  size_t  size_st_esalts;
 
   FILE   *combs_fp;
-  comb_t *combs_buf;
+  pw_t   *combs_buf;
 
   void   *hooks_buf;
 
@@ -1005,6 +985,7 @@ typedef struct hc_device_param
   double  exec_us_prev1[EXPECTED_ITERATIONS];
   double  exec_us_prev2[EXPECTED_ITERATIONS];
   double  exec_us_prev3[EXPECTED_ITERATIONS];
+  double  exec_us_prev4[EXPECTED_ITERATIONS];
   double  exec_us_prev_init2[EXPECTED_ITERATIONS];
   double  exec_us_prev_loop2[EXPECTED_ITERATIONS];
 
@@ -1037,6 +1018,7 @@ typedef struct hc_device_param
   cl_kernel  kernel2;
   cl_kernel  kernel23;
   cl_kernel  kernel3;
+  cl_kernel  kernel4;
   cl_kernel  kernel_init2;
   cl_kernel  kernel_loop2;
   cl_kernel  kernel_mp;
@@ -1078,7 +1060,6 @@ typedef struct hc_device_param
   cl_mem  d_digests_shown;
   cl_mem  d_salt_bufs;
   cl_mem  d_esalt_bufs;
-  cl_mem  d_bcrypt_bufs;
   cl_mem  d_tmps;
   cl_mem  d_hooks;
   cl_mem  d_result;
@@ -1088,6 +1069,9 @@ typedef struct hc_device_param
   cl_mem  d_scryptV3_buf;
   cl_mem  d_root_css_buf;
   cl_mem  d_markov_css_buf;
+  cl_mem  d_st_digests_buf;
+  cl_mem  d_st_salts_buf;
+  cl_mem  d_st_esalts_buf;
 
   void   *kernel_params[PARAMCNT];
   void   *kernel_params_mp[PARAMCNT];
@@ -1470,6 +1454,7 @@ typedef struct user_options
   bool         keep_guessing;
   bool         keyspace;
   bool         left;
+  bool         length_limit_disable;
   bool         logfile_disable;
   bool         loopback;
   bool         machine_readable;
@@ -1483,6 +1468,7 @@ typedef struct user_options
   bool         remove;
   bool         restore;
   bool         restore_disable;
+  bool         self_test_disable;
   bool         show;
   bool         status;
   bool         stdout_flag;
@@ -1693,7 +1679,7 @@ typedef struct cpt_ctx
 
 } cpt_ctx_t;
 
-typedef struct
+typedef struct device_info
 {
   bool    skipped_dev;
   double  hashes_msec_dev;
@@ -1709,7 +1695,7 @@ typedef struct
 
 } device_info_t;
 
-typedef struct
+typedef struct hashcat_status
 {
   const char *hash_target;
   char       *hash_type;
@@ -1871,6 +1857,8 @@ typedef struct cache_generate
   u64 comp;
   u64 cnt;
   u64 cnt2;
+
+  time_t runtime;
 
 } cache_generate_t;
 

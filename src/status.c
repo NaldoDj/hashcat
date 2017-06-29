@@ -21,16 +21,17 @@
 
 static const char ST_0000[] = "Initializing";
 static const char ST_0001[] = "Autotuning";
-static const char ST_0002[] = "Running";
-static const char ST_0003[] = "Paused";
-static const char ST_0004[] = "Exhausted";
-static const char ST_0005[] = "Cracked";
-static const char ST_0006[] = "Aborted";
-static const char ST_0007[] = "Quit";
-static const char ST_0008[] = "Bypass";
-static const char ST_0009[] = "Aborted (Checkpoint)";
-static const char ST_0010[] = "Aborted (Runtime)";
-static const char ST_0011[] = "Running (Checkpoint Quit requested)";
+static const char ST_0002[] = "Selftest";
+static const char ST_0003[] = "Running";
+static const char ST_0004[] = "Paused";
+static const char ST_0005[] = "Exhausted";
+static const char ST_0006[] = "Cracked";
+static const char ST_0007[] = "Aborted";
+static const char ST_0008[] = "Quit";
+static const char ST_0009[] = "Bypass";
+static const char ST_0010[] = "Aborted (Checkpoint)";
+static const char ST_0011[] = "Aborted (Runtime)";
+static const char ST_0012[] = "Running (Checkpoint Quit requested)";
 static const char ST_9999[] = "Unknown! Bug!";
 
 static const char UNITS[7] = { ' ', 'k', 'M', 'G', 'T', 'P', 'E' };
@@ -204,7 +205,7 @@ char *status_get_status_string (const hashcat_ctx_t *hashcat_ctx)
   {
     if (status_ctx->checkpoint_shutdown == true)
     {
-      return ((char *) ST_0011);
+      return ((char *) ST_0012);
     }
   }
 
@@ -212,15 +213,16 @@ char *status_get_status_string (const hashcat_ctx_t *hashcat_ctx)
   {
     case STATUS_INIT:               return ((char *) ST_0000);
     case STATUS_AUTOTUNE:           return ((char *) ST_0001);
-    case STATUS_RUNNING:            return ((char *) ST_0002);
-    case STATUS_PAUSED:             return ((char *) ST_0003);
-    case STATUS_EXHAUSTED:          return ((char *) ST_0004);
-    case STATUS_CRACKED:            return ((char *) ST_0005);
-    case STATUS_ABORTED:            return ((char *) ST_0006);
-    case STATUS_QUIT:               return ((char *) ST_0007);
-    case STATUS_BYPASS:             return ((char *) ST_0008);
-    case STATUS_ABORTED_CHECKPOINT: return ((char *) ST_0009);
-    case STATUS_ABORTED_RUNTIME:    return ((char *) ST_0010);
+    case STATUS_SELFTEST:           return ((char *) ST_0002);
+    case STATUS_RUNNING:            return ((char *) ST_0003);
+    case STATUS_PAUSED:             return ((char *) ST_0004);
+    case STATUS_EXHAUSTED:          return ((char *) ST_0005);
+    case STATUS_CRACKED:            return ((char *) ST_0006);
+    case STATUS_ABORTED:            return ((char *) ST_0007);
+    case STATUS_QUIT:               return ((char *) ST_0008);
+    case STATUS_BYPASS:             return ((char *) ST_0009);
+    case STATUS_ABORTED_CHECKPOINT: return ((char *) ST_0010);
+    case STATUS_ABORTED_RUNTIME:    return ((char *) ST_0011);
   }
 
   return ((char *) ST_9999);
@@ -749,8 +751,8 @@ char *status_get_guess_candidates_dev (const hashcat_ctx_t *hashcat_ctx, const i
   plain_t plain1 = { 0, 0, 0, outerloop_first, innerloop_first };
   plain_t plain2 = { 0, 0, 0, outerloop_last,  innerloop_last  };
 
-  u32 plain_buf1[40] = { 0 };
-  u32 plain_buf2[40] = { 0 };
+  u32 plain_buf1[(64 * 2) + 2] = { 0 };
+  u32 plain_buf2[(64 * 2) + 2] = { 0 };
 
   u8 *plain_ptr1 = (u8 *) plain_buf1;
   u8 *plain_ptr2 = (u8 *) plain_buf2;
@@ -1805,4 +1807,49 @@ void status_ctx_destroy (hashcat_ctx_t *hashcat_ctx)
   hcfree (status_ctx->hashcat_status_final);
 
   memset (status_ctx, 0, sizeof (status_ctx_t));
+}
+
+
+void status_status_destroy (hashcat_ctx_t *hashcat_ctx, hashcat_status_t *hashcat_status)
+{
+  const status_ctx_t *status_ctx = hashcat_ctx->status_ctx;
+
+  if (status_ctx == NULL) return;
+
+  if (status_ctx->accessible == false) return;
+
+  hcfree (hashcat_status->session);
+  hcfree (hashcat_status->time_estimated_absolute);
+  hcfree (hashcat_status->time_estimated_relative);
+  hcfree (hashcat_status->time_started_absolute);
+  hcfree (hashcat_status->time_started_relative);
+  hcfree (hashcat_status->speed_sec_all);
+  hcfree (hashcat_status->guess_base);
+  hcfree (hashcat_status->guess_mod);
+  hcfree (hashcat_status->guess_charset);
+  hcfree (hashcat_status->cpt);
+
+  hashcat_status->session                 = NULL;
+  hashcat_status->time_estimated_absolute = NULL;
+  hashcat_status->time_estimated_relative = NULL;
+  hashcat_status->time_started_absolute   = NULL;
+  hashcat_status->time_started_relative   = NULL;
+  hashcat_status->speed_sec_all           = NULL;
+  hashcat_status->guess_base              = NULL;
+  hashcat_status->guess_mod               = NULL;
+  hashcat_status->guess_charset           = NULL;
+  hashcat_status->cpt                     = NULL;
+
+  for (int device_id = 0; device_id < hashcat_status->device_info_cnt; device_id++)
+  {
+    device_info_t *device_info = hashcat_status->device_info_buf + device_id;
+
+    hcfree (device_info->speed_sec_dev);
+    hcfree (device_info->guess_candidates_dev);
+    hcfree (device_info->hwmon_dev);
+
+    device_info->speed_sec_dev        = NULL;
+    device_info->guess_candidates_dev = NULL;
+    device_info->hwmon_dev            = NULL;
+  }
 }

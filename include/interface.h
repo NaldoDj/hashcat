@@ -49,28 +49,28 @@ static const char LM_MASKED_PLAIN[] = "[notfound]";
 #define LUKS_ALIGN_KEYSLOTS 4096
 
 struct luks_phdr {
-	char		magic[LUKS_MAGIC_L];
-	uint16_t	version;
-	char		cipherName[LUKS_CIPHERNAME_L];
-	char		cipherMode[LUKS_CIPHERMODE_L];
-	char            hashSpec[LUKS_HASHSPEC_L];
-	uint32_t	payloadOffset;
-	uint32_t	keyBytes;
-	char		mkDigest[LUKS_DIGESTSIZE];
-	char		mkDigestSalt[LUKS_SALTSIZE];
-	uint32_t	mkDigestIterations;
-	char            uuid[UUID_STRING_L];
-	struct {
-		uint32_t active;
-		/* parameters used for password processing */
-		uint32_t passwordIterations;
-		char     passwordSalt[LUKS_SALTSIZE];
-		/* parameters used for AF store/load */
-		uint32_t keyMaterialOffset;
-		uint32_t stripes;
-	} keyblock[LUKS_NUMKEYS];
-	/* Align it to 512 sector size */
-	char		_padding[432];
+  char      magic[LUKS_MAGIC_L];
+  uint16_t  version;
+  char      cipherName[LUKS_CIPHERNAME_L];
+  char      cipherMode[LUKS_CIPHERMODE_L];
+  char      hashSpec[LUKS_HASHSPEC_L];
+  uint32_t  payloadOffset;
+  uint32_t  keyBytes;
+  char      mkDigest[LUKS_DIGESTSIZE];
+  char      mkDigestSalt[LUKS_SALTSIZE];
+  uint32_t  mkDigestIterations;
+  char      uuid[UUID_STRING_L];
+  struct {
+    uint32_t active;
+    /* parameters used for password processing */
+    uint32_t passwordIterations;
+    char     passwordSalt[LUKS_SALTSIZE];
+    /* parameters used for AF store/load */
+    uint32_t keyMaterialOffset;
+    uint32_t stripes;
+  } keyblock[LUKS_NUMKEYS];
+  /* Align it to 512 sector size */
+  char       _padding[432];
 };
 
 // not from original headers start with hc_
@@ -129,21 +129,25 @@ typedef struct itunes_backup
 
 } itunes_backup_t;
 
-typedef struct luks_tmp
+typedef struct blake2
 {
-  u32 ipad32[8];
-  u64 ipad64[8];
+  u64 h[8];
+  u64 t[2];
+  u64 f[2];
+  u32 buflen;
+  u32 outlen;
+  u8  last_node;
 
-  u32 opad32[8];
-  u64 opad64[8];
+} blake2_t;
 
-  u32 dgst32[32];
-  u64 dgst64[16];
+typedef struct chacha20
+{
+  u32 iv[2];
+  u32 plain[2];
+  u32 position[2];
+  u32 offset;
 
-  u32 out32[32];
-  u64 out64[16];
-
-} luks_tmp_t;
+} chacha20_t;
 
 typedef struct rar5
 {
@@ -419,6 +423,68 @@ typedef struct psafe3
   u32  hash_buf[8];
 
 } psafe3_t;
+
+typedef struct dpapimk
+{
+  u32 version;
+  u32 context;
+
+  u32 SID[32];
+  u32 SID_len;
+  u32 SID_offset;
+
+  /* here only for possible
+     forward compatibiliy
+  */
+  // u8 cipher_algo[16];
+  // u8 hash_algo[16];
+
+  u32 iv[4];
+  u32 contents_len;
+  u32 contents[128];
+
+} dpapimk_t;
+
+typedef struct jks_sha1
+{
+  u32 checksum[5];
+  u32 iv[5];
+  u32 enc_key_buf[4096];
+  u32 enc_key_len;
+  u32 der[5];
+  u32 alias[16];
+
+} jks_sha1_t;
+
+typedef struct ethereum_pbkdf2
+{
+  u32 salt_buf[16];
+  u32 ciphertext[8];
+
+} ethereum_pbkdf2_t;
+
+typedef struct ethereum_scrypt
+{
+  u32 salt_buf[16];
+  u32 ciphertext[8];
+
+} ethereum_scrypt_t;
+
+typedef struct luks_tmp
+{
+  u32 ipad32[8];
+  u64 ipad64[8];
+
+  u32 opad32[8];
+  u64 opad64[8];
+
+  u32 dgst32[32];
+  u64 dgst64[16];
+
+  u32 out32[32];
+  u64 out64[16];
+
+} luks_tmp_t;
 
 typedef struct pdf14_tmp
 {
@@ -779,18 +845,13 @@ typedef struct seven_zip_hook_salt
 
   u8  data_type;
 
-  u32 data_buf[2048];
+  u32 data_buf[81882];
   u32 data_len;
 
   u32 unpack_size;
 
   char coder_attributes[5 + 1];
   u8   coder_attributes_len;
-
-  u32 margin;
-
-  bool padding_check_full;
-  bool padding_check_fast;
 
   int aes_len; // pre-computed length of the maximal (subset of) data we need for AES-CBC
 
@@ -809,6 +870,24 @@ typedef struct keepass_tmp
   u32 tmp_digest[8];
 
 } keepass_tmp_t;
+
+typedef struct dpapimk_tmp
+{
+  /* dedicated to hmac-sha1 */
+  u32 ipad[5];
+  u32 opad[5];
+  u32 dgst[10];
+  u32 out[10];
+
+  u32 userKey[5];
+
+  /* dedicated to hmac-sha512 */
+  u64 ipad64[8];
+  u64 opad64[8];
+  u64 dgst64[16];
+  u64 out64[16];
+
+} dpapimk_tmp_t;
 
 typedef struct seven_zip_hook
 {
@@ -968,10 +1047,10 @@ typedef enum display_len
   DISPLAY_LEN_MAX_1750H = 128 + 1 + 102,
   DISPLAY_LEN_MIN_1800  = 90 + 0,
   DISPLAY_LEN_MAX_1800  = 90 + 16,
-  DISPLAY_LEN_MIN_2100  = 6 + 1 + 1 + 32 + 1 + 0,
-  DISPLAY_LEN_MAX_2100  = 6 + 5 + 1 + 32 + 1 + 19,
-  DISPLAY_LEN_MIN_2100H = 6 + 1 + 1 + 32 + 1 + 0,
-  DISPLAY_LEN_MAX_2100H = 6 + 5 + 1 + 32 + 1 + 38,
+  DISPLAY_LEN_MIN_2100  = 6 + 1 + 1 +   1 + 1 + 32,
+  DISPLAY_LEN_MAX_2100  = 6 + 5 + 1 + 256 + 1 + 32,
+  DISPLAY_LEN_MIN_2100H = 6 + 1 + 1 +   2 + 1 + 32,
+  DISPLAY_LEN_MAX_2100H = 6 + 5 + 1 + 512 + 1 + 32,
   DISPLAY_LEN_MIN_2400  = 16,
   DISPLAY_LEN_MAX_2400  = 16,
   DISPLAY_LEN_MIN_2410  = 16 + 1 + 0,
@@ -1128,8 +1207,8 @@ typedef enum display_len
   DISPLAY_LEN_MAX_11400 = 6 + 512 + 1 + 512 + 1 + 116 + 1 + 116 + 1 + 246 + 1 + 245 + 1 + 246 + 1 + 245 + 1 + 50 + 1 + 50 + 1 + 50 + 1 + 50 + 1 + 3 + 1 + 32,
   DISPLAY_LEN_MIN_11500 = 8 + 1 + 8,
   DISPLAY_LEN_MAX_11500 = 8 + 1 + 8,
-  DISPLAY_LEN_MIN_11600 = 1 + 2 + 1 + 1 + 1 + 1 + 1 + 1 + 1 +  0 + 1 + 1 + 1 + 32 + 1 +  1 + 1 + 1 + 1 + 1 + 1 +     2,
-  DISPLAY_LEN_MAX_11600 = 1 + 2 + 1 + 1 + 1 + 2 + 1 + 1 + 1 + 64 + 1 + 1 + 1 + 32 + 1 + 10 + 1 + 4 + 1 + 4 + 1 + 16384+ /* only for compression: */ + 1 + 4 + 1 + 10,
+  DISPLAY_LEN_MIN_11600 = 1 + 2 + 1 + 1 + 1 + 1 + 1 + 1 + 1 +  0 + 1 + 1 + 1 + 32 + 1 +  1 + 1 + 1 + 1 + 1 + 1 +      2 + 0 + 0 + 0 +  0,
+  DISPLAY_LEN_MAX_11600 = 1 + 2 + 1 + 1 + 1 + 2 + 1 + 1 + 1 + 64 + 1 + 1 + 1 + 32 + 1 + 10 + 1 + 4 + 1 + 4 + 1 + 655056 + 1 + 4 + 1 + 10,
   DISPLAY_LEN_MIN_11700 = 64,
   DISPLAY_LEN_MAX_11700 = 64,
   DISPLAY_LEN_MIN_11800 = 128,
@@ -1190,6 +1269,16 @@ typedef enum display_len
   DISPLAY_LEN_MAX_15100 = 6 + 6 + 1 + 8 + 1 + 28,
   DISPLAY_LEN_MIN_15200 =  1 + 10 + 1 + 2 + 1 + 1 + 1 + 1 + 1 + 64,
   DISPLAY_LEN_MAX_15200 =  1 + 10 + 1 + 2 + 1 + 8 + 1 + 5 + 1 + 20000,
+  DISPLAY_LEN_MIN_15300 =  1 + 7 + 1 + 1 + 1 + 1 + 1 +  10 + 1 + 4 + 1 + 4 + 1 +  1 + 1 + 32 + 1 + 3 + 1 + 128,
+  DISPLAY_LEN_MAX_15300 =  1 + 7 + 1 + 1 + 1 + 1 + 1 + 100 + 1 + 6 + 1 + 6 + 1 + 10 + 1 + 32 + 1 + 4 + 1 + 512,
+  DISPLAY_LEN_MIN_15400 = 10 + 1 + 16 + 1 + 1 + 1 + 16 + 1 + 16 + 1 + 16,
+  DISPLAY_LEN_MAX_15400 = 10 + 1 + 16 + 1 + 2 + 1 + 16 + 1 + 16 + 1 + 16,
+  DISPLAY_LEN_MIN_15500 = 10 + 1 + 40 + 1 + 40 + 1 +     1 + 1 + 2 + 1 + 28 + 1 +  1,
+  DISPLAY_LEN_MAX_15500 = 10 + 1 + 40 + 1 + 40 + 1 + 16384 + 1 + 2 + 1 + 28 + 1 + 64,
+  DISPLAY_LEN_MIN_15600 = 11 + 1 + 1 + 1 + 32 + 1 + 64 + 1 + 64,
+  DISPLAY_LEN_MAX_15600 = 11 + 1 + 6 + 1 + 64 + 1 + 64 + 1 + 64,
+  DISPLAY_LEN_MIN_15700 = 11 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 64 + 1 + 64 + 1 + 64,
+  DISPLAY_LEN_MAX_15700 = 11 + 1 + 6 + 1 + 1 + 1 + 1 + 1 + 64 + 1 + 64 + 1 + 64,
   DISPLAY_LEN_MIN_99999 = 1,
   DISPLAY_LEN_MAX_99999 = 55,
 
@@ -1329,6 +1418,9 @@ typedef enum hash_type
   HASH_TYPE_ITUNES_BACKUP_10    = 57,
   HASH_TYPE_SKIP32              = 58,
   HASH_TYPE_BLAKE2B             = 59,
+  HASH_TYPE_CHACHA20            = 60,
+  HASH_TYPE_DPAPIMK             = 61,
+  HASH_TYPE_JKS_SHA1            = 62,
 
 } hash_type_t;
 
@@ -1518,6 +1610,11 @@ typedef enum kern_type
   KERN_TYPE_SKIP32                  = 14900,
   KERN_TYPE_FILEZILLA_SERVER        = 15000,
   KERN_TYPE_NETBSD_SHA1CRYPT        = 15100,
+  KERN_TYPE_DPAPIMK                 = 15300,
+  KERN_TYPE_CHACHA20                = 15400,
+  KERN_TYPE_JKS_SHA1                = 15500,
+  KERN_TYPE_ETHEREUM_PBKDF2         = 15600,
+  KERN_TYPE_ETHEREUM_SCRYPT         = 15700,
   KERN_TYPE_PLAINTEXT               = 99999,
 
 } kern_type_t;
@@ -1588,6 +1685,8 @@ typedef enum rounds_count
    ROUNDS_ITUNES102_BACKUP   = 10000,
    ROUNDS_ATLASSIAN          = 10000,
    ROUNDS_NETBSD_SHA1CRYPT   = 20000,
+   ROUNDS_DPAPIMK            = 24000 - 1, // from 4000 to 24000 (possibly more)
+   ROUNDS_ETHEREUM_PBKDF2    = 262144 - 1,
    ROUNDS_STDOUT             = 0
 
 } rounds_count_t;
@@ -1609,6 +1708,7 @@ int postgresql_parse_hash         (u8 *input_buf, u32 input_len, hash_t *hash_bu
 int netscreen_parse_hash          (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
 int keccak_parse_hash             (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
 int blake2b_parse_hash            (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
+int chacha20_parse_hash           (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
 int lm_parse_hash                 (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
 int md4_parse_hash                (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
 int md5_parse_hash                (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
@@ -1766,12 +1866,16 @@ int sha256b64s_parse_hash         (u8 *input_buf, u32 input_len, hash_t *hash_bu
 int filezilla_server_parse_hash   (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
 int netbsd_sha1crypt_parse_hash   (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
 int atlassian_parse_hash          (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
+int dpapimk_parse_hash            (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
+int jks_sha1_parse_hash           (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
+int ethereum_pbkdf2_parse_hash    (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
+int ethereum_scrypt_parse_hash    (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
 
 /**
  * hook functions
  */
 
-void seven_zip_hook_func (hc_device_param_t *device_param, hashes_t *hashes, const u32 salt_pos, const u32 pws_cnt);
+void seven_zip_hook_func (hc_device_param_t *device_param, void *hook_salts_buf, const u32 salt_pos, const u32 pws_cnt);
 
 /**
  * output functions
@@ -1786,12 +1890,13 @@ void to_hccapx_t (hashcat_ctx_t *hashcat_ctx, hccapx_t *hccapx, const u32 salt_p
 
 int ascii_digest (hashcat_ctx_t *hashcat_ctx, char *out_buf, const size_t out_len, const u32 salt_pos, const u32 digest_pos);
 
-int         hashconfig_init               (hashcat_ctx_t *hashcat_ctx);
-void        hashconfig_destroy            (hashcat_ctx_t *hashcat_ctx);
-u32         hashconfig_get_kernel_threads (hashcat_ctx_t *hashcat_ctx, const hc_device_param_t *device_param);
-u32         hashconfig_get_kernel_loops   (hashcat_ctx_t *hashcat_ctx);
-int         hashconfig_general_defaults   (hashcat_ctx_t *hashcat_ctx);
-void        hashconfig_benchmark_defaults (hashcat_ctx_t *hashcat_ctx, salt_t *salt, void *esalt, void *hook_salt);
-const char *hashconfig_benchmark_mask     (hashcat_ctx_t *hashcat_ctx);
+int         hashconfig_init                   (hashcat_ctx_t *hashcat_ctx);
+void        hashconfig_destroy                (hashcat_ctx_t *hashcat_ctx);
+u32         hashconfig_forced_kernel_threads  (hashcat_ctx_t *hashcat_ctx);
+u32         hashconfig_get_kernel_threads     (hashcat_ctx_t *hashcat_ctx, const hc_device_param_t *device_param);
+u32         hashconfig_get_kernel_loops       (hashcat_ctx_t *hashcat_ctx);
+int         hashconfig_general_defaults       (hashcat_ctx_t *hashcat_ctx);
+void        hashconfig_benchmark_defaults     (hashcat_ctx_t *hashcat_ctx, salt_t *salt, void *esalt, void *hook_salt);
+const char *hashconfig_benchmark_mask         (hashcat_ctx_t *hashcat_ctx);
 
 #endif // _INTERFACE_H

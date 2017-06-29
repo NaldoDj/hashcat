@@ -42,7 +42,7 @@ int build_plain (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, pl
 
     if (rc == -1) return -1;
 
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < 64; i++)
     {
       plain_buf[i] = pw.i[i];
     }
@@ -63,7 +63,7 @@ int build_plain (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, pl
 
     if (rc == -1) return -1;
 
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < 64; i++)
     {
       plain_buf[i] = pw.i[i];
     }
@@ -84,20 +84,29 @@ int build_plain (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, pl
       memcpy (plain_ptr, comb_buf, comb_len);
     }
 
-    int pw_max_combi;
+    plain_len += comb_len;
 
-    if (hashconfig->pw_max < PW_DICTMAX)
+    if (user_options->length_limit_disable == true)
     {
-      pw_max_combi = hashconfig->pw_max;
+      int pw_max_combi;
+
+      #define PW_DICTMAX 32
+
+      if (hashconfig->pw_max < PW_DICTMAX)
+      {
+        pw_max_combi = hashconfig->pw_max;
+      }
+      else
+      {
+        pw_max_combi = PW_MAX_OLD;
+      }
+
+      plain_len = MIN ((int) plain_len, (int) pw_max_combi);
     }
     else
     {
-      pw_max_combi = PW_MAX;
+      plain_len = MIN ((int) plain_len, (int) hashconfig->pw_max);
     }
-
-    plain_len += comb_len;
-
-    if (plain_len > pw_max_combi) plain_len = pw_max_combi;
   }
   else if (user_options->attack_mode == ATTACK_MODE_BF)
   {
@@ -123,7 +132,7 @@ int build_plain (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, pl
 
     if (rc == -1) return -1;
 
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < 64; i++)
     {
       plain_buf[i] = pw.i[i];
     }
@@ -149,7 +158,7 @@ int build_plain (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, pl
 
     if (rc == -1) return -1;
 
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < 64; i++)
     {
       plain_buf[i] = pw.i[i];
     }
@@ -182,9 +191,18 @@ int build_plain (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, pl
         }
       }
 
-      if (hashconfig->opts_type & OPTS_TYPE_PT_UNICODE)
+      if (hashconfig->opts_type & OPTS_TYPE_PT_UTF16LE)
       {
         for (int i = 0, j = 0; i < plain_len; i += 2, j += 1)
+        {
+          plain_ptr[j] = plain_ptr[i];
+        }
+
+        plain_len = plain_len / 2;
+      }
+      else if (hashconfig->opts_type & OPTS_TYPE_PT_UTF16BE)
+      {
+        for (int i = 1, j = 0; i < plain_len; i += 2, j += 1)
         {
           plain_ptr[j] = plain_ptr[i];
         }

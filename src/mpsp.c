@@ -7,12 +7,14 @@
 #include "types.h"
 #include "memory.h"
 #include "event.h"
+#include "bitops.h"
 #include "logfile.h"
 #include "convert.h"
 #include "filehandling.h"
 #include "interface.h"
 #include "opencl.h"
 #include "shared.h"
+#include "ext_lzma.h"
 #include "mpsp.h"
 
 static const char DEF_MASK[] = "?1?2?2?2?2?2?2?3?3?3?3?d?d?d?d";
@@ -47,7 +49,7 @@ static void mp_css_split_cnt (hashcat_ctx_t *hashcat_ctx, const u32 css_cnt_orig
     }
     else
     {
-      if (hashconfig->opts_type & OPTS_TYPE_PT_UNICODE)
+      if ((hashconfig->opts_type & OPTS_TYPE_PT_UTF16LE) || (hashconfig->opts_type & OPTS_TYPE_PT_UTF16BE))
       {
         if (css_cnt_orig == 8 || css_cnt_orig == 10)
         {
@@ -122,26 +124,50 @@ static int mp_css_append_salt (hashcat_ctx_t *hashcat_ctx, salt_t *salt_buf)
   return 0;
 }
 
-static int mp_css_unicode_expand (hashcat_ctx_t *hashcat_ctx)
+static int mp_css_utf16le_expand (hashcat_ctx_t *hashcat_ctx)
 {
   mask_ctx_t *mask_ctx = hashcat_ctx->mask_ctx;
 
-  u32 css_cnt_unicode = mask_ctx->css_cnt * 2;
+  u32 css_cnt_utf16le = mask_ctx->css_cnt * 2;
 
-  cs_t *css_buf_unicode = (cs_t *) hccalloc (css_cnt_unicode, sizeof (cs_t));
+  cs_t *css_buf_utf16le = (cs_t *) hccalloc (css_cnt_utf16le, sizeof (cs_t));
 
   for (u32 i = 0, j = 0; i < mask_ctx->css_cnt; i += 1, j += 2)
   {
-    memcpy (&css_buf_unicode[j + 0], &mask_ctx->css_buf[i], sizeof (cs_t));
+    memcpy (&css_buf_utf16le[j + 0], &mask_ctx->css_buf[i], sizeof (cs_t));
 
-    css_buf_unicode[j + 1].cs_buf[0] = 0;
-    css_buf_unicode[j + 1].cs_len    = 1;
+    css_buf_utf16le[j + 1].cs_buf[0] = 0;
+    css_buf_utf16le[j + 1].cs_len    = 1;
   }
 
   hcfree (mask_ctx->css_buf);
 
-  mask_ctx->css_buf = css_buf_unicode;
-  mask_ctx->css_cnt = css_cnt_unicode;
+  mask_ctx->css_buf = css_buf_utf16le;
+  mask_ctx->css_cnt = css_cnt_utf16le;
+
+  return 0;
+}
+
+static int mp_css_utf16be_expand (hashcat_ctx_t *hashcat_ctx)
+{
+  mask_ctx_t *mask_ctx = hashcat_ctx->mask_ctx;
+
+  u32 css_cnt_utf16be = mask_ctx->css_cnt * 2;
+
+  cs_t *css_buf_utf16be = (cs_t *) hccalloc (css_cnt_utf16be, sizeof (cs_t));
+
+  for (u32 i = 0, j = 0; i < mask_ctx->css_cnt; i += 1, j += 2)
+  {
+    css_buf_utf16be[j + 0].cs_buf[0] = 0;
+    css_buf_utf16be[j + 0].cs_len    = 1;
+
+    memcpy (&css_buf_utf16be[j + 1], &mask_ctx->css_buf[i], sizeof (cs_t));
+  }
+
+  hcfree (mask_ctx->css_buf);
+
+  mask_ctx->css_buf = css_buf_utf16be;
+  mask_ctx->css_cnt = css_cnt_utf16be;
 
   return 0;
 }
@@ -654,6 +680,15 @@ static int sp_setup_tbl (hashcat_ctx_t *hashcat_ctx)
     hcstat = hcstat_tmp;
   }
 
+  hc_stat_t s;
+
+  if (hc_stat (hcstat, &s) == -1)
+  {
+    event_log_error (hashcat_ctx, "%s: %s", hcstat, strerror (errno));
+
+    return -1;
+  }
+
   FILE *fd = fopen (hcstat, "rb");
 
   if (fd == NULL)
@@ -663,25 +698,89 @@ static int sp_setup_tbl (hashcat_ctx_t *hashcat_ctx)
     return -1;
   }
 
-  if (fread (root_stats_buf, sizeof (u64), SP_ROOT_CNT, fd) != SP_ROOT_CNT)
+  u8 *inbuf = (u8 *) hcmalloc (s.st_size);
+
+  SizeT inlen = (SizeT) fread (inbuf, 1, s.st_size, fd);
+
+  if (inlen != (SizeT) s.st_size)
   {
-    event_log_error (hashcat_ctx, "%s: Could not load data.", hcstat);
+    event_log_error (hashcat_ctx, "%s: Could not read data.", hcstat);
 
     fclose (fd);
 
-    return -1;
-  }
-
-  if (fread (markov_stats_buf, sizeof (u64), SP_MARKOV_CNT, fd) != SP_MARKOV_CNT)
-  {
-    event_log_error (hashcat_ctx, "%s: Could not load data.", hcstat);
-
-    fclose (fd);
+    hcfree (inbuf);
 
     return -1;
   }
 
   fclose (fd);
+
+  u8 *outbuf = (u8 *) hcmalloc (SP_FILESZ);
+
+  SizeT outlen = SP_FILESZ;
+
+  const char props = 0x1c; // lzma properties constant, retrieved with 7z2hashcat
+
+  const SRes res = hc_lzma2_decompress (inbuf, &inlen, outbuf, &outlen, &props);
+
+  if (res != SZ_OK)
+  {
+    event_log_error (hashcat_ctx, "%s: Could not uncompress data.", hcstat);
+
+    hcfree (inbuf);
+    hcfree (outbuf);
+
+    return -1;
+  }
+
+  if (outlen != SP_FILESZ)
+  {
+    event_log_error (hashcat_ctx, "%s: Could not uncompress data.", hcstat);
+
+    hcfree (inbuf);
+    hcfree (outbuf);
+
+    return -1;
+  }
+
+  u64 *ptr = (u64 *) outbuf;
+
+  u64 v = *ptr++;
+  u64 z = *ptr++;
+
+  memcpy (root_stats_buf,   ptr, sizeof (u64) * SP_ROOT_CNT);   ptr += SP_ROOT_CNT;
+  memcpy (markov_stats_buf, ptr, sizeof (u64) * SP_MARKOV_CNT); ptr += SP_MARKOV_CNT;
+
+  hcfree (inbuf);
+  hcfree (outbuf);
+
+  /**
+   * switch endianess
+   */
+
+  v = byte_swap_64 (v);
+  z = byte_swap_64 (z);
+
+  for (int i = 0; i < SP_ROOT_CNT; i++)   root_stats_buf[i]   = byte_swap_64 (root_stats_buf[i]);
+  for (int i = 0; i < SP_MARKOV_CNT; i++) markov_stats_buf[i] = byte_swap_64 (markov_stats_buf[i]);
+
+  /**
+   * verify header
+   */
+
+  if (v != SP_VERSION)
+  {
+    event_log_error (hashcat_ctx, "%s: Invalid header", hcstat);
+
+    return -1;
+  }
+
+  if (z != 0)
+  {
+    event_log_error (hashcat_ctx, "%s: Invalid header", hcstat);
+
+    return -1;
+  }
 
   /**
    * Markov modifier of hcstat_table on user request
@@ -1165,9 +1264,15 @@ int mask_ctx_update_loop (hashcat_ctx_t *hashcat_ctx)
         return 0;
       }
 
-      if (hashconfig->opts_type & OPTS_TYPE_PT_UNICODE)
+      if (hashconfig->opts_type & OPTS_TYPE_PT_UTF16LE)
       {
-        const int rc = mp_css_unicode_expand (hashcat_ctx);
+        const int rc = mp_css_utf16le_expand (hashcat_ctx);
+
+        if (rc == -1) return -1;
+      }
+      else if (hashconfig->opts_type & OPTS_TYPE_PT_UTF16BE)
+      {
+        const int rc = mp_css_utf16be_expand (hashcat_ctx);
 
         if (rc == -1) return -1;
       }
