@@ -4,6 +4,8 @@
  */
 
 #include "common.h"
+#include "types.h"
+#include "shared.h"
 #include "usage.h"
 
 static const char *USAGE_MINI[] =
@@ -183,6 +185,7 @@ static const char *USAGE_BIG[] =
   "  12100 | PBKDF2-HMAC-SHA512                               | Generic KDF",
   "     23 | Skype                                            | Network Protocols",
   "   2500 | WPA/WPA2                                         | Network Protocols",
+  "   2501 | WPA/WPA2 PMK                                     | Network Protocols",
   "   4800 | iSCSI CHAP authentication, MD5(CHAP)             | Network Protocols",
   "   5300 | IKE-PSK MD5                                      | Network Protocols",
   "   5400 | IKE-PSK SHA1                                     | Network Protocols",
@@ -449,7 +452,7 @@ void usage_mini_print (const char *progname)
   {
     printf (USAGE_MINI[i], progname);
 
-    fwrite (EOL, strlen (EOL), 1, stdout);
+    hc_fwrite (EOL, strlen (EOL), 1, stdout);
   }
 }
 
@@ -459,6 +462,6 @@ void usage_big_print (const char *progname)
   {
     printf (USAGE_BIG[i], progname);
 
-    fwrite (EOL, strlen (EOL), 1, stdout);
+    hc_fwrite (EOL, strlen (EOL), 1, stdout);
   }
 }

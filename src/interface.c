@@ -18,6 +18,7 @@
 #include "cpu_sha1.h"
 #include "cpu_sha256.h"
 #include "cpu_blake2.h"
+#include "shared.h"
 #include "interface.h"
 #include "ext_lzma.h"
 
@@ -26,6 +27,7 @@ static char ST_PASS_HASHCAT_EXCL[]  = "hashcat!";
 static char ST_PASS_HASHCAT_EXCL3[] = "hashcat!!!";
 static char ST_PASS_HASHCAT_ONE[]   = "hashcat1";
 static char ST_PASS_HASHCAT_ONET3[] = "hashcat1hashcat1hashcat1";
+static char ST_PASS_HEX_02501[]     = "d57c2900bd83d5098003bf803ad7e204260a84ac164f12e03552d92280a6943e";
 static char ST_PASS_BIN_09710[]     = "\x91\xb2\xe0\x62\xb9";
 static char ST_PASS_BIN_09810[]     = "\xb8\xf6\x36\x19\xca";
 static char ST_PASS_BIN_10410[]     = "\x6a\x8a\xed\xcc\xb7";
@@ -105,6 +107,7 @@ static char ST_HASH_01800[] = "$6$72820166$U4DVzpcYxgw7MVVDGGvB2/H5lRistD5.Ah4up
 static char ST_HASH_02100[] = "$DCC2$10240#6848#e2829c8af2232fa53797e2f0e35e4626";
 static char ST_HASH_02400[] = "dRRVnUmUHXOTt9nk";
 static char ST_HASH_02500[] = "4843505804000000000235380000000000000000000000000000000000000000000000000000000000000151aecc428f182acefbd1a9e62d369a079265784da83ba4cf88375c44c830e6e5aa5d6faf352aa496a9ee129fb8292f7435df5420b823a1cd402aed449cced04f552c5b5acfebf06ae96a09c96d9a01c443a17aa62258c4f651a68aa67b0001030077fe010900200000000000000001a4cf88375c44c830e6e5aa5d6faf352aa496a9ee129fb8292f7435df5420b8230000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000018dd160050f20101000050f20201000050f20201000050f20200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+static char ST_HASH_02501[] = "48435058040000000013303638353333303430353632363637323238330000000000000000000000000002aa8c03531d05376358e25a5248ba2b45e2a2c5d4cf88d71258a797ac501653bbbb4512d8f1ab32584641df9e40e098c5df48acc3baa9ba60ea99968f9377d8a596d33fd762366677b37683fc00693899edc9569c284cbe15c570f56379000103007501010a00000000000000000001d71258a797ac501653bbbb4512d8f1ab32584641df9e40e098c5df48acc3baa9000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001630140100000fac040100000fac040100000fac020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 static char ST_HASH_02410[] = "YjDBNr.A0AN7DA8s:4684";
 static char ST_HASH_02600[] = "a936af92b0ae20b1ff6c3347a72e5fbe";
 static char ST_HASH_02611[] = "28f9975808ae2bdc5847b1cda26033ea:308";
@@ -365,6 +368,7 @@ static const char HT_02100[] = "Domain Cached Credentials 2 (DCC2), MS Cache 2";
 static const char HT_02400[] = "Cisco-PIX MD5";
 static const char HT_02410[] = "Cisco-ASA MD5";
 static const char HT_02500[] = "WPA/WPA2";
+static const char HT_02501[] = "WPA/WPA2 PMK";
 static const char HT_02600[] = "md5(md5($pass))";
 static const char HT_03000[] = "LM";
 static const char HT_03100[] = "Oracle H: Type (Oracle 7+)";
@@ -3304,7 +3308,7 @@ int wpa_parse_hash (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED
 
   salt->salt_len = salt_len;
 
-  salt->salt_iter = ROUNDS_WPA2 - 1;
+  salt->salt_iter = ROUNDS_WPA - 1;
 
   memcpy (wpa->essid, in.essid, in.essid_len);
 
@@ -3488,7 +3492,7 @@ int psafe2_parse_hash (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNU
 
   memset (&buf, 0, sizeof (psafe2_hdr));
 
-  const size_t n = fread (&buf, sizeof (psafe2_hdr), 1, fp);
+  const size_t n = hc_fread (&buf, sizeof (psafe2_hdr), 1, fp);
 
   fclose (fp);
 
@@ -3525,7 +3529,7 @@ int psafe3_parse_hash (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNU
 
   memset (&in, 0, sizeof (psafe3_t));
 
-  const size_t n = fread (&in, sizeof (psafe3_t), 1, fp);
+  const size_t n = hc_fread (&in, sizeof (psafe3_t), 1, fp);
 
   fclose (fp);
 
@@ -6185,7 +6189,7 @@ int truecrypt_parse_hash_1k (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAY
 
   char buf[512] = { 0 };
 
-  const size_t n = fread (buf, 1, sizeof (buf), fp);
+  const size_t n = hc_fread (buf, 1, sizeof (buf), fp);
 
   fclose (fp);
 
@@ -6224,7 +6228,7 @@ int truecrypt_parse_hash_2k (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAY
 
   char buf[512] = { 0 };
 
-  const size_t n = fread (buf, 1, sizeof (buf), fp);
+  const size_t n = hc_fread (buf, 1, sizeof (buf), fp);
 
   fclose (fp);
 
@@ -6263,7 +6267,7 @@ int veracrypt_parse_hash_200000 (u8 *input_buf, u32 input_len, hash_t *hash_buf,
 
   char buf[512] = { 0 };
 
-  const size_t n = fread (buf, 1, sizeof (buf), fp);
+  const size_t n = hc_fread (buf, 1, sizeof (buf), fp);
 
   fclose (fp);
 
@@ -6302,7 +6306,7 @@ int veracrypt_parse_hash_500000 (u8 *input_buf, u32 input_len, hash_t *hash_buf,
 
   char buf[512] = { 0 };
 
-  const size_t n = fread (buf, 1, sizeof (buf), fp);
+  const size_t n = hc_fread (buf, 1, sizeof (buf), fp);
 
   fclose (fp);
 
@@ -6341,7 +6345,7 @@ int veracrypt_parse_hash_327661 (u8 *input_buf, u32 input_len, hash_t *hash_buf,
 
   char buf[512] = { 0 };
 
-  const size_t n = fread (buf, 1, sizeof (buf), fp);
+  const size_t n = hc_fread (buf, 1, sizeof (buf), fp);
 
   fclose (fp);
 
@@ -6380,7 +6384,7 @@ int veracrypt_parse_hash_655331 (u8 *input_buf, u32 input_len, hash_t *hash_buf,
 
   char buf[512] = { 0 };
 
-  const size_t n = fread (buf, 1, sizeof (buf), fp);
+  const size_t n = hc_fread (buf, 1, sizeof (buf), fp);
 
   fclose (fp);
 
@@ -14361,7 +14365,7 @@ int luks_parse_hash (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSE
 
   struct luks_phdr hdr;
 
-  const size_t nread = fread (&hdr, sizeof (hdr), 1, fp);
+  const size_t nread = hc_fread (&hdr, sizeof (hdr), 1, fp);
 
   if (nread != 1)
   {
@@ -14615,7 +14619,7 @@ int luks_parse_hash (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSE
     return (PARSER_LUKS_FILE_SIZE);
   }
 
-  const size_t nread2 = fread (luks->af_src_buf, keyBytes, stripes, fp);
+  const size_t nread2 = hc_fread (luks->af_src_buf, keyBytes, stripes, fp);
 
   if (nread2 != stripes)
   {
@@ -14637,7 +14641,7 @@ int luks_parse_hash (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSE
     return (PARSER_LUKS_FILE_SIZE);
   }
 
-  const size_t nread3 = fread (luks->ct_buf, sizeof (u32), 128, fp);
+  const size_t nread3 = hc_fread (luks->ct_buf, sizeof (u32), 128, fp);
 
   if (nread3 != 128)
   {
@@ -15910,6 +15914,7 @@ char *strhashtype (const u32 hash_mode)
     case  2400: return ((char *) HT_02400);
     case  2410: return ((char *) HT_02410);
     case  2500: return ((char *) HT_02500);
+    case  2501: return ((char *) HT_02501);
     case  2600: return ((char *) HT_02600);
     case  2611: return ((char *) HT_02611);
     case  2612: return ((char *) HT_02612);
@@ -16128,7 +16133,7 @@ int check_old_hccap (const char *hashfile)
 
   u32 signature;
 
-  const size_t nread = fread (&signature, sizeof (u32), 1, fp);
+  const size_t nread = hc_fread (&signature, sizeof (u32), 1, fp);
 
   fclose (fp);
 
@@ -16947,7 +16952,7 @@ int ascii_digest (hashcat_ctx_t *hashcat_ctx, char *out_buf, const size_t out_le
 
     out_buf[16] = 0;
   }
-  else if (hash_mode == 2500)
+  else if ((hash_mode == 2500) || (hash_mode == 2501))
   {
     wpa_t *wpas = (wpa_t *) esalts_buf;
 
@@ -20475,7 +20480,8 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->kern_type      = KERN_TYPE_PHPASS;
                  hashconfig->dgst_size      = DGST_SIZE_4_4;
                  hashconfig->parse_func     = phpass_parse_hash;
-                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE;
+                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
                  hashconfig->dgst_pos2      = 2;
@@ -21257,6 +21263,24 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->st_pass        = ST_PASS_HASHCAT_EXCL;
                  break;
 
+    case  2501:  hashconfig->hash_type      = HASH_TYPE_WPA;
+                 hashconfig->salt_type      = SALT_TYPE_EMBEDDED;
+                 hashconfig->attack_exec    = ATTACK_EXEC_OUTSIDE_KERNEL;
+                 hashconfig->opts_type      = OPTS_TYPE_PT_GENERATE_LE
+                                            | OPTS_TYPE_BINARY_HASHFILE;
+                 hashconfig->kern_type      = KERN_TYPE_WPAPMK;
+                 hashconfig->dgst_size      = DGST_SIZE_4_4;
+                 hashconfig->parse_func     = wpa_parse_hash;
+                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP;
+                 hashconfig->dgst_pos0      = 0;
+                 hashconfig->dgst_pos1      = 1;
+                 hashconfig->dgst_pos2      = 2;
+                 hashconfig->dgst_pos3      = 3;
+                 hashconfig->st_hash        = ST_HASH_02501;
+                 hashconfig->st_pass        = ST_PASS_HEX_02501;
+                 break;
+
     case  2600:  hashconfig->hash_type      = HASH_TYPE_MD5;
                  hashconfig->salt_type      = SALT_TYPE_VIRTUAL;
                  hashconfig->attack_exec    = ATTACK_EXEC_INSIDE_KERNEL;
@@ -21792,7 +21816,8 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->kern_type      = KERN_TYPE_PSAFE3;
                  hashconfig->dgst_size      = DGST_SIZE_4_8;
                  hashconfig->parse_func     = psafe3_parse_hash;
-                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE;
+                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
                  hashconfig->dgst_pos2      = 2;
@@ -21958,7 +21983,8 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->kern_type      = KERN_TYPE_TCRIPEMD160_XTS512;
                  hashconfig->dgst_size      = DGST_SIZE_4_5;
                  hashconfig->parse_func     = truecrypt_parse_hash_2k;
-                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE;
+                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
                  hashconfig->dgst_pos2      = 2;
@@ -21975,7 +22001,8 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->kern_type      = KERN_TYPE_TCRIPEMD160_XTS1024;
                  hashconfig->dgst_size      = DGST_SIZE_4_5;
                  hashconfig->parse_func     = truecrypt_parse_hash_2k;
-                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE;
+                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
                  hashconfig->dgst_pos2      = 2;
@@ -21992,7 +22019,8 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->kern_type      = KERN_TYPE_TCRIPEMD160_XTS1536;
                  hashconfig->dgst_size      = DGST_SIZE_4_5;
                  hashconfig->parse_func     = truecrypt_parse_hash_2k;
-                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE;
+                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
                  hashconfig->dgst_pos2      = 2;
@@ -22010,6 +22038,7 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->dgst_size      = DGST_SIZE_8_8;
                  hashconfig->parse_func     = truecrypt_parse_hash_1k;
                  hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP
                                             | OPTI_TYPE_USES_BITS_64;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
@@ -22028,6 +22057,7 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->dgst_size      = DGST_SIZE_8_8;
                  hashconfig->parse_func     = truecrypt_parse_hash_1k;
                  hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP
                                             | OPTI_TYPE_USES_BITS_64;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
@@ -22046,6 +22076,7 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->dgst_size      = DGST_SIZE_8_8;
                  hashconfig->parse_func     = truecrypt_parse_hash_1k;
                  hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP
                                             | OPTI_TYPE_USES_BITS_64;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
@@ -22180,7 +22211,8 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->kern_type      = KERN_TYPE_SHA256AIX;
                  hashconfig->dgst_size      = DGST_SIZE_4_8;
                  hashconfig->parse_func     = sha256aix_parse_hash;
-                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE;
+                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
                  hashconfig->dgst_pos2      = 2;
@@ -22197,6 +22229,7 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->dgst_size      = DGST_SIZE_8_8;
                  hashconfig->parse_func     = sha512aix_parse_hash;
                  hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP
                                             | OPTI_TYPE_USES_BITS_64;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
@@ -22213,7 +22246,8 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->kern_type      = KERN_TYPE_AGILEKEY;
                  hashconfig->dgst_size      = DGST_SIZE_4_5; // because kernel uses _SHA1_
                  hashconfig->parse_func     = agilekey_parse_hash;
-                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE;
+                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
                  hashconfig->dgst_pos2      = 2;
@@ -22229,7 +22263,8 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->kern_type      = KERN_TYPE_SHA1AIX;
                  hashconfig->dgst_size      = DGST_SIZE_4_5;
                  hashconfig->parse_func     = sha1aix_parse_hash;
-                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE;
+                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
                  hashconfig->dgst_pos2      = 2;
@@ -22245,7 +22280,8 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->kern_type      = KERN_TYPE_LASTPASS;
                  hashconfig->dgst_size      = DGST_SIZE_4_8; // because kernel uses _SHA256_
                  hashconfig->parse_func     = lastpass_parse_hash;
-                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE;
+                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
                  hashconfig->dgst_pos2      = 2;
@@ -22595,7 +22631,8 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->kern_type      = KERN_TYPE_ANDROIDFDE;
                  hashconfig->dgst_size      = DGST_SIZE_4_4;
                  hashconfig->parse_func     = androidfde_parse_hash;
-                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE;
+                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
                  hashconfig->dgst_pos2      = 2;
@@ -22645,7 +22682,8 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->kern_type      = KERN_TYPE_LOTUS8;
                  hashconfig->dgst_size      = DGST_SIZE_4_4; // originally DGST_SIZE_4_2
                  hashconfig->parse_func     = lotus8_parse_hash;
-                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE;
+                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
                  hashconfig->dgst_pos2      = 2;
@@ -22694,7 +22732,8 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->kern_type      = KERN_TYPE_OFFICE2007;
                  hashconfig->dgst_size      = DGST_SIZE_4_4;
                  hashconfig->parse_func     = office2007_parse_hash;
-                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE;
+                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
                  hashconfig->dgst_pos2      = 2;
@@ -22710,7 +22749,8 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->kern_type      = KERN_TYPE_OFFICE2010;
                  hashconfig->dgst_size      = DGST_SIZE_4_4;
                  hashconfig->parse_func     = office2010_parse_hash;
-                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE;
+                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
                  hashconfig->dgst_pos2      = 2;
@@ -22726,7 +22766,8 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->kern_type      = KERN_TYPE_OFFICE2013;
                  hashconfig->dgst_size      = DGST_SIZE_4_4;
                  hashconfig->parse_func     = office2013_parse_hash;
-                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE;
+                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
                  hashconfig->dgst_pos2      = 2;
@@ -23660,6 +23701,7 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->dgst_size      = DGST_SIZE_8_8;
                  hashconfig->parse_func     = veracrypt_parse_hash_500000;
                  hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP
                                             | OPTI_TYPE_USES_BITS_64;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
@@ -23678,6 +23720,7 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->dgst_size      = DGST_SIZE_8_8;
                  hashconfig->parse_func     = veracrypt_parse_hash_500000;
                  hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP
                                             | OPTI_TYPE_USES_BITS_64;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
@@ -23696,6 +23739,7 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->dgst_size      = DGST_SIZE_8_8;
                  hashconfig->parse_func     = veracrypt_parse_hash_500000;
                  hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP
                                             | OPTI_TYPE_USES_BITS_64;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
@@ -23815,7 +23859,8 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->kern_type      = KERN_TYPE_VCSHA256_XTS512;
                  hashconfig->dgst_size      = DGST_SIZE_4_8;
                  hashconfig->parse_func     = veracrypt_parse_hash_500000;
-                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE;
+                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
                  hashconfig->dgst_pos2      = 2;
@@ -23832,7 +23877,8 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->kern_type      = KERN_TYPE_VCSHA256_XTS1024;
                  hashconfig->dgst_size      = DGST_SIZE_4_8;
                  hashconfig->parse_func     = veracrypt_parse_hash_500000;
-                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE;
+                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
                  hashconfig->dgst_pos2      = 2;
@@ -23849,7 +23895,8 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->kern_type      = KERN_TYPE_VCSHA256_XTS1536;
                  hashconfig->dgst_size      = DGST_SIZE_4_8;
                  hashconfig->parse_func     = veracrypt_parse_hash_500000;
-                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE;
+                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP;
                  hashconfig->dgst_pos0      = 0;
                  hashconfig->dgst_pos1      = 1;
                  hashconfig->dgst_pos2      = 2;
@@ -24315,6 +24362,7 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
   {
     case   600: hashconfig->esalt_size = sizeof (blake2_t);          break;
     case  2500: hashconfig->esalt_size = sizeof (wpa_t);             break;
+    case  2501: hashconfig->esalt_size = sizeof (wpa_t);             break;
     case  5300: hashconfig->esalt_size = sizeof (ikepsk_t);          break;
     case  5400: hashconfig->esalt_size = sizeof (ikepsk_t);          break;
     case  5500: hashconfig->esalt_size = sizeof (netntlm_t);         break;
@@ -24419,6 +24467,7 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
     case  1800: hashconfig->tmp_size = sizeof (sha512crypt_tmp_t);     break;
     case  2100: hashconfig->tmp_size = sizeof (dcc2_tmp_t);            break;
     case  2500: hashconfig->tmp_size = sizeof (wpa_tmp_t);             break;
+    case  2501: hashconfig->tmp_size = sizeof (wpapmk_tmp_t);          break;
     case  3200: hashconfig->tmp_size = sizeof (bcrypt_tmp_t);          break;
     case  5200: hashconfig->tmp_size = sizeof (pwsafe3_tmp_t);         break;
     case  5800: hashconfig->tmp_size = sizeof (androidpin_tmp_t);      break;
@@ -24511,31 +24560,33 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
     case 11600: hashconfig->hook_size = sizeof (seven_zip_hook_t);     break;
   };
 
-  // pw_min
+  // pw_min : algo specific hard min length
 
   hashconfig->pw_min = PW_MIN;
 
   switch (hashconfig->hash_mode)
   {
-    case  2500: hashconfig->pw_min = 8;
+    case  2500: hashconfig->pw_min = 8;  // WPA min
                 break;
-    case  9710: hashconfig->pw_min = 5;
+    case  2501: hashconfig->pw_min = 64; // WPA PMK min
                 break;
-    case  9810: hashconfig->pw_min = 5;
+    case  9710: hashconfig->pw_min = 5;  // RC4-40 min
                 break;
-    case 10410: hashconfig->pw_min = 5;
+    case  9810: hashconfig->pw_min = 5;  // RC4-40 min
                 break;
-    case 14000: hashconfig->pw_min = 8;
+    case 10410: hashconfig->pw_min = 5;  // RC4-40 min
                 break;
-    case 14100: hashconfig->pw_min = 24;
+    case 14000: hashconfig->pw_min = 8;  // DES min
                 break;
-    case 14900: hashconfig->pw_min = 10;
+    case 14100: hashconfig->pw_min = 24; // 3DES min
+                break;
+    case 14900: hashconfig->pw_min = 10; // Skip32 min
                 break;
   }
 
   // pw_max
 
-  if (user_options->length_limit_disable == false)
+  if (user_options->length_limit_disable == true)
   {
     hashconfig->pw_max = PW_MAX;
   }
@@ -24552,33 +24603,25 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
     {
       case   125: hashconfig->pw_max = 32;
                   break;
-      case   500: hashconfig->pw_max = 16;
+      case   500: hashconfig->pw_max = 15;
                   break;
-      case  1600: hashconfig->pw_max = 16;
+      case  1600: hashconfig->pw_max = 15;
                   break;
       case  1800: hashconfig->pw_max = 16;
-                  break;
-      case  2100: hashconfig->pw_max = 27;
                   break;
       case  5200: hashconfig->pw_max = 24;
                   break;
       case  5800: hashconfig->pw_max = 16;
                   break;
-      case  6300: hashconfig->pw_max = 16;
+      case  6300: hashconfig->pw_max = 15;
                   break;
       case  7000: hashconfig->pw_max = 19;
                   break;
-      case  7400: hashconfig->pw_max = 16;
+      case  7400: hashconfig->pw_max = 15;
                   break;
       case  7700: hashconfig->pw_max = 8;
                   break;
-      case  7900: hashconfig->pw_max = 48;
-                  break;
       case  8600: hashconfig->pw_max = 16;
-                  break;
-      case 10300: hashconfig->pw_max = 40;
-                  break;
-      case 10500: hashconfig->pw_max = 40;
                   break;
       case 10700: hashconfig->pw_max = 16;
                   break;
@@ -24597,41 +24640,151 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
       case 15500: hashconfig->pw_max = 16;
                   break;
     }
-
-    // fully converted to length 256
-
-    switch (hashconfig->hash_mode)
-    {
-      case   400: hashconfig->pw_max = 256;
-                  break;
-      case  2100: hashconfig->pw_max = 256;
-                  break;
-    }
   }
 
-  // pw_max : algo specific hard limits
+  // pw_max : some algo are converted to long password support but without dropping performance
 
   switch (hashconfig->hash_mode)
   {
-    case  1500: hashconfig->pw_max = 8;
+    case  5200: hashconfig->pw_max = PW_MAX;
                 break;
-    case  2500: hashconfig->pw_max = 64;
+    case  7900: hashconfig->pw_max = PW_MAX;
                 break;
-    case  3000: hashconfig->pw_max = 7;
+    case  9400: hashconfig->pw_max = PW_MAX;
                 break;
-    case  8500: hashconfig->pw_max = 8;
+    case  9500: hashconfig->pw_max = PW_MAX;
                 break;
-    case  9710: hashconfig->pw_max = 5;
+    case  9600: hashconfig->pw_max = PW_MAX;
                 break;
-    case  9810: hashconfig->pw_max = 5;
+    case 10300: hashconfig->pw_max = PW_MAX;
                 break;
-    case 10410: hashconfig->pw_max = 5;
+  }
+
+  // pw_max : algo specific hard max length
+
+  switch (hashconfig->hash_mode)
+  {
+    case  1500: hashconfig->pw_max = 8;   // DES max
                 break;
-    case 14000: hashconfig->pw_max = 8;
+    case  2100: hashconfig->pw_max = 64;  // PBKDF2-HMAC-SHA1 max
                 break;
-    case 14100: hashconfig->pw_max = 24;
+    case  2500: hashconfig->pw_max = 63;  // WPA max
                 break;
-    case 14900: hashconfig->pw_max = 10;
+    case  2501: hashconfig->pw_max = 64;  // WPA PMK max
+                break;
+    case  3000: hashconfig->pw_max = 7;   // LM half max
+                break;
+    case  3200: hashconfig->pw_max = 72;  // bcrypt max
+                break;
+    case  6211: hashconfig->pw_max = 64;  // PBKDF2-HMAC-RipeMD160 max
+                break;
+    case  6212: hashconfig->pw_max = 64;  // PBKDF2-HMAC-RipeMD160 max
+                break;
+    case  6213: hashconfig->pw_max = 64;  // PBKDF2-HMAC-RipeMD160 max
+                break;
+    case  6221: hashconfig->pw_max = 128; // PBKDF2-HMAC-SHA512 max
+                break;
+    case  6222: hashconfig->pw_max = 128; // PBKDF2-HMAC-SHA512 max
+                break;
+    case  6223: hashconfig->pw_max = 128; // PBKDF2-HMAC-SHA512 max
+                break;
+    case  6231: hashconfig->pw_max = 64;  // PBKDF2-HMAC-Whirlpool max
+                break;
+    case  6232: hashconfig->pw_max = 64;  // PBKDF2-HMAC-Whirlpool max
+                break;
+    case  6233: hashconfig->pw_max = 64;  // PBKDF2-HMAC-Whirlpool max
+                break;
+    case  6241: hashconfig->pw_max = 64;  // PBKDF2-HMAC-RipeMD160 max
+                break;
+    case  6242: hashconfig->pw_max = 64;  // PBKDF2-HMAC-RipeMD160 max
+                break;
+    case  6243: hashconfig->pw_max = 64;  // PBKDF2-HMAC-RipeMD160 max
+                break;
+    case  6400: hashconfig->pw_max = 64;  // PBKDF2-HMAC-SHA256 max
+                break;
+    case  6500: hashconfig->pw_max = 128; // PBKDF2-HMAC-SHA512 max
+                break;
+    case  6600: hashconfig->pw_max = 64;  // PBKDF2-HMAC-SHA1 max
+                break;
+    case  6700: hashconfig->pw_max = 64;  // PBKDF2-HMAC-SHA1 max
+                break;
+    case  6800: hashconfig->pw_max = 64;  // PBKDF2-HMAC-SHA256 max
+                break;
+    case  7100: hashconfig->pw_max = 128; // PBKDF2-HMAC-SHA512 max
+                break;
+    case  7200: hashconfig->pw_max = 128; // PBKDF2-HMAC-SHA512 max
+                break;
+    case  8200: hashconfig->pw_max = 128; // PBKDF2-HMAC-SHA512 max
+                break;
+    case  8500: hashconfig->pw_max = 8;   // DES max
+                break;
+    case  8800: hashconfig->pw_max = 64;  // PBKDF2-HMAC-SHA1 max
+                break;
+    case  8900: hashconfig->pw_max = 64;  // PBKDF2-HMAC-SHA256 max
+                break;
+    case  9100: hashconfig->pw_max = 64;  // Lotus Notes/Domino 8 max
+                break;
+    case  9200: hashconfig->pw_max = 64;  // PBKDF2-HMAC-SHA256 max
+                break;
+    case  9300: hashconfig->pw_max = 64;  // PBKDF2-HMAC-SHA256 max
+                break;
+    case  9710: hashconfig->pw_max = 5;   // RC4-40 max
+                break;
+    case  9810: hashconfig->pw_max = 5;   // RC4-40 max
+                break;
+    case 10000: hashconfig->pw_max = 64;  // PBKDF2-HMAC-SHA256 max
+                break;
+    case 10410: hashconfig->pw_max = 5;   // RC4-40 max
+                break;
+    case 10500: hashconfig->pw_max = 32;  // PDF 1.4 - 1.6 (Acrobat 5 - 8) max
+                break;
+    case 10900: hashconfig->pw_max = 64;  // PBKDF2-HMAC-SHA256 max
+                break;
+    case 12000: hashconfig->pw_max = 64;  // PBKDF2-HMAC-SHA1 max
+                break;
+    case 12001: hashconfig->pw_max = 64;  // PBKDF2-HMAC-SHA1 max
+                break;
+    case 13711: hashconfig->pw_max = 64;  // PBKDF2-HMAC-RipeMD160 max
+                break;
+    case 13712: hashconfig->pw_max = 64;  // PBKDF2-HMAC-RipeMD160 max
+                break;
+    case 13713: hashconfig->pw_max = 64;  // PBKDF2-HMAC-RipeMD160 max
+                break;
+    case 13721: hashconfig->pw_max = 128; // PBKDF2-HMAC-SHA512 max
+                break;
+    case 13722: hashconfig->pw_max = 128; // PBKDF2-HMAC-SHA512 max
+                break;
+    case 13723: hashconfig->pw_max = 128; // PBKDF2-HMAC-SHA512 max
+                break;
+    case 13731: hashconfig->pw_max = 64;  // PBKDF2-HMAC-Whirlpool max
+                break;
+    case 13732: hashconfig->pw_max = 64;  // PBKDF2-HMAC-Whirlpool max
+                break;
+    case 13733: hashconfig->pw_max = 64;  // PBKDF2-HMAC-Whirlpool max
+                break;
+    case 13741: hashconfig->pw_max = 64;  // PBKDF2-HMAC-RipeMD160 max
+                break;
+    case 13742: hashconfig->pw_max = 64;  // PBKDF2-HMAC-RipeMD160 max
+                break;
+    case 13743: hashconfig->pw_max = 64;  // PBKDF2-HMAC-RipeMD160 max
+                break;
+    case 13751: hashconfig->pw_max = 64;  // PBKDF2-HMAC-SHA256 max
+                break;
+    case 13752: hashconfig->pw_max = 64;  // PBKDF2-HMAC-SHA256 max
+                break;
+    case 13753: hashconfig->pw_max = 64;  // PBKDF2-HMAC-SHA256 max
+                break;
+    case 13761: hashconfig->pw_max = 64;  // PBKDF2-HMAC-SHA256 max
+                break;
+    case 13762: hashconfig->pw_max = 64;  // PBKDF2-HMAC-SHA256 max
+                break;
+    case 13763: hashconfig->pw_max = 64;  // PBKDF2-HMAC-SHA256 max
+                break;
+    case 14000: hashconfig->pw_max = 8;   // DES max
+                break;
+    case 14100: hashconfig->pw_max = 24;  // 3DES max
+                break;
+    case 14900: hashconfig->pw_max = 10;  // Skip32 max
                 break;
   }
 
@@ -24837,6 +24990,8 @@ void hashconfig_benchmark_defaults (hashcat_ctx_t *hashcat_ctx, salt_t *salt, vo
                   break;
       case  2500: memcpy (salt->salt_buf, "hashcat.net", 11);
                   break;
+      case  2501: memcpy (salt->salt_buf, "hashcat.net", 11);
+                  break;
       case  3100: salt->salt_len = 1;
                   break;
       case  5000: salt->keccak_mdlen = 32;
@@ -24919,6 +25074,8 @@ void hashconfig_benchmark_defaults (hashcat_ctx_t *hashcat_ctx, salt_t *salt, vo
     switch (hashconfig->hash_mode)
     {
       case  2500: ((wpa_t *)           esalt)->eapol_len    = 128;
+                  break;
+      case  2501: ((wpa_t *)           esalt)->eapol_len    = 128;
                   break;
       case  5300: ((ikepsk_t *)        esalt)->nr_len        = 1;
                   ((ikepsk_t *)        esalt)->msg_len       = 1;
@@ -25005,7 +25162,9 @@ void hashconfig_benchmark_defaults (hashcat_ctx_t *hashcat_ctx, salt_t *salt, vo
                  break;
     case  2100:  salt->salt_iter  = ROUNDS_DCC2;
                  break;
-    case  2500:  salt->salt_iter  = ROUNDS_WPA2;
+    case  2500:  salt->salt_iter  = ROUNDS_WPA;
+                 break;
+    case  2501:  salt->salt_iter  = ROUNDS_WPAPMK;
                  break;
     case  3200:  salt->salt_iter  = ROUNDS_BCRYPT;
                  break;
@@ -25188,6 +25347,8 @@ const char *hashconfig_benchmark_mask (hashcat_ctx_t *hashcat_ctx)
   switch (hashconfig->hash_mode)
   {
     case  2500: mask = "?a?a?a?a?a?a?a?a";
+                break;
+    case  2501: mask = "?a?a?a?a?a?a?a?axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
                 break;
     case  9710: mask = "?b?b?b?b?b";
                 break;

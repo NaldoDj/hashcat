@@ -1,8 +1,8 @@
 
 // important notes on this:
 // input buf unused bytes needs to be set to zero
-// input buf need to be in algorithm native byte order (md5 = LE, sha1 = BE, etc)
-// input buf need to be 64 byte aligned when usin md5_update()
+// input buf needs to be in algorithm native byte order (md5 = LE, sha1 = BE, etc)
+// input buf needs to be 64 byte aligned when using md5_update()
 
 typedef struct sha1_ctx
 {
@@ -42,7 +42,6 @@ void sha1_transform (const u32 w0[4], const u32 w1[4], const u32 w2[4], const u3
   u32 we_t = w3[2];
   u32 wf_t = w3[3];
 
-  #undef K
   #define K SHA1C00
 
   SHA1_STEP_S (SHA1_F0o, a, b, c, d, e, w0_t);
@@ -137,6 +136,8 @@ void sha1_transform (const u32 w0[4], const u32 w1[4], const u32 w2[4], const u3
   wd_t = rotl32_S ((wa_t ^ w5_t ^ wf_t ^ wd_t), 1u); SHA1_STEP_S (SHA1_F1, d, e, a, b, c, wd_t);
   we_t = rotl32_S ((wb_t ^ w6_t ^ w0_t ^ we_t), 1u); SHA1_STEP_S (SHA1_F1, c, d, e, a, b, we_t);
   wf_t = rotl32_S ((wc_t ^ w7_t ^ w1_t ^ wf_t), 1u); SHA1_STEP_S (SHA1_F1, b, c, d, e, a, wf_t);
+
+  #undef K
 
   digest[0] += a;
   digest[1] += b;
@@ -295,6 +296,92 @@ void sha1_update (sha1_ctx_t *ctx, const u32 *w, const int len)
   w3[1] = w[pos4 + 13];
   w3[2] = w[pos4 + 14];
   w3[3] = w[pos4 + 15];
+
+  sha1_update_64 (ctx, w0, w1, w2, w3, len - pos1);
+}
+
+void sha1_update_swap (sha1_ctx_t *ctx, const u32 *w, const int len)
+{
+  u32 w0[4];
+  u32 w1[4];
+  u32 w2[4];
+  u32 w3[4];
+
+  int pos1;
+  int pos4;
+
+  for (pos1 = 0, pos4 = 0; pos1 < len - 64; pos1 += 64, pos4 += 16)
+  {
+    w0[0] = w[pos4 +  0];
+    w0[1] = w[pos4 +  1];
+    w0[2] = w[pos4 +  2];
+    w0[3] = w[pos4 +  3];
+    w1[0] = w[pos4 +  4];
+    w1[1] = w[pos4 +  5];
+    w1[2] = w[pos4 +  6];
+    w1[3] = w[pos4 +  7];
+    w2[0] = w[pos4 +  8];
+    w2[1] = w[pos4 +  9];
+    w2[2] = w[pos4 + 10];
+    w2[3] = w[pos4 + 11];
+    w3[0] = w[pos4 + 12];
+    w3[1] = w[pos4 + 13];
+    w3[2] = w[pos4 + 14];
+    w3[3] = w[pos4 + 15];
+
+    w0[0] = swap32_S (w0[0]);
+    w0[1] = swap32_S (w0[1]);
+    w0[2] = swap32_S (w0[2]);
+    w0[3] = swap32_S (w0[3]);
+    w1[0] = swap32_S (w1[0]);
+    w1[1] = swap32_S (w1[1]);
+    w1[2] = swap32_S (w1[2]);
+    w1[3] = swap32_S (w1[3]);
+    w2[0] = swap32_S (w2[0]);
+    w2[1] = swap32_S (w2[1]);
+    w2[2] = swap32_S (w2[2]);
+    w2[3] = swap32_S (w2[3]);
+    w3[0] = swap32_S (w3[0]);
+    w3[1] = swap32_S (w3[1]);
+    w3[2] = swap32_S (w3[2]);
+    w3[3] = swap32_S (w3[3]);
+
+    sha1_update_64 (ctx, w0, w1, w2, w3, 64);
+  }
+
+  w0[0] = w[pos4 +  0];
+  w0[1] = w[pos4 +  1];
+  w0[2] = w[pos4 +  2];
+  w0[3] = w[pos4 +  3];
+  w1[0] = w[pos4 +  4];
+  w1[1] = w[pos4 +  5];
+  w1[2] = w[pos4 +  6];
+  w1[3] = w[pos4 +  7];
+  w2[0] = w[pos4 +  8];
+  w2[1] = w[pos4 +  9];
+  w2[2] = w[pos4 + 10];
+  w2[3] = w[pos4 + 11];
+  w3[0] = w[pos4 + 12];
+  w3[1] = w[pos4 + 13];
+  w3[2] = w[pos4 + 14];
+  w3[3] = w[pos4 + 15];
+
+  w0[0] = swap32_S (w0[0]);
+  w0[1] = swap32_S (w0[1]);
+  w0[2] = swap32_S (w0[2]);
+  w0[3] = swap32_S (w0[3]);
+  w1[0] = swap32_S (w1[0]);
+  w1[1] = swap32_S (w1[1]);
+  w1[2] = swap32_S (w1[2]);
+  w1[3] = swap32_S (w1[3]);
+  w2[0] = swap32_S (w2[0]);
+  w2[1] = swap32_S (w2[1]);
+  w2[2] = swap32_S (w2[2]);
+  w2[3] = swap32_S (w2[3]);
+  w3[0] = swap32_S (w3[0]);
+  w3[1] = swap32_S (w3[1]);
+  w3[2] = swap32_S (w3[2]);
+  w3[3] = swap32_S (w3[3]);
 
   sha1_update_64 (ctx, w0, w1, w2, w3, len - pos1);
 }
@@ -662,6 +749,11 @@ void sha1_hmac_update (sha1_hmac_ctx_t *ctx, const u32 *w, const int len)
   sha1_update (&ctx->ipad, w, len);
 }
 
+void sha1_hmac_update_swap (sha1_hmac_ctx_t *ctx, const u32 *w, const int len)
+{
+  sha1_update_swap (&ctx->ipad, w, len);
+}
+
 void sha1_hmac_update_global (sha1_hmac_ctx_t *ctx, const __global u32 *w, const int len)
 {
   sha1_update_global (&ctx->ipad, w, len);
@@ -753,7 +845,6 @@ void sha1_transform_vector (const u32x w0[4], const u32x w1[4], const u32x w2[4]
   u32x we_t = w3[2];
   u32x wf_t = w3[3];
 
-  #undef K
   #define K SHA1C00
 
   SHA1_STEP (SHA1_F0o, a, b, c, d, e, w0_t);
@@ -848,6 +939,8 @@ void sha1_transform_vector (const u32x w0[4], const u32x w1[4], const u32x w2[4]
   wd_t = rotl32 ((wa_t ^ w5_t ^ wf_t ^ wd_t), 1u); SHA1_STEP (SHA1_F1, d, e, a, b, c, wd_t);
   we_t = rotl32 ((wb_t ^ w6_t ^ w0_t ^ we_t), 1u); SHA1_STEP (SHA1_F1, c, d, e, a, b, we_t);
   wf_t = rotl32 ((wc_t ^ w7_t ^ w1_t ^ wf_t), 1u); SHA1_STEP (SHA1_F1, b, c, d, e, a, wf_t);
+
+  #undef K
 
   digest[0] += a;
   digest[1] += b;

@@ -11,6 +11,7 @@
 #include "inc_types.cl"
 #include "inc_common.cl"
 #include "inc_simd.cl"
+#include "inc_hash_md5.cl"
 
 #define MD5_STEP_REV(f,a,b,c,d,x,t,s)   \
 {                                       \
