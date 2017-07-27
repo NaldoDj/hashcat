@@ -37,9 +37,18 @@ int weak_hash_check (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param
 
   if (hashconfig->attack_exec == ATTACK_EXEC_INSIDE_KERNEL)
   {
-    CL_rc = run_kernel (hashcat_ctx, device_param, KERN_RUN_1, 1, false, 0);
+    if (hashconfig->opti_type & OPTI_TYPE_OPTIMIZED_KERNEL)
+    {
+      CL_rc = run_kernel (hashcat_ctx, device_param, KERN_RUN_1, 1, false, 0);
 
-    if (CL_rc == -1) return -1;
+      if (CL_rc == -1) return -1;
+    }
+    else
+    {
+      CL_rc = run_kernel (hashcat_ctx, device_param, KERN_RUN_4, 1, false, 0);
+
+      if (CL_rc == -1) return -1;
+    }
   }
   else
   {

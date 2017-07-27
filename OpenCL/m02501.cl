@@ -17,12 +17,12 @@
 #define COMPARE_S "inc_comp_single.cl"
 #define COMPARE_M "inc_comp_multi.cl"
 
-inline u8 hex_convert (const u8 c)
+u8 hex_convert (const u8 c)
 {
   return (c & 15) + (c >> 6) * 9;
 }
 
-inline u8 hex_to_u8 (const u8 hex[2])
+u8 hex_to_u8 (const u8 hex[2])
 {
   u8 v = 0;
 
@@ -68,14 +68,14 @@ __kernel void m02501_init (__global pw_t *pws, __global const kernel_rule_t *rul
     out_ptr[i] = hex_to_u8 (in_ptr + j);
   }
 
-  tmps[gid].out[0] = swap32 (out[0]);
-  tmps[gid].out[1] = swap32 (out[1]);
-  tmps[gid].out[2] = swap32 (out[2]);
-  tmps[gid].out[3] = swap32 (out[3]);
-  tmps[gid].out[4] = swap32 (out[4]);
-  tmps[gid].out[5] = swap32 (out[5]);
-  tmps[gid].out[6] = swap32 (out[6]);
-  tmps[gid].out[7] = swap32 (out[7]);
+  tmps[gid].out[0] = swap32_S (out[0]);
+  tmps[gid].out[1] = swap32_S (out[1]);
+  tmps[gid].out[2] = swap32_S (out[2]);
+  tmps[gid].out[3] = swap32_S (out[3]);
+  tmps[gid].out[4] = swap32_S (out[4]);
+  tmps[gid].out[5] = swap32_S (out[5]);
+  tmps[gid].out[6] = swap32_S (out[6]);
+  tmps[gid].out[7] = swap32_S (out[7]);
 }
 
 __kernel void m02501_loop (__global pw_t *pws, __global const kernel_rule_t *rules_buf, __global const pw_t *combs_buf, __global const bf_t *bfs_buf, __global wpapmk_tmp_t *tmps, __global void *hooks, __global const u32 *bitmaps_buf_s1_a, __global const u32 *bitmaps_buf_s1_b, __global const u32 *bitmaps_buf_s1_c, __global const u32 *bitmaps_buf_s1_d, __global const u32 *bitmaps_buf_s2_a, __global const u32 *bitmaps_buf_s2_b, __global const u32 *bitmaps_buf_s2_c, __global const u32 *bitmaps_buf_s2_d, __global plain_t *plains_buf, __global const digest_t *digests_buf, __global u32 *hashes_shown, __global const salt_t *salt_bufs, __global const wpa_t *wpa_bufs, __global u32 *d_return_buf, __global u32 *d_scryptV0_buf, __global u32 *d_scryptV1_buf, __global u32 *d_scryptV2_buf, __global u32 *d_scryptV3_buf, const u32 bitmap_mask, const u32 bitmap_shift1, const u32 bitmap_shift2, const u32 salt_pos, const u32 loop_pos, const u32 loop_cnt, const u32 il_cnt, const u32 digests_cnt, const u32 digests_offset, const u32 combs_mode, const u32 gid_max)
@@ -206,7 +206,7 @@ __kernel void m02501_comp (__global pw_t *pws, __global const kernel_rule_t *rul
 
     sha1_hmac_ctx_t ctx1;
 
-    sha1_hmac_init (&ctx1, w0, w1, w2, w3);
+    sha1_hmac_init_64 (&ctx1, w0, w1, w2, w3);
 
     sha1_hmac_update (&ctx1, pke, 100);
 
@@ -245,7 +245,7 @@ __kernel void m02501_comp (__global pw_t *pws, __global const kernel_rule_t *rul
 
       md5_hmac_ctx_t ctx2;
 
-      md5_hmac_init (&ctx2, t0, t1, t2, t3);
+      md5_hmac_init_64 (&ctx2, t0, t1, t2, t3);
 
       md5_hmac_update_global (&ctx2, wpa->eapol, wpa->eapol_len);
 
@@ -282,7 +282,7 @@ __kernel void m02501_comp (__global pw_t *pws, __global const kernel_rule_t *rul
 
       sha1_hmac_ctx_t ctx2;
 
-      sha1_hmac_init (&ctx2, t0, t1, t2, t3);
+      sha1_hmac_init_64 (&ctx2, t0, t1, t2, t3);
 
       sha1_hmac_update_global (&ctx2, wpa->eapol, wpa->eapol_len);
 
@@ -356,7 +356,7 @@ __kernel void m02501_comp (__global pw_t *pws, __global const kernel_rule_t *rul
 
     sha1_hmac_ctx_t ctx1;
 
-    sha1_hmac_init (&ctx1, w0, w1, w2, w3);
+    sha1_hmac_init_64 (&ctx1, w0, w1, w2, w3);
 
     sha1_hmac_update (&ctx1, pke, 100);
 
@@ -395,7 +395,7 @@ __kernel void m02501_comp (__global pw_t *pws, __global const kernel_rule_t *rul
 
       md5_hmac_ctx_t ctx2;
 
-      md5_hmac_init (&ctx2, t0, t1, t2, t3);
+      md5_hmac_init_64 (&ctx2, t0, t1, t2, t3);
 
       md5_hmac_update_global (&ctx2, wpa->eapol, wpa->eapol_len);
 
@@ -432,7 +432,7 @@ __kernel void m02501_comp (__global pw_t *pws, __global const kernel_rule_t *rul
 
       sha1_hmac_ctx_t ctx2;
 
-      sha1_hmac_init (&ctx2, t0, t1, t2, t3);
+      sha1_hmac_init_64 (&ctx2, t0, t1, t2, t3);
 
       sha1_hmac_update_global (&ctx2, wpa->eapol, wpa->eapol_len);
 

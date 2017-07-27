@@ -18,7 +18,6 @@ static int selftest (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param
   hashconfig_t         *hashconfig         = hashcat_ctx->hashconfig;
   hashes_t             *hashes             = hashcat_ctx->hashes;
   status_ctx_t         *status_ctx         = hashcat_ctx->status_ctx;
-  user_options_t       *user_options       = hashcat_ctx->user_options;
   user_options_extra_t *user_options_extra = hashcat_ctx->user_options_extra;
 
   cl_int CL_err;
@@ -306,13 +305,7 @@ static int selftest (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param
 
   if (hashconfig->attack_exec == ATTACK_EXEC_INSIDE_KERNEL)
   {
-    if (user_options->length_limit_disable == true)
-    {
-      CL_rc = run_kernel (hashcat_ctx, device_param, KERN_RUN_4, 1, false, 0);
-
-      if (CL_rc == -1) return -1;
-    }
-    else
+    if (hashconfig->opti_type & OPTI_TYPE_OPTIMIZED_KERNEL)
     {
       if (highest_pw_len < 16)
       {
@@ -332,6 +325,12 @@ static int selftest (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param
 
         if (CL_rc == -1) return -1;
       }
+    }
+    else
+    {
+      CL_rc = run_kernel (hashcat_ctx, device_param, KERN_RUN_4, 1, false, 0);
+
+      if (CL_rc == -1) return -1;
     }
   }
   else
@@ -412,7 +411,7 @@ static int selftest (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param
       if (CL_rc == -1) return -1;
     }
 
-    if ((hashconfig->hash_mode == 2500) || (hashconfig->hash_mode == 2501))
+    if ((hashconfig->hash_mode == 2500) || (hashconfig->hash_mode == 2501) || (hashconfig->hash_mode == 15800))
     {
       device_param->kernel_params_buf32[28] = 0;
       device_param->kernel_params_buf32[29] = 1;

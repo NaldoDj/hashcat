@@ -244,6 +244,11 @@
 
 #define SHIFT_RIGHT_64(x,n) ((x) >> (n))
 
+#define SHA384_S0_S(x) (rotr64_S ((x), 28) ^ rotr64_S ((x), 34) ^ rotr64_S ((x), 39))
+#define SHA384_S1_S(x) (rotr64_S ((x), 14) ^ rotr64_S ((x), 18) ^ rotr64_S ((x), 41))
+#define SHA384_S2_S(x) (rotr64_S ((x),  1) ^ rotr64_S ((x),  8) ^ SHIFT_RIGHT_64 ((x), 7))
+#define SHA384_S3_S(x) (rotr64_S ((x), 19) ^ rotr64_S ((x), 61) ^ SHIFT_RIGHT_64 ((x), 6))
+
 #define SHA384_S0(x) (rotr64 ((x), 28) ^ rotr64 ((x), 34) ^ rotr64 ((x), 39))
 #define SHA384_S1(x) (rotr64 ((x), 14) ^ rotr64 ((x), 18) ^ rotr64 ((x), 41))
 #define SHA384_S2(x) (rotr64 ((x),  1) ^ rotr64 ((x),  8) ^ SHIFT_RIGHT_64 ((x), 7))
@@ -266,6 +271,19 @@
 #define SHA384_F0o(x,y,z) (SHA384_F0 ((x), (y), (z)))
 #define SHA384_F1o(x,y,z) (SHA384_F1 ((x), (y), (z)))
 #endif
+
+#define SHA384_STEP_S(F0,F1,a,b,c,d,e,f,g,h,x,K)  \
+{                                                 \
+  h += K;                                         \
+  h += x;                                         \
+  h += SHA384_S1_S (e);                           \
+  h += F0 (e, f, g);                              \
+  d += h;                                         \
+  h += SHA384_S0_S (a);                           \
+  h += F1 (a, b, c);                              \
+}
+
+#define SHA384_EXPAND_S(x,y,z,w) (SHA384_S3_S (x) + y + SHA384_S2_S (z) + w)
 
 #define SHA384_STEP(F0,F1,a,b,c,d,e,f,g,h,x,K)  \
 {                                               \

@@ -319,14 +319,14 @@ typedef enum salt_type
 {
   SALT_TYPE_NONE     = 1,
   SALT_TYPE_EMBEDDED = 2,
-  SALT_TYPE_INTERN   = 3,
-  SALT_TYPE_EXTERN   = 4,
+  SALT_TYPE_GENERIC  = 3,
   SALT_TYPE_VIRTUAL  = 5
 
 } salt_type_t;
 
 typedef enum opti_type
 {
+  OPTI_TYPE_OPTIMIZED_KERNEL    = (1 <<  0),
   OPTI_TYPE_ZERO_BYTE           = (1 <<  1),
   OPTI_TYPE_PRECOMPUTE_INIT     = (1 <<  2),
   OPTI_TYPE_PRECOMPUTE_MERKLE   = (1 <<  3),
@@ -532,7 +532,6 @@ typedef enum user_options_defaults
   KERNEL_LOOPS            = 0,
   KEYSPACE                = false,
   LEFT                    = false,
-  LENGTH_LIMIT_DISABLE    = false,
   LIMIT                   = 0,
   LOGFILE_DISABLE         = false,
   LOOPBACK                = false,
@@ -543,6 +542,7 @@ typedef enum user_options_defaults
   NONCE_ERROR_CORRECTIONS = 8,
   NVIDIA_SPIN_DAMP        = 100,
   OPENCL_VECTOR_WIDTH     = 0,
+  OPTIMIZED_KERNEL_ENABLE = false,
   OUTFILE_AUTOHEX         = true,
   OUTFILE_CHECK_TIMER     = 5,
   OUTFILE_FORMAT          = 3,
@@ -613,7 +613,6 @@ typedef enum user_options_map
   IDX_KERNEL_LOOPS             = 'u',
   IDX_KEYSPACE                 = 0xff14,
   IDX_LEFT                     = 0xff15,
-  IDX_LENGTH_LIMIT_DISABLE     = 'L',
   IDX_LIMIT                    = 'l',
   IDX_LOGFILE_DISABLE          = 0xff16,
   IDX_LOOPBACK                 = 0xff17,
@@ -629,6 +628,7 @@ typedef enum user_options_map
   IDX_OPENCL_INFO              = 'I',
   IDX_OPENCL_PLATFORMS         = 0xff1e,
   IDX_OPENCL_VECTOR_WIDTH      = 0xff1f,
+  IDX_OPTIMIZED_KERNEL_ENABLE  = 'O',
   IDX_OUTFILE_AUTOHEX_DISABLE  = 0xff20,
   IDX_OUTFILE_CHECK_DIR        = 0xff21,
   IDX_OUTFILE_CHECK_TIMER      = 0xff22,
@@ -832,8 +832,15 @@ struct hashconfig
   u32   tmp_size;
   u32   hook_size;
 
+  // password length limit
+
   u32   pw_min;
   u32   pw_max;
+
+  // salt length limit (generic hashes)
+
+  u32   salt_min;
+  u32   salt_max;
 
   int (*parse_func) (u8 *, u32, hash_t *, const struct hashconfig *);
 
@@ -1001,7 +1008,6 @@ typedef struct hc_device_param
 
   char   *device_name;
   char   *device_vendor;
-  char   *device_name_chksum;
   char   *device_version;
   char   *driver_version;
   char   *device_opencl_version;
@@ -1134,6 +1140,8 @@ typedef struct opencl_ctx
   bool                need_nvapi;
   bool                need_xnvctrl;
   bool                need_sysfs;
+
+  int                 comptime;
 
   int                 force_jit_compilation;
 
@@ -1454,13 +1462,13 @@ typedef struct user_options
   bool         keep_guessing;
   bool         keyspace;
   bool         left;
-  bool         length_limit_disable;
   bool         logfile_disable;
   bool         loopback;
   bool         machine_readable;
   bool         markov_classic;
   bool         markov_disable;
   bool         opencl_info;
+  bool         optimized_kernel_enable;
   bool         outfile_autohex;
   bool         potfile_disable;
   bool         powertune_enable;

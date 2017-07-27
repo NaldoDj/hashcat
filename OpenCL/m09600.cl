@@ -243,22 +243,22 @@ __kernel void m09600_comp (__global pw_t *pws, __global const kernel_rule_t *rul
   u32 w6[4];
   u32 w7[4];
 
-  w0[0] = h32_from_64 (tmp[0]);
-  w0[1] = l32_from_64 (tmp[0]);
-  w0[2] = h32_from_64 (tmp[1]);
-  w0[3] = l32_from_64 (tmp[1]);
-  w1[0] = h32_from_64 (tmp[2]);
-  w1[1] = l32_from_64 (tmp[2]);
-  w1[2] = h32_from_64 (tmp[3]);
-  w1[3] = l32_from_64 (tmp[3]);
-  w2[0] = h32_from_64 (tmp[4]);
-  w2[1] = l32_from_64 (tmp[4]);
-  w2[2] = h32_from_64 (tmp[5]);
-  w2[3] = l32_from_64 (tmp[5]);
-  w3[0] = h32_from_64 (tmp[6]);
-  w3[1] = l32_from_64 (tmp[6]);
-  w3[2] = h32_from_64 (tmp[7]);
-  w3[3] = l32_from_64 (tmp[7]);
+  w0[0] = h32_from_64_S (tmp[0]);
+  w0[1] = l32_from_64_S (tmp[0]);
+  w0[2] = h32_from_64_S (tmp[1]);
+  w0[3] = l32_from_64_S (tmp[1]);
+  w1[0] = h32_from_64_S (tmp[2]);
+  w1[1] = l32_from_64_S (tmp[2]);
+  w1[2] = h32_from_64_S (tmp[3]);
+  w1[3] = l32_from_64_S (tmp[3]);
+  w2[0] = h32_from_64_S (tmp[4]);
+  w2[1] = l32_from_64_S (tmp[4]);
+  w2[2] = h32_from_64_S (tmp[5]);
+  w2[3] = l32_from_64_S (tmp[5]);
+  w3[0] = h32_from_64_S (tmp[6]);
+  w3[1] = l32_from_64_S (tmp[6]);
+  w3[2] = h32_from_64_S (tmp[7]);
+  w3[3] = l32_from_64_S (tmp[7]);
   w4[0] = encryptedVerifierHashInputBlockKey[0];
   w4[1] = encryptedVerifierHashInputBlockKey[1];
   w4[2] = 0;
@@ -291,22 +291,22 @@ __kernel void m09600_comp (__global pw_t *pws, __global const kernel_rule_t *rul
   digest0[2] = ctx.h[2];
   digest0[3] = ctx.h[3];
 
-  w0[0] = h32_from_64 (tmp[0]);
-  w0[1] = l32_from_64 (tmp[0]);
-  w0[2] = h32_from_64 (tmp[1]);
-  w0[3] = l32_from_64 (tmp[1]);
-  w1[0] = h32_from_64 (tmp[2]);
-  w1[1] = l32_from_64 (tmp[2]);
-  w1[2] = h32_from_64 (tmp[3]);
-  w1[3] = l32_from_64 (tmp[3]);
-  w2[0] = h32_from_64 (tmp[4]);
-  w2[1] = l32_from_64 (tmp[4]);
-  w2[2] = h32_from_64 (tmp[5]);
-  w2[3] = l32_from_64 (tmp[5]);
-  w3[0] = h32_from_64 (tmp[6]);
-  w3[1] = l32_from_64 (tmp[6]);
-  w3[2] = h32_from_64 (tmp[7]);
-  w3[3] = l32_from_64 (tmp[7]);
+  w0[0] = h32_from_64_S (tmp[0]);
+  w0[1] = l32_from_64_S (tmp[0]);
+  w0[2] = h32_from_64_S (tmp[1]);
+  w0[3] = l32_from_64_S (tmp[1]);
+  w1[0] = h32_from_64_S (tmp[2]);
+  w1[1] = l32_from_64_S (tmp[2]);
+  w1[2] = h32_from_64_S (tmp[3]);
+  w1[3] = l32_from_64_S (tmp[3]);
+  w2[0] = h32_from_64_S (tmp[4]);
+  w2[1] = l32_from_64_S (tmp[4]);
+  w2[2] = h32_from_64_S (tmp[5]);
+  w2[3] = l32_from_64_S (tmp[5]);
+  w3[0] = h32_from_64_S (tmp[6]);
+  w3[1] = l32_from_64_S (tmp[6]);
+  w3[2] = h32_from_64_S (tmp[7]);
+  w3[3] = l32_from_64_S (tmp[7]);
   w4[0] = encryptedVerifierHashValueBlockKey[0];
   w4[1] = encryptedVerifierHashValueBlockKey[1];
   w4[2] = 0;
@@ -339,29 +339,20 @@ __kernel void m09600_comp (__global pw_t *pws, __global const kernel_rule_t *rul
 
   // now we got the AES key, decrypt the verifier
 
-  u32 ukeyx[8];
+  u32 ukey[8];
 
-  ukeyx[0] = h32_from_64 (digest0[0]);
-  ukeyx[1] = l32_from_64 (digest0[0]);
-  ukeyx[2] = h32_from_64 (digest0[1]);
-  ukeyx[3] = l32_from_64 (digest0[1]);
-  ukeyx[4] = h32_from_64 (digest0[2]);
-  ukeyx[5] = l32_from_64 (digest0[2]);
-  ukeyx[6] = h32_from_64 (digest0[3]);
-  ukeyx[7] = l32_from_64 (digest0[3]);
-
-  ukeyx[0] = swap32_S (ukeyx[0]);
-  ukeyx[1] = swap32_S (ukeyx[1]);
-  ukeyx[2] = swap32_S (ukeyx[2]);
-  ukeyx[3] = swap32_S (ukeyx[3]);
-  ukeyx[4] = swap32_S (ukeyx[4]);
-  ukeyx[5] = swap32_S (ukeyx[5]);
-  ukeyx[6] = swap32_S (ukeyx[6]);
-  ukeyx[7] = swap32_S (ukeyx[7]);
+  ukey[0] = h32_from_64_S (digest0[0]);
+  ukey[1] = l32_from_64_S (digest0[0]);
+  ukey[2] = h32_from_64_S (digest0[1]);
+  ukey[3] = l32_from_64_S (digest0[1]);
+  ukey[4] = h32_from_64_S (digest0[2]);
+  ukey[5] = l32_from_64_S (digest0[2]);
+  ukey[6] = h32_from_64_S (digest0[3]);
+  ukey[7] = l32_from_64_S (digest0[3]);
 
   u32 ks[60];
 
-  aes256_set_decrypt_key (ks, ukeyx, s_te0, s_te1, s_te2, s_te3, s_te4, s_td0, s_td1, s_td2, s_td3, s_td4);
+  AES256_set_decrypt_key (ks, ukey, s_te0, s_te1, s_te2, s_te3, s_te4, s_td0, s_td1, s_td2, s_td3, s_td4);
 
   u32 data[4];
 
@@ -370,19 +361,9 @@ __kernel void m09600_comp (__global pw_t *pws, __global const kernel_rule_t *rul
   data[2] = office2013_bufs[digests_offset].encryptedVerifier[2];
   data[3] = office2013_bufs[digests_offset].encryptedVerifier[3];
 
-  data[0] = swap32_S (data[0]);
-  data[1] = swap32_S (data[1]);
-  data[2] = swap32_S (data[2]);
-  data[3] = swap32_S (data[3]);
-
   u32 out[4];
 
-  aes256_decrypt (ks, data, out, s_td0, s_td1, s_td2, s_td3, s_td4);
-
-  out[0] = swap32_S (out[0]);
-  out[1] = swap32_S (out[1]);
-  out[2] = swap32_S (out[2]);
-  out[3] = swap32_S (out[3]);
+  AES256_decrypt (ks, data, out, s_td0, s_td1, s_td2, s_td3, s_td4);
 
   out[0] ^= salt_bufs[salt_pos].salt_buf[0];
   out[1] ^= salt_bufs[salt_pos].salt_buf[1];
@@ -439,42 +420,23 @@ __kernel void m09600_comp (__global pw_t *pws, __global const kernel_rule_t *rul
 
   // encrypt with 2nd key
 
-  ukeyx[0] = h32_from_64 (digest1[0]);
-  ukeyx[1] = l32_from_64 (digest1[0]);
-  ukeyx[2] = h32_from_64 (digest1[1]);
-  ukeyx[3] = l32_from_64 (digest1[1]);
-  ukeyx[4] = h32_from_64 (digest1[2]);
-  ukeyx[5] = l32_from_64 (digest1[2]);
-  ukeyx[6] = h32_from_64 (digest1[3]);
-  ukeyx[7] = l32_from_64 (digest1[3]);
+  ukey[0] = h32_from_64_S (digest1[0]);
+  ukey[1] = l32_from_64_S (digest1[0]);
+  ukey[2] = h32_from_64_S (digest1[1]);
+  ukey[3] = l32_from_64_S (digest1[1]);
+  ukey[4] = h32_from_64_S (digest1[2]);
+  ukey[5] = l32_from_64_S (digest1[2]);
+  ukey[6] = h32_from_64_S (digest1[3]);
+  ukey[7] = l32_from_64_S (digest1[3]);
 
-  ukeyx[0] = swap32_S (ukeyx[0]);
-  ukeyx[1] = swap32_S (ukeyx[1]);
-  ukeyx[2] = swap32_S (ukeyx[2]);
-  ukeyx[3] = swap32_S (ukeyx[3]);
-  ukeyx[4] = swap32_S (ukeyx[4]);
-  ukeyx[5] = swap32_S (ukeyx[5]);
-  ukeyx[6] = swap32_S (ukeyx[6]);
-  ukeyx[7] = swap32_S (ukeyx[7]);
+  AES256_set_encrypt_key (ks, ukey, s_te0, s_te1, s_te2, s_te3, s_te4);
 
-  aes256_set_encrypt_key (ks, ukeyx, s_te0, s_te1, s_te2, s_te3, s_te4);
+  data[0] = h32_from_64_S (digest[0]) ^ salt_bufs[salt_pos].salt_buf[0];
+  data[1] = l32_from_64_S (digest[0]) ^ salt_bufs[salt_pos].salt_buf[1];
+  data[2] = h32_from_64_S (digest[1]) ^ salt_bufs[salt_pos].salt_buf[2];
+  data[3] = l32_from_64_S (digest[1]) ^ salt_bufs[salt_pos].salt_buf[3];
 
-  data[0] = h32_from_64 (digest[0]) ^ salt_bufs[salt_pos].salt_buf[0];
-  data[1] = l32_from_64 (digest[0]) ^ salt_bufs[salt_pos].salt_buf[1];
-  data[2] = h32_from_64 (digest[1]) ^ salt_bufs[salt_pos].salt_buf[2];
-  data[3] = l32_from_64 (digest[1]) ^ salt_bufs[salt_pos].salt_buf[3];
-
-  data[0] = swap32_S (data[0]);
-  data[1] = swap32_S (data[1]);
-  data[2] = swap32_S (data[2]);
-  data[3] = swap32_S (data[3]);
-
-  aes256_encrypt (ks, data, out, s_te0, s_te1, s_te2, s_te3, s_te4);
-
-  out[0] = swap32_S (out[0]);
-  out[1] = swap32_S (out[1]);
-  out[2] = swap32_S (out[2]);
-  out[3] = swap32_S (out[3]);
+  AES256_encrypt (ks, data, out, s_te0, s_te1, s_te2, s_te3, s_te4);
 
   const u32 r0 = out[0];
   const u32 r1 = out[1];

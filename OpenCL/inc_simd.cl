@@ -1043,12 +1043,18 @@
 
 #endif
 
+#ifdef IS_CPU
+// CPU seem to have a bit more advanced vector comparison functions (on XOP/AVX2)
+#define MATCHES_NONE_VV(a,b) all ((a) != (b))
+#define MATCHES_NONE_VS(a,b) all ((a) != (b))
+#else
 #define MATCHES_NONE_VV(a,b) !(MATCHES_ONE_VV ((a), (b)))
 #define MATCHES_NONE_VS(a,b) !(MATCHES_ONE_VS ((a), (b)))
+#endif
 
 // attack-mode 0
 
-inline u32x ix_create_bft (__global const bf_t *bfs_buf, const u32 il_pos)
+u32x ix_create_bft (__global const bf_t *bfs_buf, const u32 il_pos)
 {
   #if   VECT_SIZE == 1
   const u32x ix = (u32x) (bfs_buf[il_pos + 0].i);
@@ -1067,7 +1073,7 @@ inline u32x ix_create_bft (__global const bf_t *bfs_buf, const u32 il_pos)
 
 // attack-mode 1
 
-inline u32x pwlenx_create_combt (__global const pw_t *combs_buf, const u32 il_pos)
+u32x pwlenx_create_combt (__global const pw_t *combs_buf, const u32 il_pos)
 {
   #if   VECT_SIZE == 1
   const u32x pw_lenx = (u32x) (combs_buf[il_pos + 0].pw_len);
@@ -1084,7 +1090,7 @@ inline u32x pwlenx_create_combt (__global const pw_t *combs_buf, const u32 il_po
   return pw_lenx;
 }
 
-inline u32x ix_create_combt (__global const pw_t *combs_buf, const u32 il_pos, const int idx)
+u32x ix_create_combt (__global const pw_t *combs_buf, const u32 il_pos, const int idx)
 {
   #if   VECT_SIZE == 1
   const u32x ix = (u32x) (combs_buf[il_pos + 0].i[idx]);

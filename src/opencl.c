@@ -108,112 +108,6 @@ static int ocl_check_dri (MAYBE_UNUSED hashcat_ctx_t *hashcat_ctx)
   return 0;
 }
 
-static void generate_source_kernel_filename (const u32 attack_exec, const u32 attack_kern, const u32 kern_type, const bool length_limit_disable, char *shared_dir, char *source_file)
-{
-  if (length_limit_disable == true)
-  {
-    if (attack_exec == ATTACK_EXEC_INSIDE_KERNEL)
-    {
-      if (attack_kern == ATTACK_KERN_STRAIGHT)
-        snprintf (source_file, 255, "%s/OpenCL/m%05d_a0-pure.cl", shared_dir, (int) kern_type);
-      else if (attack_kern == ATTACK_KERN_COMBI)
-        snprintf (source_file, 255, "%s/OpenCL/m%05d_a1-pure.cl", shared_dir, (int) kern_type);
-      else if (attack_kern == ATTACK_KERN_BF)
-        snprintf (source_file, 255, "%s/OpenCL/m%05d_a3-pure.cl", shared_dir, (int) kern_type);
-    }
-    else
-    {
-      snprintf (source_file, 255, "%s/OpenCL/m%05d-pure.cl", shared_dir, (int) kern_type);
-    }
-  }
-  else
-  {
-    if (attack_exec == ATTACK_EXEC_INSIDE_KERNEL)
-    {
-      if (attack_kern == ATTACK_KERN_STRAIGHT)
-        snprintf (source_file, 255, "%s/OpenCL/m%05d_a0.cl", shared_dir, (int) kern_type);
-      else if (attack_kern == ATTACK_KERN_COMBI)
-        snprintf (source_file, 255, "%s/OpenCL/m%05d_a1.cl", shared_dir, (int) kern_type);
-      else if (attack_kern == ATTACK_KERN_BF)
-        snprintf (source_file, 255, "%s/OpenCL/m%05d_a3.cl", shared_dir, (int) kern_type);
-    }
-    else
-    {
-      snprintf (source_file, 255, "%s/OpenCL/m%05d.cl", shared_dir, (int) kern_type);
-    }
-  }
-}
-
-static void generate_cached_kernel_filename (const u32 attack_exec, const u32 attack_kern, const u32 kern_type, const bool length_limit_disable, char *profile_dir, const char *device_name_chksum, char *cached_file)
-{
-  if (length_limit_disable == true)
-  {
-    if (attack_exec == ATTACK_EXEC_INSIDE_KERNEL)
-    {
-      if (attack_kern == ATTACK_KERN_STRAIGHT)
-        snprintf (cached_file, 255, "%s/kernels/m%05d_a0-pure.%s.kernel", profile_dir, (int) kern_type, device_name_chksum);
-      else if (attack_kern == ATTACK_KERN_COMBI)
-        snprintf (cached_file, 255, "%s/kernels/m%05d_a1-pure.%s.kernel", profile_dir, (int) kern_type, device_name_chksum);
-      else if (attack_kern == ATTACK_KERN_BF)
-        snprintf (cached_file, 255, "%s/kernels/m%05d_a3-pure.%s.kernel", profile_dir, (int) kern_type, device_name_chksum);
-    }
-    else
-    {
-      snprintf (cached_file, 255, "%s/kernels/m%05d-pure.%s.kernel", profile_dir, (int) kern_type, device_name_chksum);
-    }
-  }
-  else
-  {
-    if (attack_exec == ATTACK_EXEC_INSIDE_KERNEL)
-    {
-      if (attack_kern == ATTACK_KERN_STRAIGHT)
-        snprintf (cached_file, 255, "%s/kernels/m%05d_a0.%s.kernel", profile_dir, (int) kern_type, device_name_chksum);
-      else if (attack_kern == ATTACK_KERN_COMBI)
-        snprintf (cached_file, 255, "%s/kernels/m%05d_a1.%s.kernel", profile_dir, (int) kern_type, device_name_chksum);
-      else if (attack_kern == ATTACK_KERN_BF)
-        snprintf (cached_file, 255, "%s/kernels/m%05d_a3.%s.kernel", profile_dir, (int) kern_type, device_name_chksum);
-    }
-    else
-    {
-      snprintf (cached_file, 255, "%s/kernels/m%05d.%s.kernel", profile_dir, (int) kern_type, device_name_chksum);
-    }
-  }
-}
-
-static void generate_source_kernel_mp_filename (const u32 opti_type, const u64 opts_type, char *shared_dir, char *source_file)
-{
-  if ((opti_type & OPTI_TYPE_BRUTE_FORCE) && (opts_type & OPTS_TYPE_PT_GENERATE_BE))
-  {
-    snprintf (source_file, 255, "%s/OpenCL/markov_be.cl", shared_dir);
-  }
-  else
-  {
-    snprintf (source_file, 255, "%s/OpenCL/markov_le.cl", shared_dir);
-  }
-}
-
-static void generate_cached_kernel_mp_filename (const u32 opti_type, const u64 opts_type, char *profile_dir, const char *device_name_chksum, char *cached_file)
-{
-  if ((opti_type & OPTI_TYPE_BRUTE_FORCE) && (opts_type & OPTS_TYPE_PT_GENERATE_BE))
-  {
-    snprintf (cached_file, 255, "%s/kernels/markov_be.%s.kernel", profile_dir, device_name_chksum);
-  }
-  else
-  {
-    snprintf (cached_file, 255, "%s/kernels/markov_le.%s.kernel", profile_dir, device_name_chksum);
-  }
-}
-
-static void generate_source_kernel_amp_filename (const u32 attack_kern, char *shared_dir, char *source_file)
-{
-  snprintf (source_file, 255, "%s/OpenCL/amp_a%u.cl", shared_dir, attack_kern);
-}
-
-static void generate_cached_kernel_amp_filename (const u32 attack_kern, char *profile_dir, const char *device_name_chksum, char *cached_file)
-{
-  snprintf (cached_file, 255, "%s/kernels/amp_a%u.%s.kernel", profile_dir, attack_kern, device_name_chksum);
-}
-
 static int setup_opencl_platforms_filter (hashcat_ctx_t *hashcat_ctx, const char *opencl_platforms, u32 *out)
 {
   u32 opencl_platforms_filter = 0;
@@ -422,6 +316,112 @@ static int write_kernel_binary (hashcat_ctx_t *hashcat_ctx, char *kernel_file, c
   }
 
   return 0;
+}
+
+void generate_source_kernel_filename (const u32 attack_exec, const u32 attack_kern, const u32 kern_type, const u32 opti_type, char *shared_dir, char *source_file)
+{
+  if (opti_type & OPTI_TYPE_OPTIMIZED_KERNEL)
+  {
+    if (attack_exec == ATTACK_EXEC_INSIDE_KERNEL)
+    {
+      if (attack_kern == ATTACK_KERN_STRAIGHT)
+        snprintf (source_file, 255, "%s/OpenCL/m%05d_a0-optimized.cl", shared_dir, (int) kern_type);
+      else if (attack_kern == ATTACK_KERN_COMBI)
+        snprintf (source_file, 255, "%s/OpenCL/m%05d_a1-optimized.cl", shared_dir, (int) kern_type);
+      else if (attack_kern == ATTACK_KERN_BF)
+        snprintf (source_file, 255, "%s/OpenCL/m%05d_a3-optimized.cl", shared_dir, (int) kern_type);
+    }
+    else
+    {
+      snprintf (source_file, 255, "%s/OpenCL/m%05d-optimized.cl", shared_dir, (int) kern_type);
+    }
+  }
+  else
+  {
+    if (attack_exec == ATTACK_EXEC_INSIDE_KERNEL)
+    {
+      if (attack_kern == ATTACK_KERN_STRAIGHT)
+        snprintf (source_file, 255, "%s/OpenCL/m%05d_a0.cl", shared_dir, (int) kern_type);
+      else if (attack_kern == ATTACK_KERN_COMBI)
+        snprintf (source_file, 255, "%s/OpenCL/m%05d_a1.cl", shared_dir, (int) kern_type);
+      else if (attack_kern == ATTACK_KERN_BF)
+        snprintf (source_file, 255, "%s/OpenCL/m%05d_a3.cl", shared_dir, (int) kern_type);
+    }
+    else
+    {
+      snprintf (source_file, 255, "%s/OpenCL/m%05d.cl", shared_dir, (int) kern_type);
+    }
+  }
+}
+
+void generate_cached_kernel_filename (const u32 attack_exec, const u32 attack_kern, const u32 kern_type, const u32 opti_type, char *profile_dir, const char *device_name_chksum, char *cached_file)
+{
+  if (opti_type & OPTI_TYPE_OPTIMIZED_KERNEL)
+  {
+    if (attack_exec == ATTACK_EXEC_INSIDE_KERNEL)
+    {
+      if (attack_kern == ATTACK_KERN_STRAIGHT)
+        snprintf (cached_file, 255, "%s/kernels/m%05d_a0-optimized.%s.kernel", profile_dir, (int) kern_type, device_name_chksum);
+      else if (attack_kern == ATTACK_KERN_COMBI)
+        snprintf (cached_file, 255, "%s/kernels/m%05d_a1-optimized.%s.kernel", profile_dir, (int) kern_type, device_name_chksum);
+      else if (attack_kern == ATTACK_KERN_BF)
+        snprintf (cached_file, 255, "%s/kernels/m%05d_a3-optimized.%s.kernel", profile_dir, (int) kern_type, device_name_chksum);
+    }
+    else
+    {
+      snprintf (cached_file, 255, "%s/kernels/m%05d-optimized.%s.kernel", profile_dir, (int) kern_type, device_name_chksum);
+    }
+  }
+  else
+  {
+    if (attack_exec == ATTACK_EXEC_INSIDE_KERNEL)
+    {
+      if (attack_kern == ATTACK_KERN_STRAIGHT)
+        snprintf (cached_file, 255, "%s/kernels/m%05d_a0.%s.kernel", profile_dir, (int) kern_type, device_name_chksum);
+      else if (attack_kern == ATTACK_KERN_COMBI)
+        snprintf (cached_file, 255, "%s/kernels/m%05d_a1.%s.kernel", profile_dir, (int) kern_type, device_name_chksum);
+      else if (attack_kern == ATTACK_KERN_BF)
+        snprintf (cached_file, 255, "%s/kernels/m%05d_a3.%s.kernel", profile_dir, (int) kern_type, device_name_chksum);
+    }
+    else
+    {
+      snprintf (cached_file, 255, "%s/kernels/m%05d.%s.kernel", profile_dir, (int) kern_type, device_name_chksum);
+    }
+  }
+}
+
+void generate_source_kernel_mp_filename (const u32 opti_type, const u64 opts_type, char *shared_dir, char *source_file)
+{
+  if ((opti_type & OPTI_TYPE_BRUTE_FORCE) && (opts_type & OPTS_TYPE_PT_GENERATE_BE))
+  {
+    snprintf (source_file, 255, "%s/OpenCL/markov_be.cl", shared_dir);
+  }
+  else
+  {
+    snprintf (source_file, 255, "%s/OpenCL/markov_le.cl", shared_dir);
+  }
+}
+
+void generate_cached_kernel_mp_filename (const u32 opti_type, const u64 opts_type, char *profile_dir, const char *device_name_chksum_amp_mp, char *cached_file)
+{
+  if ((opti_type & OPTI_TYPE_BRUTE_FORCE) && (opts_type & OPTS_TYPE_PT_GENERATE_BE))
+  {
+    snprintf (cached_file, 255, "%s/kernels/markov_be.%s.kernel", profile_dir, device_name_chksum_amp_mp);
+  }
+  else
+  {
+    snprintf (cached_file, 255, "%s/kernels/markov_le.%s.kernel", profile_dir, device_name_chksum_amp_mp);
+  }
+}
+
+void generate_source_kernel_amp_filename (const u32 attack_kern, char *shared_dir, char *source_file)
+{
+  snprintf (source_file, 255, "%s/OpenCL/amp_a%u.cl", shared_dir, attack_kern);
+}
+
+void generate_cached_kernel_amp_filename (const u32 attack_kern, char *profile_dir, const char *device_name_chksum_amp_mp, char *cached_file)
+{
+  snprintf (cached_file, 255, "%s/kernels/amp_a%u.%s.kernel", profile_dir, attack_kern, device_name_chksum_amp_mp);
 }
 
 int ocl_init (hashcat_ctx_t *hashcat_ctx)
@@ -1165,13 +1165,7 @@ int choose_kernel (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, 
       }
     }
 
-    if (user_options->length_limit_disable == true)
-    {
-      CL_rc = run_kernel (hashcat_ctx, device_param, KERN_RUN_4, pws_cnt, true, fast_iteration);
-
-      if (CL_rc == -1) return -1;
-    }
-    else
+    if (hashconfig->opti_type & OPTI_TYPE_OPTIMIZED_KERNEL)
     {
       if (highest_pw_len < 16)
       {
@@ -1191,6 +1185,12 @@ int choose_kernel (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, 
 
         if (CL_rc == -1) return -1;
       }
+    }
+    else
+    {
+      CL_rc = run_kernel (hashcat_ctx, device_param, KERN_RUN_4, pws_cnt, true, fast_iteration);
+
+      if (CL_rc == -1) return -1;
     }
   }
   else
@@ -1350,7 +1350,7 @@ int choose_kernel (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, 
     {
       u32 loops_cnt = 1;
 
-      if ((hashconfig->hash_mode == 2500) || (hashconfig->hash_mode == 2501))
+      if ((hashconfig->hash_mode == 2500) || (hashconfig->hash_mode == 2501) || (hashconfig->hash_mode == 15800))
       {
         loops_cnt = hashes->salts_buf[salt_pos].digests_cnt;
       }
@@ -1792,32 +1792,7 @@ int run_copy (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, const
   }
   else if (user_options_extra->attack_kern == ATTACK_KERN_COMBI)
   {
-    if (user_options->length_limit_disable == true)
-    {
-      if (user_options->attack_mode == ATTACK_MODE_COMBI)
-      {
-        const int CL_rc = hc_clEnqueueWriteBuffer (hashcat_ctx, device_param->command_queue, device_param->d_pws_buf, CL_TRUE, 0, pws_cnt * sizeof (pw_t), device_param->pws_buf, 0, NULL, NULL);
-
-        if (CL_rc == -1) return -1;
-      }
-      else if (user_options->attack_mode == ATTACK_MODE_HYBRID1)
-      {
-        const int CL_rc = hc_clEnqueueWriteBuffer (hashcat_ctx, device_param->command_queue, device_param->d_pws_buf, CL_TRUE, 0, pws_cnt * sizeof (pw_t), device_param->pws_buf, 0, NULL, NULL);
-
-        if (CL_rc == -1) return -1;
-      }
-      else if (user_options->attack_mode == ATTACK_MODE_HYBRID2)
-      {
-        const u64 off = device_param->words_off;
-
-        device_param->kernel_params_mp_buf64[3] = off;
-
-        const int CL_rc = run_kernel_mp (hashcat_ctx, device_param, KERN_RUN_MP, pws_cnt);
-
-        if (CL_rc == -1) return -1;
-      }
-    }
-    else
+    if (hashconfig->opti_type & OPTI_TYPE_OPTIMIZED_KERNEL)
     {
       if (user_options->attack_mode == ATTACK_MODE_COMBI)
       {
@@ -1876,6 +1851,31 @@ int run_copy (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, const
       const int CL_rc = hc_clEnqueueWriteBuffer (hashcat_ctx, device_param->command_queue, device_param->d_pws_buf, CL_TRUE, 0, pws_cnt * sizeof (pw_t), device_param->pws_buf, 0, NULL, NULL);
 
       if (CL_rc == -1) return -1;
+    }
+    else
+    {
+      if (user_options->attack_mode == ATTACK_MODE_COMBI)
+      {
+        const int CL_rc = hc_clEnqueueWriteBuffer (hashcat_ctx, device_param->command_queue, device_param->d_pws_buf, CL_TRUE, 0, pws_cnt * sizeof (pw_t), device_param->pws_buf, 0, NULL, NULL);
+
+        if (CL_rc == -1) return -1;
+      }
+      else if (user_options->attack_mode == ATTACK_MODE_HYBRID1)
+      {
+        const int CL_rc = hc_clEnqueueWriteBuffer (hashcat_ctx, device_param->command_queue, device_param->d_pws_buf, CL_TRUE, 0, pws_cnt * sizeof (pw_t), device_param->pws_buf, 0, NULL, NULL);
+
+        if (CL_rc == -1) return -1;
+      }
+      else if (user_options->attack_mode == ATTACK_MODE_HYBRID2)
+      {
+        const u64 off = device_param->words_off;
+
+        device_param->kernel_params_mp_buf64[3] = off;
+
+        const int CL_rc = run_kernel_mp (hashcat_ctx, device_param, KERN_RUN_MP, pws_cnt);
+
+        if (CL_rc == -1) return -1;
+      }
     }
   }
   else if (user_options_extra->attack_kern == ATTACK_KERN_BF)
@@ -1954,7 +1954,7 @@ int run_cracker (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, co
 
     FILE *combs_fp = device_param->combs_fp;
 
-    if ((user_options->attack_mode == ATTACK_MODE_COMBI) || ((user_options->length_limit_disable == true) && (user_options->attack_mode == ATTACK_MODE_HYBRID2)))
+    if ((user_options->attack_mode == ATTACK_MODE_COMBI) || (((hashconfig->opti_type & OPTI_TYPE_OPTIMIZED_KERNEL) == 0) && (user_options->attack_mode == ATTACK_MODE_HYBRID2)))
     {
       rewind (combs_fp);
     }
@@ -2018,108 +2018,7 @@ int run_cracker (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, co
       }
       else if (user_options_extra->attack_kern == ATTACK_KERN_COMBI)
       {
-        if (user_options->length_limit_disable == true)
-        {
-          if ((user_options->attack_mode == ATTACK_MODE_COMBI) || (user_options->attack_mode == ATTACK_MODE_HYBRID2))
-          {
-            char *line_buf = combinator_ctx->scratch_buf;
-
-            u32 i = 0;
-
-            while (i < innerloop_left)
-            {
-              if (feof (combs_fp)) break;
-
-              int line_len = fgetl (combs_fp, line_buf);
-
-              line_len = convert_from_hex (hashcat_ctx, line_buf, line_len);
-
-              if (line_len >= PW_MAX) continue;
-
-              char *line_buf_new = line_buf;
-
-              char rule_buf_out[BLOCK_SIZE];
-
-              if (run_rule_engine (user_options_extra->rule_len_r, user_options->rule_buf_r))
-              {
-                if (line_len >= BLOCK_SIZE) continue;
-
-                memset (rule_buf_out, 0, sizeof (rule_buf_out));
-
-                const int rule_len_out = _old_apply_rule (user_options->rule_buf_r, user_options_extra->rule_len_r, line_buf, line_len, rule_buf_out);
-
-                if (rule_len_out < 0)
-                {
-                  status_ctx->words_progress_rejected[salt_pos] += pws_cnt;
-
-                  continue;
-                }
-
-                line_len = rule_len_out;
-
-                line_buf_new = rule_buf_out;
-              }
-
-              line_len = MIN (line_len, PW_MAX - 1);
-
-              u8 *ptr = (u8 *) device_param->combs_buf[i].i;
-
-              memcpy (ptr, line_buf_new, line_len);
-
-              memset (ptr + line_len, 0, PW_MAX - line_len);
-
-              if (hashconfig->opts_type & OPTS_TYPE_PT_UPPER)
-              {
-                uppercase (ptr, line_len);
-              }
-
-              if (combinator_ctx->combs_mode == COMBINATOR_MODE_BASE_LEFT)
-              {
-                if (hashconfig->opts_type & OPTS_TYPE_PT_ADD80)
-                {
-                  ptr[line_len] = 0x80;
-                }
-
-                if (hashconfig->opts_type & OPTS_TYPE_PT_ADD01)
-                {
-                  ptr[line_len] = 0x01;
-                }
-              }
-
-              device_param->combs_buf[i].pw_len = line_len;
-
-              i++;
-            }
-
-            for (u32 j = i; j < innerloop_left; j++)
-            {
-              memset (&device_param->combs_buf[j], 0, sizeof (pw_t));
-            }
-
-            innerloop_left = i;
-
-            const int CL_rc = hc_clEnqueueWriteBuffer (hashcat_ctx, device_param->command_queue, device_param->d_combs_c, CL_TRUE, 0, innerloop_left * sizeof (pw_t), device_param->combs_buf, 0, NULL, NULL);
-
-            if (CL_rc == -1) return -1;
-          }
-          else if (user_options->attack_mode == ATTACK_MODE_HYBRID1)
-          {
-            u64 off = innerloop_pos;
-
-            device_param->kernel_params_mp_buf64[3] = off;
-
-            int CL_rc;
-
-            CL_rc = run_kernel_mp (hashcat_ctx, device_param, KERN_RUN_MP, innerloop_left);
-
-            if (CL_rc == -1) return -1;
-
-            CL_rc = hc_clEnqueueCopyBuffer (hashcat_ctx, device_param->command_queue, device_param->d_combs, device_param->d_combs_c, 0, 0, innerloop_left * sizeof (pw_t), 0, NULL, NULL);
-
-            if (CL_rc == -1) return -1;
-          }
-        }
-        else
+        if (hashconfig->opti_type & OPTI_TYPE_OPTIMIZED_KERNEL)
         {
           if (user_options->attack_mode == ATTACK_MODE_COMBI)
           {
@@ -2236,6 +2135,107 @@ int run_cracker (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, co
             if (CL_rc == -1) return -1;
           }
         }
+        else
+        {
+          if ((user_options->attack_mode == ATTACK_MODE_COMBI) || (user_options->attack_mode == ATTACK_MODE_HYBRID2))
+          {
+            char *line_buf = combinator_ctx->scratch_buf;
+
+            u32 i = 0;
+
+            while (i < innerloop_left)
+            {
+              if (feof (combs_fp)) break;
+
+              int line_len = fgetl (combs_fp, line_buf);
+
+              line_len = convert_from_hex (hashcat_ctx, line_buf, line_len);
+
+              if (line_len >= PW_MAX) continue;
+
+              char *line_buf_new = line_buf;
+
+              char rule_buf_out[BLOCK_SIZE];
+
+              if (run_rule_engine (user_options_extra->rule_len_r, user_options->rule_buf_r))
+              {
+                if (line_len >= BLOCK_SIZE) continue;
+
+                memset (rule_buf_out, 0, sizeof (rule_buf_out));
+
+                const int rule_len_out = _old_apply_rule (user_options->rule_buf_r, user_options_extra->rule_len_r, line_buf, line_len, rule_buf_out);
+
+                if (rule_len_out < 0)
+                {
+                  status_ctx->words_progress_rejected[salt_pos] += pws_cnt;
+
+                  continue;
+                }
+
+                line_len = rule_len_out;
+
+                line_buf_new = rule_buf_out;
+              }
+
+              line_len = MIN (line_len, PW_MAX - 1);
+
+              u8 *ptr = (u8 *) device_param->combs_buf[i].i;
+
+              memcpy (ptr, line_buf_new, line_len);
+
+              memset (ptr + line_len, 0, PW_MAX - line_len);
+
+              if (hashconfig->opts_type & OPTS_TYPE_PT_UPPER)
+              {
+                uppercase (ptr, line_len);
+              }
+
+              if (combinator_ctx->combs_mode == COMBINATOR_MODE_BASE_LEFT)
+              {
+                if (hashconfig->opts_type & OPTS_TYPE_PT_ADD80)
+                {
+                  ptr[line_len] = 0x80;
+                }
+
+                if (hashconfig->opts_type & OPTS_TYPE_PT_ADD01)
+                {
+                  ptr[line_len] = 0x01;
+                }
+              }
+
+              device_param->combs_buf[i].pw_len = line_len;
+
+              i++;
+            }
+
+            for (u32 j = i; j < innerloop_left; j++)
+            {
+              memset (&device_param->combs_buf[j], 0, sizeof (pw_t));
+            }
+
+            innerloop_left = i;
+
+            const int CL_rc = hc_clEnqueueWriteBuffer (hashcat_ctx, device_param->command_queue, device_param->d_combs_c, CL_TRUE, 0, innerloop_left * sizeof (pw_t), device_param->combs_buf, 0, NULL, NULL);
+
+            if (CL_rc == -1) return -1;
+          }
+          else if (user_options->attack_mode == ATTACK_MODE_HYBRID1)
+          {
+            u64 off = innerloop_pos;
+
+            device_param->kernel_params_mp_buf64[3] = off;
+
+            int CL_rc;
+
+            CL_rc = run_kernel_mp (hashcat_ctx, device_param, KERN_RUN_MP, innerloop_left);
+
+            if (CL_rc == -1) return -1;
+
+            CL_rc = hc_clEnqueueCopyBuffer (hashcat_ctx, device_param->command_queue, device_param->d_combs, device_param->d_combs_c, 0, 0, innerloop_left * sizeof (pw_t), 0, NULL, NULL);
+
+            if (CL_rc == -1) return -1;
+          }
+        }
       }
       else if (user_options_extra->attack_kern == ATTACK_KERN_BF)
       {
@@ -2259,7 +2259,7 @@ int run_cracker (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, co
         hc_timer_set (&device_param->timer_speed);
       }
 
-      int rc = choose_kernel (hashcat_ctx, device_param, highest_pw_len, pws_cnt, fast_iteration, salt_pos);
+      const int rc = choose_kernel (hashcat_ctx, device_param, highest_pw_len, pws_cnt, fast_iteration, salt_pos);
 
       if (rc == -1) return -1;
 
@@ -3121,27 +3121,6 @@ int opencl_ctx_devices_init (hashcat_ctx_t *hashcat_ctx, const int comptime)
 
       device_param->driver_version = driver_version;
 
-      // device_name_chksum
-
-      char *device_name_chksum = (char *) hcmalloc (HCBUFSIZ_TINY);
-
-      #if defined (__x86_64__)
-      const size_t dnclen = snprintf (device_name_chksum, HCBUFSIZ_TINY - 1, "%d-%u-%u-%s-%s-%s-%d-%u-%u", 64, device_param->platform_vendor_id, device_param->vector_width, device_param->device_name, device_param->device_version, device_param->driver_version, comptime, user_options->opencl_vector_width, user_options->hash_mode);
-      #else
-      const size_t dnclen = snprintf (device_name_chksum, HCBUFSIZ_TINY - 1, "%d-%u-%u-%s-%s-%s-%d-%u-%u", 32, device_param->platform_vendor_id, device_param->vector_width, device_param->device_name, device_param->device_version, device_param->driver_version, comptime, user_options->opencl_vector_width, user_options->hash_mode);
-      #endif
-
-      u32 device_name_digest[4] = { 0 };
-
-      for (size_t i = 0; i < dnclen; i += 64)
-      {
-        md5_64 ((u32 *) (device_name_chksum + i), device_name_digest);
-      }
-
-      snprintf (device_name_chksum, HCBUFSIZ_TINY - 1, "%08x", device_name_digest[0]);
-
-      device_param->device_name_chksum = device_name_chksum;
-
       // vendor specific
 
       if (device_param->device_type & CL_DEVICE_TYPE_GPU)
@@ -3436,6 +3415,8 @@ int opencl_ctx_devices_init (hashcat_ctx_t *hashcat_ctx, const int comptime)
   opencl_ctx->need_xnvctrl        = need_xnvctrl;
   opencl_ctx->need_sysfs          = need_sysfs;
 
+  opencl_ctx->comptime            = comptime;
+
   return 0;
 }
 
@@ -3459,7 +3440,6 @@ void opencl_ctx_devices_destroy (hashcat_ctx_t *hashcat_ctx)
     if (device_param->skipped == true) continue;
 
     hcfree (device_param->device_name);
-    hcfree (device_param->device_name_chksum);
     hcfree (device_param->device_version);
     hcfree (device_param->driver_version);
     hcfree (device_param->device_opencl_version);
@@ -3728,13 +3708,17 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
       vector_width = user_options->opencl_vector_width;
     }
 
-    // We can't have SIMD in kernels where final password length depends on user input we can't precompute
+    // We can't have SIMD in kernels where we have an unknown final password length
 
-    if (user_options->length_limit_disable == true)
+    if ((hashconfig->opti_type & OPTI_TYPE_OPTIMIZED_KERNEL) == 0)
     {
       if (hashconfig->attack_exec == ATTACK_EXEC_INSIDE_KERNEL)
       {
-        if ((user_options_extra->attack_kern == ATTACK_KERN_STRAIGHT) || (user_options_extra->attack_kern == ATTACK_KERN_COMBI))
+        if (user_options_extra->attack_kern == ATTACK_KERN_STRAIGHT)
+        {
+          vector_width = 1;
+        }
+        else if (user_options_extra->attack_kern == ATTACK_KERN_COMBI)
         {
           vector_width = 1;
         }
@@ -3806,8 +3790,7 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
      * device properties
      */
 
-    const char *device_name_chksum  = device_param->device_name_chksum;
-    const u32   device_processors   = device_param->device_processors;
+    const u32 device_processors = device_param->device_processors;
 
     /**
      * create context for each device
@@ -4235,11 +4218,52 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
     snprintf (build_opts_new, sizeof (build_opts_new) - 1, "%s -D VENDOR_ID=%u -D CUDA_ARCH=%u -D VECT_SIZE=%u -D DEVICE_TYPE=%u -D DGST_R0=%u -D DGST_R1=%u -D DGST_R2=%u -D DGST_R3=%u -D DGST_ELEM=%u -D KERN_TYPE=%u -D _unroll -cl-std=CL1.2 -w", build_opts, device_param->platform_vendor_id, (device_param->sm_major * 100) + device_param->sm_minor, device_param->vector_width, (u32) device_param->device_type, hashconfig->dgst_pos0, hashconfig->dgst_pos1, hashconfig->dgst_pos2, hashconfig->dgst_pos3, hashconfig->dgst_size / 4, hashconfig->kern_type);
     #endif
 
+    if (device_param->device_type & CL_DEVICE_TYPE_CPU)
+    {
+      if (device_param->platform_vendor_id == VENDOR_ID_INTEL_SDK)
+      {
+        strncat (build_opts_new, " -cl-opt-disable", sizeof (build_opts_new) - 1);
+      }
+    }
+
     strncpy (build_opts, build_opts_new, sizeof (build_opts) - 1);
 
     #if defined (DEBUG)
     if (user_options->quiet == false) event_log_warning (hashcat_ctx, "* Device #%u: build_opts '%s'", device_id + 1, build_opts);
     #endif
+
+    /**
+     * device_name_chksum
+     */
+
+    char *device_name_chksum        = (char *) hcmalloc (HCBUFSIZ_TINY);
+    char *device_name_chksum_amp_mp = (char *) hcmalloc (HCBUFSIZ_TINY);
+
+    #if defined (__x86_64__)
+    const size_t dnclen        = snprintf (device_name_chksum,        HCBUFSIZ_TINY - 1, "%d-%u-%u-%s-%s-%s-%d-%u-%u", 64, device_param->platform_vendor_id, device_param->vector_width, device_param->device_name, device_param->device_version, device_param->driver_version, opencl_ctx->comptime, user_options->opencl_vector_width, user_options->hash_mode);
+    const size_t dnclen_amp_mp = snprintf (device_name_chksum_amp_mp, HCBUFSIZ_TINY - 1, "%d-%u-%s-%s-%s-%d",          64, device_param->platform_vendor_id,                             device_param->device_name, device_param->device_version, device_param->driver_version, opencl_ctx->comptime);
+    #else
+    const size_t dnclen        = snprintf (device_name_chksum,        HCBUFSIZ_TINY - 1, "%d-%u-%u-%s-%s-%s-%d-%u-%u", 32, device_param->platform_vendor_id, device_param->vector_width, device_param->device_name, device_param->device_version, device_param->driver_version, opencl_ctx->comptime, user_options->opencl_vector_width, user_options->hash_mode);
+    const size_t dnclen_amp_mp = snprintf (device_name_chksum_amp_mp, HCBUFSIZ_TINY - 1, "%d-%u-%s-%s-%s-%d",          32, device_param->platform_vendor_id,                             device_param->device_name, device_param->device_version, device_param->driver_version, opencl_ctx->comptime);
+    #endif
+
+    u32 device_name_digest[4] = { 0 };
+
+    for (size_t i = 0; i < dnclen; i += 64)
+    {
+      md5_64 ((u32 *) (device_name_chksum + i), device_name_digest);
+    }
+
+    snprintf (device_name_chksum, HCBUFSIZ_TINY - 1, "%08x", device_name_digest[0]);
+
+    u32 device_name_digest_amp_mp[4] = { 0 };
+
+    for (size_t i = 0; i < dnclen_amp_mp; i += 64)
+    {
+      md5_64 ((u32 *) (device_name_chksum_amp_mp + i), device_name_digest_amp_mp);
+    }
+
+    snprintf (device_name_chksum_amp_mp, HCBUFSIZ_TINY - 1, "%08x", device_name_digest_amp_mp[0]);
 
     /**
      * main kernel
@@ -4252,7 +4276,7 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
 
       char source_file[256] = { 0 };
 
-      generate_source_kernel_filename (hashconfig->attack_exec, user_options_extra->attack_kern, hashconfig->kern_type, user_options->length_limit_disable, folder_config->shared_dir, source_file);
+      generate_source_kernel_filename (hashconfig->attack_exec, user_options_extra->attack_kern, hashconfig->kern_type, hashconfig->opti_type, folder_config->shared_dir, source_file);
 
       if (hc_path_read (source_file) == false)
       {
@@ -4267,7 +4291,7 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
 
       char cached_file[256] = { 0 };
 
-      generate_cached_kernel_filename (hashconfig->attack_exec, user_options_extra->attack_kern, hashconfig->kern_type, user_options->length_limit_disable, folder_config->profile_dir, device_name_chksum, cached_file);
+      generate_cached_kernel_filename (hashconfig->attack_exec, user_options_extra->attack_kern, hashconfig->kern_type, hashconfig->opti_type, folder_config->profile_dir, device_name_chksum, cached_file);
 
       bool cached = true;
 
@@ -4470,7 +4494,7 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
 
       char cached_file[256] = { 0 };
 
-      generate_cached_kernel_mp_filename (hashconfig->opti_type, hashconfig->opts_type, folder_config->profile_dir, device_name_chksum, cached_file);
+      generate_cached_kernel_mp_filename (hashconfig->opti_type, hashconfig->opts_type, folder_config->profile_dir, device_name_chksum_amp_mp, cached_file);
 
       bool cached = true;
 
@@ -4611,7 +4635,7 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
 
       char cached_file[256] = { 0 };
 
-      generate_cached_kernel_amp_filename (user_options_extra->attack_kern, folder_config->profile_dir, device_name_chksum, cached_file);
+      generate_cached_kernel_amp_filename (user_options_extra->attack_kern, folder_config->profile_dir, device_name_chksum_amp_mp, cached_file);
 
       bool cached = true;
 
@@ -4720,6 +4744,9 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
 
       hcfree (kernel_sources[0]);
     }
+
+    hcfree (device_name_chksum);
+    hcfree (device_name_chksum_amp_mp);
 
     // return back to the folder we came from initially (workaround)
 
@@ -4911,7 +4938,11 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
     device_param->kernel_params_mp_buf32[7] = 0;
     device_param->kernel_params_mp_buf32[8] = 0;
 
-    if (user_options->length_limit_disable == true)
+    if (hashconfig->opti_type & OPTI_TYPE_OPTIMIZED_KERNEL)
+    {
+      device_param->kernel_params_mp[0] = &device_param->d_combs;
+    }
+    else
     {
       if (user_options->attack_mode == ATTACK_MODE_HYBRID1)
       {
@@ -4921,10 +4952,6 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
       {
         device_param->kernel_params_mp[0] = &device_param->d_pws_buf;
       }
-    }
-    else
-    {
-      device_param->kernel_params_mp[0] = &device_param->d_combs;
     }
 
     device_param->kernel_params_mp[1] = &device_param->d_root_css_buf;
@@ -5003,19 +5030,7 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
     {
       if (hashconfig->opti_type & OPTI_TYPE_SINGLE_HASH)
       {
-        if (user_options->length_limit_disable == true)
-        {
-          snprintf (kernel_name, sizeof (kernel_name) - 1, "m%05u_sxx", hashconfig->kern_type);
-
-          CL_rc = hc_clCreateKernel (hashcat_ctx, device_param->program, kernel_name, &device_param->kernel4);
-
-          if (CL_rc == -1) return -1;
-
-          CL_rc = get_kernel_threads (hashcat_ctx, device_param, device_param->kernel4, &device_param->kernel_threads_by_wgs_kernel4);
-
-          if (CL_rc == -1) return -1;
-        }
-        else
+        if (hashconfig->opti_type & OPTI_TYPE_OPTIMIZED_KERNEL)
         {
           // kernel1
 
@@ -5053,12 +5068,9 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
 
           if (CL_rc == -1) return -1;
         }
-      }
-      else
-      {
-        if (user_options->length_limit_disable == true)
+        else
         {
-          snprintf (kernel_name, sizeof (kernel_name) - 1, "m%05u_mxx", hashconfig->kern_type);
+          snprintf (kernel_name, sizeof (kernel_name) - 1, "m%05u_sxx", hashconfig->kern_type);
 
           CL_rc = hc_clCreateKernel (hashcat_ctx, device_param->program, kernel_name, &device_param->kernel4);
 
@@ -5068,7 +5080,10 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
 
           if (CL_rc == -1) return -1;
         }
-        else
+      }
+      else
+      {
+        if (hashconfig->opti_type & OPTI_TYPE_OPTIMIZED_KERNEL)
         {
           // kernel1
 
@@ -5103,6 +5118,18 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
           if (CL_rc == -1) return -1;
 
           CL_rc = get_kernel_threads (hashcat_ctx, device_param, device_param->kernel3, &device_param->kernel_threads_by_wgs_kernel3);
+
+          if (CL_rc == -1) return -1;
+        }
+        else
+        {
+          snprintf (kernel_name, sizeof (kernel_name) - 1, "m%05u_mxx", hashconfig->kern_type);
+
+          CL_rc = hc_clCreateKernel (hashcat_ctx, device_param->program, kernel_name, &device_param->kernel4);
+
+          if (CL_rc == -1) return -1;
+
+          CL_rc = get_kernel_threads (hashcat_ctx, device_param, device_param->kernel4, &device_param->kernel_threads_by_wgs_kernel4);
 
           if (CL_rc == -1) return -1;
         }

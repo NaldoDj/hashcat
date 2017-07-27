@@ -39,6 +39,15 @@ void welcome_screen (hashcat_ctx_t *hashcat_ctx, const char *version_tag)
     {
       event_log_info (hashcat_ctx, "%s (%s) starting in benchmark mode...", PROGNAME, version_tag);
       event_log_info (hashcat_ctx, NULL);
+
+      if (user_options->workload_profile_chgd == false)
+      {
+        event_log_advice (hashcat_ctx, "Benchmarking uses hand-optimized kernel code by default.");
+        event_log_advice (hashcat_ctx, "You can use it in your cracking session by setting the -O option.");
+        event_log_advice (hashcat_ctx, "Note: Using optimized kernel code limits the maximum supported password length.");
+        event_log_advice (hashcat_ctx, "To disable the optimized kernel code in benchmark mode, use the -w option.");
+        event_log_advice (hashcat_ctx, NULL);
+      }
     }
     else
     {
@@ -643,10 +652,10 @@ void status_display_machine_readable (hashcat_ctx_t *hashcat_ctx)
 
     if (device_info->skipped_dev == true) continue;
 
-    printf ("%" PRIu64 "\t", (u64) device_info->hashes_msec_dev);
+    printf ("%" PRIu64 "\t", (u64) (device_info->hashes_msec_dev * 1000));
 
     // that 1\t is for backward compatibility
-    printf ("1\t");
+    printf ("1000\t");
   }
 
   printf ("EXEC_RUNTIME\t");
@@ -699,6 +708,7 @@ void status_display_machine_readable (hashcat_ctx_t *hashcat_ctx)
 
 void status_display (hashcat_ctx_t *hashcat_ctx)
 {
+  const hashconfig_t   *hashconfig   = hashcat_ctx->hashconfig;
   const user_options_t *user_options = hashcat_ctx->user_options;
 
   if (user_options->machine_readable == true)
@@ -888,7 +898,7 @@ void status_display (hashcat_ctx_t *hashcat_ctx)
 
     case GUESS_MODE_HYBRID2:
 
-      if (user_options->length_limit_disable == true)
+      if (hashconfig->opti_type & OPTI_TYPE_OPTIMIZED_KERNEL)
       {
         event_log_info (hashcat_ctx,
           "Guess.Base.......: Mask (%s) [%d], Left Side",
@@ -915,7 +925,7 @@ void status_display (hashcat_ctx_t *hashcat_ctx)
 
     case GUESS_MODE_HYBRID2_CS:
 
-      if (user_options->length_limit_disable == true)
+      if (hashconfig->opti_type & OPTI_TYPE_OPTIMIZED_KERNEL)
       {
         event_log_info (hashcat_ctx,
           "Guess.Base.......: Mask (%s) [%d], Left Side",
