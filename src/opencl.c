@@ -10,6 +10,7 @@
 #include "thread.h"
 #include "timer.h"
 #include "tuningdb.h"
+#include "rp.h"
 #include "rp_cpu.h"
 #include "mpsp.h"
 #include "straight.h"
@@ -2038,11 +2039,11 @@ int run_cracker (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, co
 
               char *line_buf_new = line_buf;
 
-              char rule_buf_out[BLOCK_SIZE];
+              char rule_buf_out[RP_PASSWORD_SIZE];
 
               if (run_rule_engine (user_options_extra->rule_len_r, user_options->rule_buf_r))
               {
-                if (line_len >= BLOCK_SIZE) continue;
+                if (line_len >= RP_PASSWORD_SIZE) continue;
 
                 memset (rule_buf_out, 0, sizeof (rule_buf_out));
 
@@ -2155,11 +2156,11 @@ int run_cracker (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, co
 
               char *line_buf_new = line_buf;
 
-              char rule_buf_out[BLOCK_SIZE];
+              char rule_buf_out[RP_PASSWORD_SIZE];
 
               if (run_rule_engine (user_options_extra->rule_len_r, user_options->rule_buf_r))
               {
-                if (line_len >= BLOCK_SIZE) continue;
+                if (line_len >= RP_PASSWORD_SIZE) continue;
 
                 memset (rule_buf_out, 0, sizeof (rule_buf_out));
 
@@ -4179,7 +4180,7 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
     // this test needs to be done manually because of osx opencl runtime
     // if there's a problem with permission, its not reporting back and erroring out silently
 
-    #define files_cnt 15
+    #define files_cnt 16
 
     const char *files_names[files_cnt] =
     {
@@ -4193,9 +4194,10 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
       "inc_comp_single.cl",
       "inc_hash_constants.h",
       "inc_hash_functions.cl",
-      "inc_rp.cl",
-      "inc_rp.h",
+      "inc_rp_optimized.cl",
+      "inc_rp_optimized.h",
       "inc_simd.cl",
+      "inc_scalar.cl",
       "inc_types.cl",
       "inc_vendor.cl",
     };
