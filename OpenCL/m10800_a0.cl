@@ -10,8 +10,8 @@
 #include "inc_hash_functions.cl"
 #include "inc_types.cl"
 #include "inc_common.cl"
-#include "inc_rp_optimized.h"
-#include "inc_rp_optimized.cl"
+#include "inc_rp.h"
+#include "inc_rp.cl"
 #include "inc_scalar.cl"
 #include "inc_hash_sha384.cl"
 
@@ -47,13 +47,15 @@ __kernel void m10800_mxx (__global pw_t *pws, __global const kernel_rule_t *rule
 
   for (u32 il_pos = 0; il_pos < il_cnt; il_pos++)
   {
-    // todo: add rules engine
+    pw_t tmp = pw;
+
+    tmp.pw_len = apply_rules (rules_buf[il_pos].cmds, tmp.i, tmp.pw_len);
 
     sha384_ctx_t ctx;
 
     sha384_init (&ctx);
 
-    sha384_update (&ctx, w, pw_len);
+    sha384_update (&ctx, tmp.i, tmp.pw_len);
 
     sha384_final (&ctx);
 
@@ -110,13 +112,15 @@ __kernel void m10800_sxx (__global pw_t *pws, __global const kernel_rule_t *rule
 
   for (u32 il_pos = 0; il_pos < il_cnt; il_pos++)
   {
-    // todo: add rules engine
+    pw_t tmp = pw;
+
+    tmp.pw_len = apply_rules (rules_buf[il_pos].cmds, tmp.i, tmp.pw_len);
 
     sha384_ctx_t ctx;
 
     sha384_init (&ctx);
 
-    sha384_update (&ctx, w, pw_len);
+    sha384_update (&ctx, tmp.i, tmp.pw_len);
 
     sha384_final (&ctx);
 

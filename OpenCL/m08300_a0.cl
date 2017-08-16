@@ -10,8 +10,8 @@
 #include "inc_hash_functions.cl"
 #include "inc_types.cl"
 #include "inc_common.cl"
-#include "inc_rp_optimized.h"
-#include "inc_rp_optimized.cl"
+#include "inc_rp.h"
+#include "inc_rp.cl"
 #include "inc_scalar.cl"
 #include "inc_hash_sha1.cl"
 
@@ -30,16 +30,7 @@ __kernel void m08300_mxx (__global pw_t *pws, __global const kernel_rule_t *rule
    * base
    */
 
-  const u32 pw_len = pws[gid].pw_len;
-
-  const u32 pw_lenv = ceil ((float) pw_len / 4);
-
-  u32 w[64] = { 0 };
-
-  for (int idx = 0; idx < pw_lenv; idx++)
-  {
-    w[idx] = pws[gid].i[idx];
-  }
+  pw_t pw = pws[gid];
 
   const u32 salt_len = salt_bufs[salt_pos].salt_len;
 
@@ -71,7 +62,9 @@ __kernel void m08300_mxx (__global pw_t *pws, __global const kernel_rule_t *rule
 
   for (u32 il_pos = 0; il_pos < il_cnt; il_pos++)
   {
-    // todo: add rules engine
+    pw_t tmp = pw;
+
+    tmp.pw_len = apply_rules (rules_buf[il_pos].cmds, tmp.i, tmp.pw_len);
 
     sha1_ctx_t ctx1;
 
@@ -81,7 +74,7 @@ __kernel void m08300_mxx (__global pw_t *pws, __global const kernel_rule_t *rule
 
     ctx1.len = 1;
 
-    sha1_update_swap (&ctx1, w, pw_len);
+    sha1_update_swap (&ctx1, tmp.i, tmp.pw_len);
 
     sha1_update (&ctx1, s_pc, salt_len_pc + 1);
 
@@ -160,16 +153,7 @@ __kernel void m08300_sxx (__global pw_t *pws, __global const kernel_rule_t *rule
    * base
    */
 
-  const u32 pw_len = pws[gid].pw_len;
-
-  const u32 pw_lenv = ceil ((float) pw_len / 4);
-
-  u32 w[64] = { 0 };
-
-  for (int idx = 0; idx < pw_lenv; idx++)
-  {
-    w[idx] = pws[gid].i[idx];
-  }
+  pw_t pw = pws[gid];
 
   const u32 salt_len = salt_bufs[salt_pos].salt_len;
 
@@ -201,7 +185,9 @@ __kernel void m08300_sxx (__global pw_t *pws, __global const kernel_rule_t *rule
 
   for (u32 il_pos = 0; il_pos < il_cnt; il_pos++)
   {
-    // todo: add rules engine
+    pw_t tmp = pw;
+
+    tmp.pw_len = apply_rules (rules_buf[il_pos].cmds, tmp.i, tmp.pw_len);
 
     sha1_ctx_t ctx1;
 
@@ -211,7 +197,7 @@ __kernel void m08300_sxx (__global pw_t *pws, __global const kernel_rule_t *rule
 
     ctx1.len = 1;
 
-    sha1_update_swap (&ctx1, w, pw_len);
+    sha1_update_swap (&ctx1, tmp.i, tmp.pw_len);
 
     sha1_update (&ctx1, s_pc, salt_len_pc + 1);
 
