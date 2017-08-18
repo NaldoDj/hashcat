@@ -26,6 +26,8 @@
 - Fixed the version number used in the restore file header
 - Fixed the parsing of command line options. It doesn't show two times the same error about an invalid option anymore.
 - Fixed the estimated time value whenever the value is very large and overflows
+- Fixed the parsing of DCC2 hashes by allowing the "#" character within the user name
+- Fixed the parsing of descrypt hashes if the hashes do have non-standard characters within the salt
 
 ##
 ## Improvements
@@ -33,6 +35,12 @@
 
 - OpenCL Runtime: Updated AMD ROCm driver version check, warn if version < 1.1
 - WPA cracking: Improved nonce-error-corrections mode to use a both positive and negative corrections
+
+##
+## Technical
+##
+
+- Time: added new type for time measurements hc_time_t and related functions to force the use of 64 bit times
 
 * changes v3.5.0 -> v3.6.0:
 

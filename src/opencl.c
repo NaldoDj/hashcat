@@ -3728,7 +3728,9 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
       }
       else
       {
-        vector_width = 1;
+        // there's currently no slow kernel that supports NEW_SIMD_CODE which
+        // has unknown final password length in _loop kernel
+        // vector_width = 1;
       }
     }
 
@@ -3920,22 +3922,22 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
         {
           if (device_param->device_vendor_id == VENDOR_ID_AMD)
           {
-            tmto_start = 3;
+            tmto_start = 4;
           }
           else if (device_param->device_vendor_id == VENDOR_ID_NV)
           {
-            tmto_start = 2;
+            tmto_start = 3;
           }
         }
         else if (hashconfig->hash_mode == 9300)
         {
           if (device_param->device_vendor_id == VENDOR_ID_AMD)
           {
-            tmto_start = 2;
+            tmto_start = 5;
           }
           else if (device_param->device_vendor_id == VENDOR_ID_NV)
           {
-            tmto_start = 4;
+            tmto_start = 3;
           }
         }
       }
