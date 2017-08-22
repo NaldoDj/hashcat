@@ -38,6 +38,14 @@ void welcome_screen (hashcat_ctx_t *hashcat_ctx, const char *version_tag)
     if (user_options->machine_readable == false)
     {
       event_log_info (hashcat_ctx, "%s (%s) starting in benchmark mode...", PROGNAME, version_tag);
+      if (user_options->optimized_kernel_enable == false)
+      {
+        event_log_info (hashcat_ctx, "Active options: -w %u", user_options->workload_profile);
+      }
+      else
+      {
+        event_log_info (hashcat_ctx, "Active options: -O, -w %u", user_options->workload_profile);
+      }
       event_log_info (hashcat_ctx, NULL);
 
       if (user_options->workload_profile_chgd == false)
@@ -52,6 +60,14 @@ void welcome_screen (hashcat_ctx_t *hashcat_ctx, const char *version_tag)
     else
     {
       event_log_info (hashcat_ctx, "# %s (%s)", PROGNAME, version_tag);
+      if (user_options->optimized_kernel_enable == false)
+      {
+        event_log_info (hashcat_ctx, "# Active options: -w %u", user_options->workload_profile);
+      }
+      else
+      {
+        event_log_info (hashcat_ctx, "# Active options: -O, -w %u", user_options->workload_profile);
+      }
     }
   }
   else if (user_options->restore == true)
@@ -495,6 +511,69 @@ void compress_terminal_line_length (char *out_buf, const size_t keep_from_beginn
   }
 
   *ptr1 = 0;
+}
+
+void example_hashes (hashcat_ctx_t *hashcat_ctx)
+{
+  user_options_t *user_options = hashcat_ctx->user_options;
+
+  if (user_options->hash_mode_chgd == true)
+  {
+    const int rc = hashconfig_init (hashcat_ctx);
+
+    if (rc == 0)
+    {
+      hashconfig_t *hashconfig = hashcat_ctx->hashconfig;
+
+      event_log_info (hashcat_ctx, "MODE: %s", strhashtype (hashconfig->hash_mode));
+
+      if ((hashconfig->st_hash != NULL) && (hashconfig->st_pass != NULL))
+      {
+        event_log_info (hashcat_ctx, "HASH: %s", hashconfig->st_hash);
+        event_log_info (hashcat_ctx, "PASS: %s", hashconfig->st_pass);
+      }
+      else
+      {
+        event_log_info (hashcat_ctx, "HASH: not stored");
+        event_log_info (hashcat_ctx, "PASS: not stored");
+      }
+
+      event_log_info (hashcat_ctx, NULL);
+    }
+
+    hashconfig_destroy (hashcat_ctx);
+  }
+  else
+  {
+    for (int i = 0; i < 100000; i++)
+    {
+      user_options->hash_mode = i;
+
+      const int rc = hashconfig_init (hashcat_ctx);
+
+      if (rc == 0)
+      {
+        hashconfig_t *hashconfig = hashcat_ctx->hashconfig;
+
+        event_log_info (hashcat_ctx, "MODE: %s", strhashtype (hashconfig->hash_mode));
+
+        if ((hashconfig->st_hash != NULL) && (hashconfig->st_pass != NULL))
+        {
+          event_log_info (hashcat_ctx, "HASH: %s", hashconfig->st_hash);
+          event_log_info (hashcat_ctx, "PASS: %s", hashconfig->st_pass);
+        }
+        else
+        {
+          event_log_info (hashcat_ctx, "HASH: not stored");
+          event_log_info (hashcat_ctx, "PASS: not stored");
+        }
+
+        event_log_info (hashcat_ctx, NULL);
+      }
+
+      hashconfig_destroy (hashcat_ctx);
+    }
+  }
 }
 
 void opencl_info (hashcat_ctx_t *hashcat_ctx)

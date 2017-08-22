@@ -448,14 +448,14 @@ static int selftest (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param
   device_param->kernel_params_buf32[31] = 0;
   device_param->kernel_params_buf32[32] = 0;
   device_param->kernel_params_buf32[33] = 0;
-  device_param->kernel_params_buf32[34] = 0;
+  device_param->kernel_params_buf64[34] = 0;
 
   device_param->kernel_params[15] = &device_param->d_digests_buf;
   device_param->kernel_params[17] = &device_param->d_salt_bufs;
   device_param->kernel_params[18] = &device_param->d_esalt_bufs;
 
   CL_rc = run_kernel_bzero (hashcat_ctx, device_param, device_param->d_pws_buf,       device_param->size_pws);      if (CL_rc == -1) return -1;
-  CL_rc = run_kernel_bzero (hashcat_ctx, device_param, device_param->d_pws_amp_buf,   device_param->size_pws);      if (CL_rc == -1) return -1;
+  CL_rc = run_kernel_bzero (hashcat_ctx, device_param, device_param->d_pws_amp_buf,   device_param->size_pws_amp);  if (CL_rc == -1) return -1;
   CL_rc = run_kernel_bzero (hashcat_ctx, device_param, device_param->d_tmps,          device_param->size_tmps);     if (CL_rc == -1) return -1;
   CL_rc = run_kernel_bzero (hashcat_ctx, device_param, device_param->d_hooks,         device_param->size_hooks);    if (CL_rc == -1) return -1;
   CL_rc = run_kernel_bzero (hashcat_ctx, device_param, device_param->d_plain_bufs,    device_param->size_plains);   if (CL_rc == -1) return -1;
