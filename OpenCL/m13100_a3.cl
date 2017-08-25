@@ -232,14 +232,14 @@ int decrypt_and_check (__local RC4_KEY *rc4_key, u32 data[4], __global const u32
   {
     j = rc4_next_16 (rc4_key, i, j, edata2, w0); i += 16; edata2 += 4;
 
-    truncate_block_4x4_le (w0, edata2_left & 0xf);
+    truncate_block_4x4_le_S (w0, edata2_left & 0xf);
   }
   else if (edata2_left < 32)
   {
     j = rc4_next_16 (rc4_key, i, j, edata2, w0); i += 16; edata2 += 4;
     j = rc4_next_16 (rc4_key, i, j, edata2, w1); i += 16; edata2 += 4;
 
-    truncate_block_4x4_le (w1, edata2_left & 0xf);
+    truncate_block_4x4_le_S (w1, edata2_left & 0xf);
   }
   else if (edata2_left < 48)
   {
@@ -247,7 +247,7 @@ int decrypt_and_check (__local RC4_KEY *rc4_key, u32 data[4], __global const u32
     j = rc4_next_16 (rc4_key, i, j, edata2, w1); i += 16; edata2 += 4;
     j = rc4_next_16 (rc4_key, i, j, edata2, w2); i += 16; edata2 += 4;
 
-    truncate_block_4x4_le (w2, edata2_left & 0xf);
+    truncate_block_4x4_le_S (w2, edata2_left & 0xf);
   }
   else
   {
@@ -256,7 +256,7 @@ int decrypt_and_check (__local RC4_KEY *rc4_key, u32 data[4], __global const u32
     j = rc4_next_16 (rc4_key, i, j, edata2, w2); i += 16; edata2 += 4;
     j = rc4_next_16 (rc4_key, i, j, edata2, w3); i += 16; edata2 += 4;
 
-    truncate_block_4x4_le (w3, edata2_left & 0xf);
+    truncate_block_4x4_le_S (w3, edata2_left & 0xf);
   }
 
   md5_hmac_update_64 (&ctx, w0, w1, w2, w3, edata2_left);
@@ -375,7 +375,7 @@ void kerb_prepare (const u32 K[4], const u32 checksum[4], u32 digest[4], u32 K2[
   K2[3] = ctx1.opad.h[3];
 }
 
-__kernel void m13100_mxx (__global pw_t *pws, __constant const kernel_rule_t *rules_buf, __global const pw_t *combs_buf, __constant const u32x *words_buf_r, __global void *tmps, __global void *hooks, __global const u32 *bitmaps_buf_s1_a, __global const u32 *bitmaps_buf_s1_b, __global const u32 *bitmaps_buf_s1_c, __global const u32 *bitmaps_buf_s1_d, __global const u32 *bitmaps_buf_s2_a, __global const u32 *bitmaps_buf_s2_b, __global const u32 *bitmaps_buf_s2_c, __global const u32 *bitmaps_buf_s2_d, __global plain_t *plains_buf, __global const digest_t *digests_buf, __global u32 *hashes_shown, __global const salt_t *salt_bufs, __global const krb5tgs_t *krb5tgs_bufs, __global u32 *d_return_buf, __global u32 *d_scryptV0_buf, __global u32 *d_scryptV1_buf, __global u32 *d_scryptV2_buf, __global u32 *d_scryptV3_buf, const u32 bitmap_mask, const u32 bitmap_shift1, const u32 bitmap_shift2, const u32 salt_pos, const u32 loop_pos, const u32 loop_cnt, const u32 il_cnt, const u32 digests_cnt, const u32 digests_offset, const u32 combs_mode, const u64 gid_max)
+__kernel void m13100_mxx (__global pw_t *pws, __global const kernel_rule_t *rules_buf, __global const pw_t *combs_buf, __constant const u32x *words_buf_r, __global void *tmps, __global void *hooks, __global const u32 *bitmaps_buf_s1_a, __global const u32 *bitmaps_buf_s1_b, __global const u32 *bitmaps_buf_s1_c, __global const u32 *bitmaps_buf_s1_d, __global const u32 *bitmaps_buf_s2_a, __global const u32 *bitmaps_buf_s2_b, __global const u32 *bitmaps_buf_s2_c, __global const u32 *bitmaps_buf_s2_d, __global plain_t *plains_buf, __global const digest_t *digests_buf, __global u32 *hashes_shown, __global const salt_t *salt_bufs, __global const krb5tgs_t *krb5tgs_bufs, __global u32 *d_return_buf, __global u32 *d_scryptV0_buf, __global u32 *d_scryptV1_buf, __global u32 *d_scryptV2_buf, __global u32 *d_scryptV3_buf, const u32 bitmap_mask, const u32 bitmap_shift1, const u32 bitmap_shift2, const u32 salt_pos, const u32 loop_pos, const u32 loop_cnt, const u32 il_cnt, const u32 digests_cnt, const u32 digests_offset, const u32 combs_mode, const u64 gid_max)
 {
   /**
    * modifier
@@ -446,7 +446,7 @@ __kernel void m13100_mxx (__global pw_t *pws, __constant const kernel_rule_t *ru
   }
 }
 
-__kernel void m13100_sxx (__global pw_t *pws, __constant const kernel_rule_t *rules_buf, __global const pw_t *combs_buf, __constant const u32x *words_buf_r, __global void *tmps, __global void *hooks, __global const u32 *bitmaps_buf_s1_a, __global const u32 *bitmaps_buf_s1_b, __global const u32 *bitmaps_buf_s1_c, __global const u32 *bitmaps_buf_s1_d, __global const u32 *bitmaps_buf_s2_a, __global const u32 *bitmaps_buf_s2_b, __global const u32 *bitmaps_buf_s2_c, __global const u32 *bitmaps_buf_s2_d, __global plain_t *plains_buf, __global const digest_t *digests_buf, __global u32 *hashes_shown, __global const salt_t *salt_bufs, __global const krb5tgs_t *krb5tgs_bufs, __global u32 *d_return_buf, __global u32 *d_scryptV0_buf, __global u32 *d_scryptV1_buf, __global u32 *d_scryptV2_buf, __global u32 *d_scryptV3_buf, const u32 bitmap_mask, const u32 bitmap_shift1, const u32 bitmap_shift2, const u32 salt_pos, const u32 loop_pos, const u32 loop_cnt, const u32 il_cnt, const u32 digests_cnt, const u32 digests_offset, const u32 combs_mode, const u64 gid_max)
+__kernel void m13100_sxx (__global pw_t *pws, __global const kernel_rule_t *rules_buf, __global const pw_t *combs_buf, __constant const u32x *words_buf_r, __global void *tmps, __global void *hooks, __global const u32 *bitmaps_buf_s1_a, __global const u32 *bitmaps_buf_s1_b, __global const u32 *bitmaps_buf_s1_c, __global const u32 *bitmaps_buf_s1_d, __global const u32 *bitmaps_buf_s2_a, __global const u32 *bitmaps_buf_s2_b, __global const u32 *bitmaps_buf_s2_c, __global const u32 *bitmaps_buf_s2_d, __global plain_t *plains_buf, __global const digest_t *digests_buf, __global u32 *hashes_shown, __global const salt_t *salt_bufs, __global const krb5tgs_t *krb5tgs_bufs, __global u32 *d_return_buf, __global u32 *d_scryptV0_buf, __global u32 *d_scryptV1_buf, __global u32 *d_scryptV2_buf, __global u32 *d_scryptV3_buf, const u32 bitmap_mask, const u32 bitmap_shift1, const u32 bitmap_shift2, const u32 salt_pos, const u32 loop_pos, const u32 loop_cnt, const u32 il_cnt, const u32 digests_cnt, const u32 digests_offset, const u32 combs_mode, const u64 gid_max)
 {
   /**
    * modifier

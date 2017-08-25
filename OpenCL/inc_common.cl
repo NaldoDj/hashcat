@@ -144,1841 +144,10 @@ static float get_entropy (const u32 *buf, const int elems)
  * vector functions
  */
 
-static void truncate_block_4x4_le (u32x w0[4], const u32 len)
-{
-  switch (len)
-  {
-    case  0:
-      w0[0]  = 0;
-      w0[1]  = 0;
-      w0[2]  = 0;
-      w0[3]  = 0;
-
-      break;
-
-    case  1:
-      w0[0] &= 0x000000ff;
-      w0[1]  = 0;
-      w0[2]  = 0;
-      w0[3]  = 0;
-
-      break;
-
-    case  2:
-      w0[0] &= 0x0000ffff;
-      w0[1]  = 0;
-      w0[2]  = 0;
-      w0[3]  = 0;
-
-      break;
-
-    case  3:
-      w0[0] &= 0x00ffffff;
-      w0[1]  = 0;
-      w0[2]  = 0;
-      w0[3]  = 0;
-
-      break;
-
-    case  4:
-      w0[1]  = 0;
-      w0[2]  = 0;
-      w0[3]  = 0;
-
-      break;
-
-    case  5:
-      w0[1] &= 0x000000ff;
-      w0[2]  = 0;
-      w0[3]  = 0;
-
-      break;
-
-    case  6:
-      w0[1] &= 0x0000ffff;
-      w0[2]  = 0;
-      w0[3]  = 0;
-
-      break;
-
-    case  7:
-      w0[1] &= 0x00ffffff;
-      w0[2]  = 0;
-      w0[3]  = 0;
-
-      break;
-
-    case  8:
-      w0[2]  = 0;
-      w0[3]  = 0;
-
-      break;
-
-    case  9:
-      w0[2] &= 0x000000ff;
-      w0[3]  = 0;
-
-      break;
-
-    case 10:
-      w0[2] &= 0x0000ffff;
-      w0[3]  = 0;
-
-      break;
-
-    case 11:
-      w0[2] &= 0x00ffffff;
-      w0[3]  = 0;
-
-      break;
-
-    case 12:
-      w0[3]  = 0;
-
-      break;
-
-    case 13:
-      w0[3] &= 0x000000ff;
-
-      break;
-
-    case 14:
-      w0[3] &= 0x0000ffff;
-
-      break;
-
-    case 15:
-      w0[3] &= 0x00ffffff;
-
-      break;
-  }
-}
-
-static void truncate_block_16x4_le (u32x w0[4], u32x w1[4], u32x w2[4], u32x w3[4], const u32 len)
-{
-  switch (len)
-  {
-    case  0:
-      w0[0]  = 0;
-      w0[1]  = 0;
-      w0[2]  = 0;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case  1:
-      w0[0] &= 0x000000ff;
-      w0[1]  = 0;
-      w0[2]  = 0;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case  2:
-      w0[0] &= 0x0000ffff;
-      w0[1]  = 0;
-      w0[2]  = 0;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case  3:
-      w0[0] &= 0x00ffffff;
-      w0[1]  = 0;
-      w0[2]  = 0;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case  4:
-      w0[1]  = 0;
-      w0[2]  = 0;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case  5:
-      w0[1] &= 0x000000ff;
-      w0[2]  = 0;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case  6:
-      w0[1] &= 0x0000ffff;
-      w0[2]  = 0;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case  7:
-      w0[1] &= 0x00ffffff;
-      w0[2]  = 0;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case  8:
-      w0[2]  = 0;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case  9:
-      w0[2] &= 0x000000ff;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 10:
-      w0[2] &= 0x0000ffff;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 11:
-      w0[2] &= 0x00ffffff;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 12:
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 13:
-      w0[3] &= 0x000000ff;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 14:
-      w0[3] &= 0x0000ffff;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 15:
-      w0[3] &= 0x00ffffff;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 16:
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 17:
-      w1[0] &= 0x000000ff;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 18:
-      w1[0] &= 0x0000ffff;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 19:
-      w1[0] &= 0x00ffffff;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 20:
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 21:
-      w1[1] &= 0x000000ff;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 22:
-      w1[1] &= 0x0000ffff;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 23:
-      w1[1] &= 0x00ffffff;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 24:
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 25:
-      w1[2] &= 0x000000ff;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 26:
-      w1[2] &= 0x0000ffff;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 27:
-      w1[2] &= 0x00ffffff;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 28:
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 29:
-      w1[3] &= 0x000000ff;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 30:
-      w1[3] &= 0x0000ffff;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 31:
-      w1[3] &= 0x00ffffff;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 32:
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 33:
-      w2[0] &= 0x000000ff;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 34:
-      w2[0] &= 0x0000ffff;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 35:
-      w2[0] &= 0x00ffffff;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 36:
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 37:
-      w2[1] &= 0x000000ff;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 38:
-      w2[1] &= 0x0000ffff;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 39:
-      w2[1] &= 0x00ffffff;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 40:
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 41:
-      w2[2] &= 0x000000ff;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 42:
-      w2[2] &= 0x0000ffff;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 43:
-      w2[2] &= 0x00ffffff;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 44:
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 45:
-      w2[3] &= 0x000000ff;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 46:
-      w2[3] &= 0x0000ffff;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 47:
-      w2[3] &= 0x00ffffff;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 48:
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 49:
-      w3[0] &= 0x000000ff;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 50:
-      w3[0] &= 0x0000ffff;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 51:
-      w3[0] &= 0x00ffffff;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 52:
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 53:
-      w3[1] &= 0x000000ff;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 54:
-      w3[1] &= 0x0000ffff;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 55:
-      w3[1] &= 0x00ffffff;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 56:
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 57:
-      w3[2] &= 0x000000ff;
-      w3[3]  = 0;
-
-      break;
-
-    case 58:
-      w3[2] &= 0x0000ffff;
-      w3[3]  = 0;
-
-      break;
-
-    case 59:
-      w3[2] &= 0x00ffffff;
-      w3[3]  = 0;
-
-      break;
-
-    case 60:
-      w3[3]  = 0;
-
-      break;
-
-    case 61:
-      w3[3] &= 0x000000ff;
-
-      break;
-
-    case 62:
-      w3[3] &= 0x0000ffff;
-
-      break;
-
-    case 63:
-      w3[3] &= 0x00ffffff;
-
-      break;
-  }
-}
-
-static void truncate_block_4x4_be (u32x w0[4], const u32 len)
-{
-  switch (len)
-  {
-    case  0:
-      w0[0]  = 0;
-      w0[1]  = 0;
-      w0[2]  = 0;
-      w0[3]  = 0;
-
-      break;
-
-    case  1:
-      w0[0] &= 0xff000000;
-      w0[1]  = 0;
-      w0[2]  = 0;
-      w0[3]  = 0;
-
-      break;
-
-    case  2:
-      w0[0] &= 0xffff0000;
-      w0[1]  = 0;
-      w0[2]  = 0;
-      w0[3]  = 0;
-
-      break;
-
-    case  3:
-      w0[0] &= 0xffffff00;
-      w0[1]  = 0;
-      w0[2]  = 0;
-      w0[3]  = 0;
-
-      break;
-
-    case  4:
-      w0[1]  = 0;
-      w0[2]  = 0;
-      w0[3]  = 0;
-
-      break;
-
-    case  5:
-      w0[1] &= 0xff000000;
-      w0[2]  = 0;
-      w0[3]  = 0;
-
-      break;
-
-    case  6:
-      w0[1] &= 0xffff0000;
-      w0[2]  = 0;
-      w0[3]  = 0;
-
-      break;
-
-    case  7:
-      w0[1] &= 0xffffff00;
-      w0[2]  = 0;
-      w0[3]  = 0;
-
-      break;
-
-    case  8:
-      w0[2]  = 0;
-      w0[3]  = 0;
-
-      break;
-
-    case  9:
-      w0[2] &= 0xff000000;
-      w0[3]  = 0;
-
-      break;
-
-    case 10:
-      w0[2] &= 0xffff0000;
-      w0[3]  = 0;
-
-      break;
-
-    case 11:
-      w0[2] &= 0xffffff00;
-      w0[3]  = 0;
-
-      break;
-
-    case 12:
-      w0[3]  = 0;
-
-      break;
-
-    case 13:
-      w0[3] &= 0xff000000;
-
-      break;
-
-    case 14:
-      w0[3] &= 0xffff0000;
-
-      break;
-
-    case 15:
-      w0[3] &= 0xffffff00;
-
-      break;
-  }
-}
-
-static void truncate_block_16x4_be (u32x w0[4], u32x w1[4], u32x w2[4], u32x w3[4], const u32 len)
-{
-  switch (len)
-  {
-    case  0:
-      w0[0]  = 0;
-      w0[1]  = 0;
-      w0[2]  = 0;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case  1:
-      w0[0] &= 0xff000000;
-      w0[1]  = 0;
-      w0[2]  = 0;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case  2:
-      w0[0] &= 0xffff0000;
-      w0[1]  = 0;
-      w0[2]  = 0;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case  3:
-      w0[0] &= 0xffffff00;
-      w0[1]  = 0;
-      w0[2]  = 0;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case  4:
-      w0[1]  = 0;
-      w0[2]  = 0;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case  5:
-      w0[1] &= 0xff000000;
-      w0[2]  = 0;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case  6:
-      w0[1] &= 0xffff0000;
-      w0[2]  = 0;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case  7:
-      w0[1] &= 0xffffff00;
-      w0[2]  = 0;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case  8:
-      w0[2]  = 0;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case  9:
-      w0[2] &= 0xff000000;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 10:
-      w0[2] &= 0xffff0000;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 11:
-      w0[2] &= 0xffffff00;
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 12:
-      w0[3]  = 0;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 13:
-      w0[3] &= 0xff000000;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 14:
-      w0[3] &= 0xffff0000;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 15:
-      w0[3] &= 0xffffff00;
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 16:
-      w1[0]  = 0;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 17:
-      w1[0] &= 0xff000000;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 18:
-      w1[0] &= 0xffff0000;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 19:
-      w1[0] &= 0xffffff00;
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 20:
-      w1[1]  = 0;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 21:
-      w1[1] &= 0xff000000;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 22:
-      w1[1] &= 0xffff0000;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 23:
-      w1[1] &= 0xffffff00;
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 24:
-      w1[2]  = 0;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 25:
-      w1[2] &= 0xff000000;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 26:
-      w1[2] &= 0xffff0000;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 27:
-      w1[2] &= 0xffffff00;
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 28:
-      w1[3]  = 0;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 29:
-      w1[3] &= 0xff000000;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 30:
-      w1[3] &= 0xffff0000;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 31:
-      w1[3] &= 0xffffff00;
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 32:
-      w2[0]  = 0;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 33:
-      w2[0] &= 0xff000000;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 34:
-      w2[0] &= 0xffff0000;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 35:
-      w2[0] &= 0xffffff00;
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 36:
-      w2[1]  = 0;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 37:
-      w2[1] &= 0xff000000;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 38:
-      w2[1] &= 0xffff0000;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 39:
-      w2[1] &= 0xffffff00;
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 40:
-      w2[2]  = 0;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 41:
-      w2[2] &= 0xff000000;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 42:
-      w2[2] &= 0xffff0000;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 43:
-      w2[2] &= 0xffffff00;
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 44:
-      w2[3]  = 0;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 45:
-      w2[3] &= 0xff000000;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 46:
-      w2[3] &= 0xffff0000;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 47:
-      w2[3] &= 0xffffff00;
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 48:
-      w3[0]  = 0;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 49:
-      w3[0] &= 0xff000000;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 50:
-      w3[0] &= 0xffff0000;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 51:
-      w3[0] &= 0xffffff00;
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 52:
-      w3[1]  = 0;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 53:
-      w3[1] &= 0xff000000;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 54:
-      w3[1] &= 0xffff0000;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 55:
-      w3[1] &= 0xffffff00;
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 56:
-      w3[2]  = 0;
-      w3[3]  = 0;
-
-      break;
-
-    case 57:
-      w3[2] &= 0xff000000;
-      w3[3]  = 0;
-
-      break;
-
-    case 58:
-      w3[2] &= 0xffff0000;
-      w3[3]  = 0;
-
-      break;
-
-    case 59:
-      w3[2] &= 0xffffff00;
-      w3[3]  = 0;
-
-      break;
-
-    case 60:
-      w3[3]  = 0;
-
-      break;
-
-    case 61:
-      w3[3] &= 0xff000000;
-
-      break;
-
-    case 62:
-      w3[3] &= 0xffff0000;
-
-      break;
-
-    case 63:
-      w3[3] &= 0xffffff00;
-
-      break;
-  }
-}
-
 static void make_utf16be (const u32x in[4], u32x out1[4], u32x out2[4])
 {
-  #ifdef IS_NV
+  #if defined IS_NV
+
   out2[3] = __byte_perm (in[3], 0, 0x3727);
   out2[2] = __byte_perm (in[3], 0, 0x1707);
   out2[1] = __byte_perm (in[2], 0, 0x3727);
@@ -1987,9 +156,20 @@ static void make_utf16be (const u32x in[4], u32x out1[4], u32x out2[4])
   out1[2] = __byte_perm (in[1], 0, 0x1707);
   out1[1] = __byte_perm (in[0], 0, 0x3727);
   out1[0] = __byte_perm (in[0], 0, 0x1707);
-  #endif
 
-  #if defined IS_AMD || defined IS_GENERIC
+  #elif defined IS_AMD_ROCM
+
+  out2[3] = __byte_perm (in[3], 0, 0x03070207);
+  out2[2] = __byte_perm (in[3], 0, 0x01070007);
+  out2[1] = __byte_perm (in[2], 0, 0x03070207);
+  out2[0] = __byte_perm (in[2], 0, 0x01070007);
+  out1[3] = __byte_perm (in[1], 0, 0x03070207);
+  out1[2] = __byte_perm (in[1], 0, 0x01070007);
+  out1[1] = __byte_perm (in[0], 0, 0x03070207);
+  out1[0] = __byte_perm (in[0], 0, 0x01070007);
+
+  #else
+
   out2[3] = ((in[3] >>  0) & 0xFF000000) | ((in[3] >> 8) & 0x0000FF00);
   out2[2] = ((in[3] << 16) & 0xFF000000) | ((in[3] << 8) & 0x0000FF00);
   out2[1] = ((in[2] >>  0) & 0xFF000000) | ((in[2] >> 8) & 0x0000FF00);
@@ -1998,12 +178,14 @@ static void make_utf16be (const u32x in[4], u32x out1[4], u32x out2[4])
   out1[2] = ((in[1] << 16) & 0xFF000000) | ((in[1] << 8) & 0x0000FF00);
   out1[1] = ((in[0] >>  0) & 0xFF000000) | ((in[0] >> 8) & 0x0000FF00);
   out1[0] = ((in[0] << 16) & 0xFF000000) | ((in[0] << 8) & 0x0000FF00);
+
   #endif
 }
 
 static void make_utf16beN (const u32x in[4], u32x out1[4], u32x out2[4])
 {
-  #ifdef IS_NV
+  #if defined IS_NV
+
   out2[3] = __byte_perm (in[3], 0, 0x1707);
   out2[2] = __byte_perm (in[3], 0, 0x3727);
   out2[1] = __byte_perm (in[2], 0, 0x1707);
@@ -2012,9 +194,20 @@ static void make_utf16beN (const u32x in[4], u32x out1[4], u32x out2[4])
   out1[2] = __byte_perm (in[1], 0, 0x3727);
   out1[1] = __byte_perm (in[0], 0, 0x1707);
   out1[0] = __byte_perm (in[0], 0, 0x3727);
-  #endif
 
-  #if defined IS_AMD || defined IS_GENERIC
+  #elif defined IS_AMD_ROCM
+
+  out2[3] = __byte_perm (in[3], 0, 0x01070007);
+  out2[2] = __byte_perm (in[3], 0, 0x03070207);
+  out2[1] = __byte_perm (in[2], 0, 0x01070007);
+  out2[0] = __byte_perm (in[2], 0, 0x03070207);
+  out1[3] = __byte_perm (in[1], 0, 0x01070007);
+  out1[2] = __byte_perm (in[1], 0, 0x03070207);
+  out1[1] = __byte_perm (in[0], 0, 0x01070007);
+  out1[0] = __byte_perm (in[0], 0, 0x03070207);
+
+  #else
+
   out2[3] = ((in[3] << 16) & 0xFF000000) | ((in[3] << 8) & 0x0000FF00);
   out2[2] = ((in[3] >>  0) & 0xFF000000) | ((in[3] >> 8) & 0x0000FF00);
   out2[1] = ((in[2] << 16) & 0xFF000000) | ((in[2] << 8) & 0x0000FF00);
@@ -2023,12 +216,14 @@ static void make_utf16beN (const u32x in[4], u32x out1[4], u32x out2[4])
   out1[2] = ((in[1] >>  0) & 0xFF000000) | ((in[1] >> 8) & 0x0000FF00);
   out1[1] = ((in[0] << 16) & 0xFF000000) | ((in[0] << 8) & 0x0000FF00);
   out1[0] = ((in[0] >>  0) & 0xFF000000) | ((in[0] >> 8) & 0x0000FF00);
+
   #endif
 }
 
 static void make_utf16le (const u32x in[4], u32x out1[4], u32x out2[4])
 {
-  #ifdef IS_NV
+  #if defined IS_NV
+
   out2[3] = __byte_perm (in[3], 0, 0x7372);
   out2[2] = __byte_perm (in[3], 0, 0x7170);
   out2[1] = __byte_perm (in[2], 0, 0x7372);
@@ -2037,9 +232,20 @@ static void make_utf16le (const u32x in[4], u32x out1[4], u32x out2[4])
   out1[2] = __byte_perm (in[1], 0, 0x7170);
   out1[1] = __byte_perm (in[0], 0, 0x7372);
   out1[0] = __byte_perm (in[0], 0, 0x7170);
-  #endif
 
-  #if defined IS_AMD || defined IS_GENERIC
+  #elif defined IS_AMD_ROCM
+
+  out2[3] = __byte_perm (in[3], 0, 0x07030702);
+  out2[2] = __byte_perm (in[3], 0, 0x07010700);
+  out2[1] = __byte_perm (in[2], 0, 0x07030702);
+  out2[0] = __byte_perm (in[2], 0, 0x07010700);
+  out1[3] = __byte_perm (in[1], 0, 0x07030702);
+  out1[2] = __byte_perm (in[1], 0, 0x07010700);
+  out1[1] = __byte_perm (in[0], 0, 0x07030702);
+  out1[0] = __byte_perm (in[0], 0, 0x07010700);
+
+  #else
+
   out2[3] = ((in[3] >> 8) & 0x00FF0000) | ((in[3] >> 16) & 0x000000FF);
   out2[2] = ((in[3] << 8) & 0x00FF0000) | ((in[3] >>  0) & 0x000000FF);
   out2[1] = ((in[2] >> 8) & 0x00FF0000) | ((in[2] >> 16) & 0x000000FF);
@@ -2048,12 +254,14 @@ static void make_utf16le (const u32x in[4], u32x out1[4], u32x out2[4])
   out1[2] = ((in[1] << 8) & 0x00FF0000) | ((in[1] >>  0) & 0x000000FF);
   out1[1] = ((in[0] >> 8) & 0x00FF0000) | ((in[0] >> 16) & 0x000000FF);
   out1[0] = ((in[0] << 8) & 0x00FF0000) | ((in[0] >>  0) & 0x000000FF);
+
   #endif
 }
 
 static void make_utf16leN (const u32x in[4], u32x out1[4], u32x out2[4])
 {
-  #ifdef IS_NV
+  #if defined IS_NV
+
   out2[3] = __byte_perm (in[3], 0, 0x7170);
   out2[2] = __byte_perm (in[3], 0, 0x7372);
   out2[1] = __byte_perm (in[2], 0, 0x7170);
@@ -2062,9 +270,20 @@ static void make_utf16leN (const u32x in[4], u32x out1[4], u32x out2[4])
   out1[2] = __byte_perm (in[1], 0, 0x7372);
   out1[1] = __byte_perm (in[0], 0, 0x7170);
   out1[0] = __byte_perm (in[0], 0, 0x7372);
-  #endif
 
-  #if defined IS_AMD || defined IS_GENERIC
+  #elif defined IS_AMD_ROCM
+
+  out2[3] = __byte_perm (in[3], 0, 0x07010700);
+  out2[2] = __byte_perm (in[3], 0, 0x07030702);
+  out2[1] = __byte_perm (in[2], 0, 0x07010700);
+  out2[0] = __byte_perm (in[2], 0, 0x07030702);
+  out1[3] = __byte_perm (in[1], 0, 0x07010700);
+  out1[2] = __byte_perm (in[1], 0, 0x07030702);
+  out1[1] = __byte_perm (in[0], 0, 0x07010700);
+  out1[0] = __byte_perm (in[0], 0, 0x07030702);
+
+  #else
+
   out2[3] = ((in[3] << 8) & 0x00FF0000) | ((in[3] >>  0) & 0x000000FF);
   out2[2] = ((in[3] >> 8) & 0x00FF0000) | ((in[3] >> 16) & 0x000000FF);
   out2[1] = ((in[2] << 8) & 0x00FF0000) | ((in[2] >>  0) & 0x000000FF);
@@ -2073,19 +292,28 @@ static void make_utf16leN (const u32x in[4], u32x out1[4], u32x out2[4])
   out1[2] = ((in[1] >> 8) & 0x00FF0000) | ((in[1] >> 16) & 0x000000FF);
   out1[1] = ((in[0] << 8) & 0x00FF0000) | ((in[0] >>  0) & 0x000000FF);
   out1[0] = ((in[0] >> 8) & 0x00FF0000) | ((in[0] >> 16) & 0x000000FF);
+
   #endif
 }
 
 static void undo_utf16be (const u32x in1[4], const u32x in2[4], u32x out[4])
 {
-  #ifdef IS_NV
+  #if defined IS_NV
+
   out[0] = __byte_perm (in1[0], in1[1], 0x4602);
   out[1] = __byte_perm (in1[2], in1[3], 0x4602);
   out[2] = __byte_perm (in2[0], in2[1], 0x4602);
   out[3] = __byte_perm (in2[2], in2[3], 0x4602);
-  #endif
 
-  #if defined IS_AMD || defined IS_GENERIC
+  #elif defined IS_AMD_ROCM
+
+  out[0] = __byte_perm (in1[0], in1[1], 0x04060002);
+  out[1] = __byte_perm (in1[2], in1[3], 0x04060002);
+  out[2] = __byte_perm (in2[0], in2[1], 0x04060002);
+  out[3] = __byte_perm (in2[2], in2[3], 0x04060002);
+
+  #else
+
   out[0] = ((in1[0] & 0x0000ff00) >>  8) | ((in1[0] & 0xff000000) >> 16)
          | ((in1[1] & 0x0000ff00) <<  8) | ((in1[1] & 0xff000000) <<  0);
   out[1] = ((in1[2] & 0x0000ff00) >>  8) | ((in1[2] & 0xff000000) >> 16)
@@ -2094,19 +322,28 @@ static void undo_utf16be (const u32x in1[4], const u32x in2[4], u32x out[4])
          | ((in2[1] & 0x0000ff00) <<  8) | ((in2[1] & 0xff000000) <<  0);
   out[3] = ((in2[2] & 0x0000ff00) >>  8) | ((in2[2] & 0xff000000) >> 16)
          | ((in2[3] & 0x0000ff00) <<  8) | ((in2[3] & 0xff000000) <<  0);
+
   #endif
 }
 
 static void undo_utf16le (const u32x in1[4], const u32x in2[4], u32x out[4])
 {
-  #ifdef IS_NV
+  #if defined IS_NV
+
   out[0] = __byte_perm (in1[0], in1[1], 0x6420);
   out[1] = __byte_perm (in1[2], in1[3], 0x6420);
   out[2] = __byte_perm (in2[0], in2[1], 0x6420);
   out[3] = __byte_perm (in2[2], in2[3], 0x6420);
-  #endif
 
-  #if defined IS_AMD || defined IS_GENERIC
+  #elif defined IS_AMD_ROCM
+
+  out[0] = __byte_perm (in1[0], in1[1], 0x06040200);
+  out[1] = __byte_perm (in1[2], in1[3], 0x06040200);
+  out[2] = __byte_perm (in2[0], in2[1], 0x06040200);
+  out[3] = __byte_perm (in2[2], in2[3], 0x06040200);
+
+  #else
+
   out[0] = ((in1[0] & 0x000000ff) >>  0) | ((in1[0] & 0x00ff0000) >>  8)
          | ((in1[1] & 0x000000ff) << 16) | ((in1[1] & 0x00ff0000) <<  8);
   out[1] = ((in1[2] & 0x000000ff) >>  0) | ((in1[2] & 0x00ff0000) >>  8)
@@ -2115,6 +352,7 @@ static void undo_utf16le (const u32x in1[4], const u32x in2[4], u32x out[4])
          | ((in2[1] & 0x000000ff) << 16) | ((in2[1] & 0x00ff0000) <<  8);
   out[3] = ((in2[2] & 0x000000ff) >>  0) | ((in2[2] & 0x00ff0000) >>  8)
          | ((in2[3] & 0x000000ff) << 16) | ((in2[3] & 0x00ff0000) <<  8);
+
   #endif
 }
 
@@ -4981,7 +3219,8 @@ static void switch_buffer_by_offset_carry_le (u32x w0[4], u32x w1[4], u32x w2[4]
 
 static void switch_buffer_by_offset_be (u32x w0[4], u32x w1[4], u32x w2[4], u32x w3[4], const u32 offset)
 {
-  #if defined IS_AMD || defined IS_GENERIC
+  #if defined IS_AMD_LEGACY || defined IS_GENERIC
+
   switch (offset / 4)
   {
     case  0:
@@ -5304,10 +3543,18 @@ static void switch_buffer_by_offset_be (u32x w0[4], u32x w1[4], u32x w2[4], u32x
 
       break;
   }
+
   #endif
 
-  #ifdef IS_NV
+  #if defined IS_AMD_ROCM || defined IS_NV
+
+  #if defined IS_NV
   const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
+  #endif
+
+  #if defined IS_AMD_ROCM
+  const int selector = 0x0706050403020100 >> ((offset & 3) * 8);
+  #endif
 
   switch (offset / 4)
   {
@@ -5631,12 +3878,13 @@ static void switch_buffer_by_offset_be (u32x w0[4], u32x w1[4], u32x w2[4], u32x
 
       break;
   }
+
   #endif
 }
 
 static void switch_buffer_by_offset_carry_be (u32x w0[4], u32x w1[4], u32x w2[4], u32x w3[4], u32x c0[4], u32x c1[4], u32x c2[4], u32x c3[4], const u32 offset)
 {
-  #if defined IS_AMD || defined IS_GENERIC
+  #if defined IS_AMD_LEGACY || defined IS_GENERIC
   switch (offset / 4)
   {
     case  0:
@@ -6097,8 +4345,15 @@ static void switch_buffer_by_offset_carry_be (u32x w0[4], u32x w1[4], u32x w2[4]
   }
   #endif
 
-  #ifdef IS_NV
+  #if defined IS_AMD_ROCM || defined IS_NV
+
+  #if defined IS_NV
   const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
+  #endif
+
+  #if defined IS_AMD_ROCM
+  const int selector = 0x0706050403020100 >> ((offset & 3) * 8);
+  #endif
 
   switch (offset / 4)
   {
@@ -6567,7 +4822,7 @@ static void switch_buffer_by_offset_8x4_le (u32x w0[4], u32x w1[4], u32x w2[4], 
 
   const int offset_minus_4 = 4 - offset_mod_4;
 
-  #if defined IS_AMD || defined IS_GENERIC
+  #if defined IS_AMD_LEGACY || defined IS_GENERIC
   w0[0] = swap32 (w0[0]);
   w0[1] = swap32 (w0[1]);
   w0[2] = swap32 (w0[2]);
@@ -7790,8 +6045,15 @@ static void switch_buffer_by_offset_8x4_le (u32x w0[4], u32x w1[4], u32x w2[4], 
   w7[3] = swap32 (w7[3]);
   #endif
 
-  #ifdef IS_NV
+  #if defined IS_AMD_ROCM || defined IS_NV
+
+  #if defined IS_NV
   const int selector = (0x76543210 >> (offset_minus_4 * 4)) & 0xffff;
+  #endif
+
+  #if defined IS_AMD_ROCM
+  const int selector = 0x0706050403020100 >> (offset_minus_4 * 8);
+  #endif
 
   switch (offset / 4)
   {
@@ -8360,7 +6622,7 @@ static void switch_buffer_by_offset_8x4_le (u32x w0[4], u32x w1[4], u32x w2[4], 
 
 static void switch_buffer_by_offset_8x4_be (u32x w0[4], u32x w1[4], u32x w2[4], u32x w3[4], u32x w4[4], u32x w5[4], u32x w6[4], u32x w7[4], const u32 offset)
 {
-  #if defined IS_AMD || defined IS_GENERIC
+  #if defined IS_AMD_LEGACY || defined IS_GENERIC
   switch (offset / 4)
   {
     case  0:
@@ -9517,8 +7779,15 @@ static void switch_buffer_by_offset_8x4_be (u32x w0[4], u32x w1[4], u32x w2[4], 
   }
   #endif
 
-  #ifdef IS_NV
+  #if defined IS_AMD_ROCM || defined IS_NV
+
+  #if defined IS_NV
   const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
+  #endif
+
+  #if defined IS_AMD_ROCM
+  const int selector = 0x0706050403020100 >> ((offset & 3) * 8);
+  #endif
 
   switch (offset / 4)
   {
@@ -10679,7 +8948,7 @@ static void switch_buffer_by_offset_8x4_be (u32x w0[4], u32x w1[4], u32x w2[4], 
 
 static void switch_buffer_by_offset_8x4_carry_be (u32x w0[4], u32x w1[4], u32x w2[4], u32x w3[4], u32x w4[4], u32x w5[4], u32x w6[4], u32x w7[4], u32x c0[4], u32x c1[4], u32x c2[4], u32x c3[4], u32x c4[4], u32x c5[4], u32x c6[4], u32x c7[4], const u32 offset)
 {
-  #if defined IS_AMD || defined IS_GENERIC
+  #if defined IS_AMD_LEGACY || defined IS_GENERIC
   switch (offset / 4)
   {
     case  0:
@@ -12364,8 +10633,15 @@ static void switch_buffer_by_offset_8x4_carry_be (u32x w0[4], u32x w1[4], u32x w
   }
   #endif
 
-  #ifdef IS_NV
+  #if defined IS_AMD_ROCM || defined IS_NV
+
+  #if defined IS_NV
   const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
+  #endif
+
+  #if defined IS_AMD_ROCM
+  const int selector = 0x0706050403020100 >> ((offset & 3) * 8);
+  #endif
 
   switch (offset / 4)
   {
@@ -14058,7 +12334,7 @@ static void switch_buffer_by_offset_1x64_le (u32x w[64], const u32 offset)
 
   const int offset_minus_4 = 4 - offset_mod_4;
 
-  #if defined IS_AMD || defined IS_GENERIC
+  #if defined IS_AMD_LEGACY || defined IS_GENERIC
 
   #pragma unroll
   for (int i = 0; i < 64; i++) w[i] = swap32 (w[i]);
@@ -18423,8 +16699,15 @@ static void switch_buffer_by_offset_1x64_le (u32x w[64], const u32 offset)
 
   #endif
 
-  #ifdef IS_NV
+  #if defined IS_AMD_ROCM || defined IS_NV
+
+  #if defined IS_NV
   const int selector = (0x76543210 >> (offset_minus_4 * 4)) & 0xffff;
+  #endif
+
+  #if defined IS_AMD_ROCM
+  const int selector = 0x0706050403020100 >> (offset_minus_4 * 8);
+  #endif
 
   switch (offset / 4)
   {
@@ -22785,7 +21068,7 @@ static void switch_buffer_by_offset_1x64_le (u32x w[64], const u32 offset)
 
 static void switch_buffer_by_offset_1x64_be (u32x w[64], const u32 offset)
 {
-  #if defined IS_AMD || defined IS_GENERIC
+  #if defined IS_AMD_LEGACY || defined IS_GENERIC
   switch (offset / 4)
   {
     case  0:
@@ -27142,8 +25425,15 @@ static void switch_buffer_by_offset_1x64_be (u32x w[64], const u32 offset)
   }
   #endif
 
-  #ifdef IS_NV
+  #if defined IS_AMD_ROCM || defined IS_NV
+
+  #if defined IS_NV
   const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
+  #endif
+
+  #if defined IS_AMD_ROCM
+  const int selector = 0x0706050403020100 >> ((offset & 3) * 8);
+  #endif
 
   switch (offset / 4)
   {
@@ -31506,6 +29796,1838 @@ static void switch_buffer_by_offset_1x64_be (u32x w[64], const u32 offset)
  * vector functions as scalar (for outer loop usage)
  */
 
+static void truncate_block_4x4_le_S (u32 w0[4], const u32 len)
+{
+  switch (len)
+  {
+    case  0:
+      w0[0]  = 0;
+      w0[1]  = 0;
+      w0[2]  = 0;
+      w0[3]  = 0;
+
+      break;
+
+    case  1:
+      w0[0] &= 0x000000ff;
+      w0[1]  = 0;
+      w0[2]  = 0;
+      w0[3]  = 0;
+
+      break;
+
+    case  2:
+      w0[0] &= 0x0000ffff;
+      w0[1]  = 0;
+      w0[2]  = 0;
+      w0[3]  = 0;
+
+      break;
+
+    case  3:
+      w0[0] &= 0x00ffffff;
+      w0[1]  = 0;
+      w0[2]  = 0;
+      w0[3]  = 0;
+
+      break;
+
+    case  4:
+      w0[1]  = 0;
+      w0[2]  = 0;
+      w0[3]  = 0;
+
+      break;
+
+    case  5:
+      w0[1] &= 0x000000ff;
+      w0[2]  = 0;
+      w0[3]  = 0;
+
+      break;
+
+    case  6:
+      w0[1] &= 0x0000ffff;
+      w0[2]  = 0;
+      w0[3]  = 0;
+
+      break;
+
+    case  7:
+      w0[1] &= 0x00ffffff;
+      w0[2]  = 0;
+      w0[3]  = 0;
+
+      break;
+
+    case  8:
+      w0[2]  = 0;
+      w0[3]  = 0;
+
+      break;
+
+    case  9:
+      w0[2] &= 0x000000ff;
+      w0[3]  = 0;
+
+      break;
+
+    case 10:
+      w0[2] &= 0x0000ffff;
+      w0[3]  = 0;
+
+      break;
+
+    case 11:
+      w0[2] &= 0x00ffffff;
+      w0[3]  = 0;
+
+      break;
+
+    case 12:
+      w0[3]  = 0;
+
+      break;
+
+    case 13:
+      w0[3] &= 0x000000ff;
+
+      break;
+
+    case 14:
+      w0[3] &= 0x0000ffff;
+
+      break;
+
+    case 15:
+      w0[3] &= 0x00ffffff;
+
+      break;
+  }
+}
+
+static void truncate_block_4x4_be_S (u32 w0[4], const u32 len)
+{
+  switch (len)
+  {
+    case  0:
+      w0[0]  = 0;
+      w0[1]  = 0;
+      w0[2]  = 0;
+      w0[3]  = 0;
+
+      break;
+
+    case  1:
+      w0[0] &= 0xff000000;
+      w0[1]  = 0;
+      w0[2]  = 0;
+      w0[3]  = 0;
+
+      break;
+
+    case  2:
+      w0[0] &= 0xffff0000;
+      w0[1]  = 0;
+      w0[2]  = 0;
+      w0[3]  = 0;
+
+      break;
+
+    case  3:
+      w0[0] &= 0xffffff00;
+      w0[1]  = 0;
+      w0[2]  = 0;
+      w0[3]  = 0;
+
+      break;
+
+    case  4:
+      w0[1]  = 0;
+      w0[2]  = 0;
+      w0[3]  = 0;
+
+      break;
+
+    case  5:
+      w0[1] &= 0xff000000;
+      w0[2]  = 0;
+      w0[3]  = 0;
+
+      break;
+
+    case  6:
+      w0[1] &= 0xffff0000;
+      w0[2]  = 0;
+      w0[3]  = 0;
+
+      break;
+
+    case  7:
+      w0[1] &= 0xffffff00;
+      w0[2]  = 0;
+      w0[3]  = 0;
+
+      break;
+
+    case  8:
+      w0[2]  = 0;
+      w0[3]  = 0;
+
+      break;
+
+    case  9:
+      w0[2] &= 0xff000000;
+      w0[3]  = 0;
+
+      break;
+
+    case 10:
+      w0[2] &= 0xffff0000;
+      w0[3]  = 0;
+
+      break;
+
+    case 11:
+      w0[2] &= 0xffffff00;
+      w0[3]  = 0;
+
+      break;
+
+    case 12:
+      w0[3]  = 0;
+
+      break;
+
+    case 13:
+      w0[3] &= 0xff000000;
+
+      break;
+
+    case 14:
+      w0[3] &= 0xffff0000;
+
+      break;
+
+    case 15:
+      w0[3] &= 0xffffff00;
+
+      break;
+  }
+}
+
+static void truncate_block_16x4_le_S (u32 w0[4], u32 w1[4], u32 w2[4], u32 w3[4], const u32 len)
+{
+  switch (len)
+  {
+    case  0:
+      w0[0]  = 0;
+      w0[1]  = 0;
+      w0[2]  = 0;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case  1:
+      w0[0] &= 0x000000ff;
+      w0[1]  = 0;
+      w0[2]  = 0;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case  2:
+      w0[0] &= 0x0000ffff;
+      w0[1]  = 0;
+      w0[2]  = 0;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case  3:
+      w0[0] &= 0x00ffffff;
+      w0[1]  = 0;
+      w0[2]  = 0;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case  4:
+      w0[1]  = 0;
+      w0[2]  = 0;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case  5:
+      w0[1] &= 0x000000ff;
+      w0[2]  = 0;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case  6:
+      w0[1] &= 0x0000ffff;
+      w0[2]  = 0;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case  7:
+      w0[1] &= 0x00ffffff;
+      w0[2]  = 0;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case  8:
+      w0[2]  = 0;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case  9:
+      w0[2] &= 0x000000ff;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 10:
+      w0[2] &= 0x0000ffff;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 11:
+      w0[2] &= 0x00ffffff;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 12:
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 13:
+      w0[3] &= 0x000000ff;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 14:
+      w0[3] &= 0x0000ffff;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 15:
+      w0[3] &= 0x00ffffff;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 16:
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 17:
+      w1[0] &= 0x000000ff;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 18:
+      w1[0] &= 0x0000ffff;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 19:
+      w1[0] &= 0x00ffffff;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 20:
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 21:
+      w1[1] &= 0x000000ff;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 22:
+      w1[1] &= 0x0000ffff;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 23:
+      w1[1] &= 0x00ffffff;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 24:
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 25:
+      w1[2] &= 0x000000ff;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 26:
+      w1[2] &= 0x0000ffff;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 27:
+      w1[2] &= 0x00ffffff;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 28:
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 29:
+      w1[3] &= 0x000000ff;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 30:
+      w1[3] &= 0x0000ffff;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 31:
+      w1[3] &= 0x00ffffff;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 32:
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 33:
+      w2[0] &= 0x000000ff;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 34:
+      w2[0] &= 0x0000ffff;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 35:
+      w2[0] &= 0x00ffffff;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 36:
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 37:
+      w2[1] &= 0x000000ff;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 38:
+      w2[1] &= 0x0000ffff;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 39:
+      w2[1] &= 0x00ffffff;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 40:
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 41:
+      w2[2] &= 0x000000ff;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 42:
+      w2[2] &= 0x0000ffff;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 43:
+      w2[2] &= 0x00ffffff;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 44:
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 45:
+      w2[3] &= 0x000000ff;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 46:
+      w2[3] &= 0x0000ffff;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 47:
+      w2[3] &= 0x00ffffff;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 48:
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 49:
+      w3[0] &= 0x000000ff;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 50:
+      w3[0] &= 0x0000ffff;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 51:
+      w3[0] &= 0x00ffffff;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 52:
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 53:
+      w3[1] &= 0x000000ff;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 54:
+      w3[1] &= 0x0000ffff;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 55:
+      w3[1] &= 0x00ffffff;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 56:
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 57:
+      w3[2] &= 0x000000ff;
+      w3[3]  = 0;
+
+      break;
+
+    case 58:
+      w3[2] &= 0x0000ffff;
+      w3[3]  = 0;
+
+      break;
+
+    case 59:
+      w3[2] &= 0x00ffffff;
+      w3[3]  = 0;
+
+      break;
+
+    case 60:
+      w3[3]  = 0;
+
+      break;
+
+    case 61:
+      w3[3] &= 0x000000ff;
+
+      break;
+
+    case 62:
+      w3[3] &= 0x0000ffff;
+
+      break;
+
+    case 63:
+      w3[3] &= 0x00ffffff;
+
+      break;
+  }
+}
+
+static void truncate_block_16x4_be_S (u32 w0[4], u32 w1[4], u32 w2[4], u32 w3[4], const u32 len)
+{
+  switch (len)
+  {
+    case  0:
+      w0[0]  = 0;
+      w0[1]  = 0;
+      w0[2]  = 0;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case  1:
+      w0[0] &= 0xff000000;
+      w0[1]  = 0;
+      w0[2]  = 0;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case  2:
+      w0[0] &= 0xffff0000;
+      w0[1]  = 0;
+      w0[2]  = 0;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case  3:
+      w0[0] &= 0xffffff00;
+      w0[1]  = 0;
+      w0[2]  = 0;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case  4:
+      w0[1]  = 0;
+      w0[2]  = 0;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case  5:
+      w0[1] &= 0xff000000;
+      w0[2]  = 0;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case  6:
+      w0[1] &= 0xffff0000;
+      w0[2]  = 0;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case  7:
+      w0[1] &= 0xffffff00;
+      w0[2]  = 0;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case  8:
+      w0[2]  = 0;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case  9:
+      w0[2] &= 0xff000000;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 10:
+      w0[2] &= 0xffff0000;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 11:
+      w0[2] &= 0xffffff00;
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 12:
+      w0[3]  = 0;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 13:
+      w0[3] &= 0xff000000;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 14:
+      w0[3] &= 0xffff0000;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 15:
+      w0[3] &= 0xffffff00;
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 16:
+      w1[0]  = 0;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 17:
+      w1[0] &= 0xff000000;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 18:
+      w1[0] &= 0xffff0000;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 19:
+      w1[0] &= 0xffffff00;
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 20:
+      w1[1]  = 0;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 21:
+      w1[1] &= 0xff000000;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 22:
+      w1[1] &= 0xffff0000;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 23:
+      w1[1] &= 0xffffff00;
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 24:
+      w1[2]  = 0;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 25:
+      w1[2] &= 0xff000000;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 26:
+      w1[2] &= 0xffff0000;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 27:
+      w1[2] &= 0xffffff00;
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 28:
+      w1[3]  = 0;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 29:
+      w1[3] &= 0xff000000;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 30:
+      w1[3] &= 0xffff0000;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 31:
+      w1[3] &= 0xffffff00;
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 32:
+      w2[0]  = 0;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 33:
+      w2[0] &= 0xff000000;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 34:
+      w2[0] &= 0xffff0000;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 35:
+      w2[0] &= 0xffffff00;
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 36:
+      w2[1]  = 0;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 37:
+      w2[1] &= 0xff000000;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 38:
+      w2[1] &= 0xffff0000;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 39:
+      w2[1] &= 0xffffff00;
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 40:
+      w2[2]  = 0;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 41:
+      w2[2] &= 0xff000000;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 42:
+      w2[2] &= 0xffff0000;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 43:
+      w2[2] &= 0xffffff00;
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 44:
+      w2[3]  = 0;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 45:
+      w2[3] &= 0xff000000;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 46:
+      w2[3] &= 0xffff0000;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 47:
+      w2[3] &= 0xffffff00;
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 48:
+      w3[0]  = 0;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 49:
+      w3[0] &= 0xff000000;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 50:
+      w3[0] &= 0xffff0000;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 51:
+      w3[0] &= 0xffffff00;
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 52:
+      w3[1]  = 0;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 53:
+      w3[1] &= 0xff000000;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 54:
+      w3[1] &= 0xffff0000;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 55:
+      w3[1] &= 0xffffff00;
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 56:
+      w3[2]  = 0;
+      w3[3]  = 0;
+
+      break;
+
+    case 57:
+      w3[2] &= 0xff000000;
+      w3[3]  = 0;
+
+      break;
+
+    case 58:
+      w3[2] &= 0xffff0000;
+      w3[3]  = 0;
+
+      break;
+
+    case 59:
+      w3[2] &= 0xffffff00;
+      w3[3]  = 0;
+
+      break;
+
+    case 60:
+      w3[3]  = 0;
+
+      break;
+
+    case 61:
+      w3[3] &= 0xff000000;
+
+      break;
+
+    case 62:
+      w3[3] &= 0xffff0000;
+
+      break;
+
+    case 63:
+      w3[3] &= 0xffffff00;
+
+      break;
+  }
+}
+
 static void append_0x01_2x4_S (u32 w0[4], u32 w1[4], const u32 offset)
 {
   const u32 tmp = 0x01 << ((offset & 3) * 8);
@@ -32104,7 +32226,8 @@ static void append_0x80_8x4_S (u32 w0[4], u32 w1[4], u32 w2[4], u32 w3[4], u32 w
 
 static void make_utf16be_S (const u32 in[4], u32 out1[4], u32 out2[4])
 {
-  #ifdef IS_NV
+  #if defined IS_NV
+
   out2[3] = __byte_perm_S (in[3], 0, 0x3727);
   out2[2] = __byte_perm_S (in[3], 0, 0x1707);
   out2[1] = __byte_perm_S (in[2], 0, 0x3727);
@@ -32113,9 +32236,20 @@ static void make_utf16be_S (const u32 in[4], u32 out1[4], u32 out2[4])
   out1[2] = __byte_perm_S (in[1], 0, 0x1707);
   out1[1] = __byte_perm_S (in[0], 0, 0x3727);
   out1[0] = __byte_perm_S (in[0], 0, 0x1707);
-  #endif
 
-  #if defined IS_AMD || defined IS_GENERIC
+  #elif defined IS_AMD_ROCM
+
+  out2[3] = __byte_perm_S (in[3], 0, 0x03070207);
+  out2[2] = __byte_perm_S (in[3], 0, 0x01070007);
+  out2[1] = __byte_perm_S (in[2], 0, 0x03070207);
+  out2[0] = __byte_perm_S (in[2], 0, 0x01070007);
+  out1[3] = __byte_perm_S (in[1], 0, 0x03070207);
+  out1[2] = __byte_perm_S (in[1], 0, 0x01070007);
+  out1[1] = __byte_perm_S (in[0], 0, 0x03070207);
+  out1[0] = __byte_perm_S (in[0], 0, 0x01070007);
+
+  #else
+
   out2[3] = ((in[3] >>  0) & 0xFF000000) | ((in[3] >> 8) & 0x0000FF00);
   out2[2] = ((in[3] << 16) & 0xFF000000) | ((in[3] << 8) & 0x0000FF00);
   out2[1] = ((in[2] >>  0) & 0xFF000000) | ((in[2] >> 8) & 0x0000FF00);
@@ -32124,12 +32258,14 @@ static void make_utf16be_S (const u32 in[4], u32 out1[4], u32 out2[4])
   out1[2] = ((in[1] << 16) & 0xFF000000) | ((in[1] << 8) & 0x0000FF00);
   out1[1] = ((in[0] >>  0) & 0xFF000000) | ((in[0] >> 8) & 0x0000FF00);
   out1[0] = ((in[0] << 16) & 0xFF000000) | ((in[0] << 8) & 0x0000FF00);
+
   #endif
 }
 
 static void make_utf16le_S (const u32 in[4], u32 out1[4], u32 out2[4])
 {
-  #ifdef IS_NV
+  #if defined IS_NV
+
   out2[3] = __byte_perm_S (in[3], 0, 0x7372);
   out2[2] = __byte_perm_S (in[3], 0, 0x7170);
   out2[1] = __byte_perm_S (in[2], 0, 0x7372);
@@ -32138,9 +32274,20 @@ static void make_utf16le_S (const u32 in[4], u32 out1[4], u32 out2[4])
   out1[2] = __byte_perm_S (in[1], 0, 0x7170);
   out1[1] = __byte_perm_S (in[0], 0, 0x7372);
   out1[0] = __byte_perm_S (in[0], 0, 0x7170);
-  #endif
 
-  #if defined IS_AMD || defined IS_GENERIC
+  #elif defined IS_AMD_ROCM
+
+  out2[3] = __byte_perm_S (in[3], 0, 0x07030702);
+  out2[2] = __byte_perm_S (in[3], 0, 0x07010700);
+  out2[1] = __byte_perm_S (in[2], 0, 0x07030702);
+  out2[0] = __byte_perm_S (in[2], 0, 0x07010700);
+  out1[3] = __byte_perm_S (in[1], 0, 0x07030702);
+  out1[2] = __byte_perm_S (in[1], 0, 0x07010700);
+  out1[1] = __byte_perm_S (in[0], 0, 0x07030702);
+  out1[0] = __byte_perm_S (in[0], 0, 0x07010700);
+
+  #else
+
   out2[3] = ((in[3] >> 8) & 0x00FF0000) | ((in[3] >> 16) & 0x000000FF);
   out2[2] = ((in[3] << 8) & 0x00FF0000) | ((in[3] >>  0) & 0x000000FF);
   out2[1] = ((in[2] >> 8) & 0x00FF0000) | ((in[2] >> 16) & 0x000000FF);
@@ -32149,19 +32296,28 @@ static void make_utf16le_S (const u32 in[4], u32 out1[4], u32 out2[4])
   out1[2] = ((in[1] << 8) & 0x00FF0000) | ((in[1] >>  0) & 0x000000FF);
   out1[1] = ((in[0] >> 8) & 0x00FF0000) | ((in[0] >> 16) & 0x000000FF);
   out1[0] = ((in[0] << 8) & 0x00FF0000) | ((in[0] >>  0) & 0x000000FF);
+
   #endif
 }
 
 static void undo_utf16be_S (const u32 in1[4], const u32 in2[4], u32 out[4])
 {
-  #ifdef IS_NV
+  #if defined IS_NV
+
   out[0] = __byte_perm_S (in1[0], in1[1], 0x4602);
   out[1] = __byte_perm_S (in1[2], in1[3], 0x4602);
   out[2] = __byte_perm_S (in2[0], in2[1], 0x4602);
   out[3] = __byte_perm_S (in2[2], in2[3], 0x4602);
-  #endif
 
-  #if defined IS_AMD || defined IS_GENERIC
+  #elif defined IS_AMD_ROCM
+
+  out[0] = __byte_perm_S (in1[0], in1[1], 0x04060002);
+  out[1] = __byte_perm_S (in1[2], in1[3], 0x04060002);
+  out[2] = __byte_perm_S (in2[0], in2[1], 0x04060002);
+  out[3] = __byte_perm_S (in2[2], in2[3], 0x04060002);
+
+  #else
+
   out[0] = ((in1[0] & 0x0000ff00) >>  8) | ((in1[0] & 0xff000000) >> 16)
          | ((in1[1] & 0x0000ff00) <<  8) | ((in1[1] & 0xff000000) <<  0);
   out[1] = ((in1[2] & 0x0000ff00) >>  8) | ((in1[2] & 0xff000000) >> 16)
@@ -32170,19 +32326,28 @@ static void undo_utf16be_S (const u32 in1[4], const u32 in2[4], u32 out[4])
          | ((in2[1] & 0x0000ff00) <<  8) | ((in2[1] & 0xff000000) <<  0);
   out[3] = ((in2[2] & 0x0000ff00) >>  8) | ((in2[2] & 0xff000000) >> 16)
          | ((in2[3] & 0x0000ff00) <<  8) | ((in2[3] & 0xff000000) <<  0);
+
   #endif
 }
 
 static void undo_utf16le_S (const u32 in1[4], const u32 in2[4], u32 out[4])
 {
-  #ifdef IS_NV
+  #if defined IS_NV
+
   out[0] = __byte_perm_S (in1[0], in1[1], 0x6420);
   out[1] = __byte_perm_S (in1[2], in1[3], 0x6420);
   out[2] = __byte_perm_S (in2[0], in2[1], 0x6420);
   out[3] = __byte_perm_S (in2[2], in2[3], 0x6420);
-  #endif
 
-  #if defined IS_AMD || defined IS_GENERIC
+  #elif defined IS_AMD_ROCM
+
+  out[0] = __byte_perm_S (in1[0], in1[1], 0x06040200);
+  out[1] = __byte_perm_S (in1[2], in1[3], 0x06040200);
+  out[2] = __byte_perm_S (in2[0], in2[1], 0x06040200);
+  out[3] = __byte_perm_S (in2[2], in2[3], 0x06040200);
+
+  #else
+
   out[0] = ((in1[0] & 0x000000ff) >>  0) | ((in1[0] & 0x00ff0000) >>  8)
          | ((in1[1] & 0x000000ff) << 16) | ((in1[1] & 0x00ff0000) <<  8);
   out[1] = ((in1[2] & 0x000000ff) >>  0) | ((in1[2] & 0x00ff0000) >>  8)
@@ -32191,6 +32356,7 @@ static void undo_utf16le_S (const u32 in1[4], const u32 in2[4], u32 out[4])
          | ((in2[1] & 0x000000ff) << 16) | ((in2[1] & 0x00ff0000) <<  8);
   out[3] = ((in2[2] & 0x000000ff) >>  0) | ((in2[2] & 0x00ff0000) >>  8)
          | ((in2[3] & 0x000000ff) << 16) | ((in2[3] & 0x00ff0000) <<  8);
+
   #endif
 }
 
@@ -34212,7 +34378,7 @@ static void switch_buffer_by_offset_carry_le_S (u32 w0[4], u32 w1[4], u32 w2[4],
 
 static void switch_buffer_by_offset_be_S (u32 w0[4], u32 w1[4], u32 w2[4], u32 w3[4], const u32 offset)
 {
-  #if defined IS_AMD || defined IS_GENERIC
+  #if defined IS_AMD_LEGACY || defined IS_GENERIC
   switch (offset / 4)
   {
     case  0:
@@ -34537,8 +34703,15 @@ static void switch_buffer_by_offset_be_S (u32 w0[4], u32 w1[4], u32 w2[4], u32 w
   }
   #endif
 
-  #ifdef IS_NV
+  #if defined IS_AMD_ROCM || defined IS_NV
+
+  #if defined IS_NV
   const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
+  #endif
+
+  #if defined IS_AMD_ROCM
+  const int selector = 0x0706050403020100 >> ((offset & 3) * 8);
+  #endif
 
   switch (offset / 4)
   {
@@ -34867,7 +35040,7 @@ static void switch_buffer_by_offset_be_S (u32 w0[4], u32 w1[4], u32 w2[4], u32 w
 
 static void switch_buffer_by_offset_carry_be_S (u32 w0[4], u32 w1[4], u32 w2[4], u32 w3[4], u32 c0[4], u32 c1[4], u32 c2[4], u32 c3[4], const u32 offset)
 {
-  #if defined IS_AMD || defined IS_GENERIC
+  #if defined IS_AMD_LEGACY || defined IS_GENERIC
   switch (offset / 4)
   {
     case  0:
@@ -35328,8 +35501,15 @@ static void switch_buffer_by_offset_carry_be_S (u32 w0[4], u32 w1[4], u32 w2[4],
   }
   #endif
 
-  #ifdef IS_NV
+  #if defined IS_AMD_ROCM || defined IS_NV
+
+  #if defined IS_NV
   const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
+  #endif
+
+  #if defined IS_AMD_ROCM
+  const int selector = 0x0706050403020100 >> ((offset & 3) * 8);
+  #endif
 
   switch (offset / 4)
   {
@@ -35798,7 +35978,7 @@ static void switch_buffer_by_offset_8x4_le_S (u32 w0[4], u32 w1[4], u32 w2[4], u
 
   const int offset_minus_4 = 4 - offset_mod_4;
 
-  #if defined IS_AMD || defined IS_GENERIC
+  #if defined IS_AMD_LEGACY || defined IS_GENERIC
   w0[0] = swap32_S (w0[0]);
   w0[1] = swap32_S (w0[1]);
   w0[2] = swap32_S (w0[2]);
@@ -37021,8 +37201,15 @@ static void switch_buffer_by_offset_8x4_le_S (u32 w0[4], u32 w1[4], u32 w2[4], u
   w7[3] = swap32_S (w7[3]);
   #endif
 
-  #ifdef IS_NV
+  #if defined IS_AMD_ROCM || defined IS_NV
+
+  #if defined IS_NV
   const int selector = (0x76543210 >> (offset_minus_4 * 4)) & 0xffff;
+  #endif
+
+  #if defined IS_AMD_ROCM
+  const int selector = 0x0706050403020100 >> (offset_minus_4 * 8);
+  #endif
 
   switch (offset / 4)
   {
@@ -37591,7 +37778,7 @@ static void switch_buffer_by_offset_8x4_le_S (u32 w0[4], u32 w1[4], u32 w2[4], u
 
 static void switch_buffer_by_offset_8x4_be_S (u32 w0[4], u32 w1[4], u32 w2[4], u32 w3[4], u32 w4[4], u32 w5[4], u32 w6[4], u32 w7[4], const u32 offset)
 {
-  #if defined IS_AMD || defined IS_GENERIC
+  #if defined IS_AMD_LEGACY || defined IS_GENERIC
   switch (offset / 4)
   {
     case  0:
@@ -38748,8 +38935,15 @@ static void switch_buffer_by_offset_8x4_be_S (u32 w0[4], u32 w1[4], u32 w2[4], u
   }
   #endif
 
-  #ifdef IS_NV
+  #if defined IS_AMD_ROCM || defined IS_NV
+
+  #if defined IS_NV
   const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
+  #endif
+
+  #if defined IS_AMD_ROCM
+  const int selector = 0x0706050403020100 >> ((offset & 3) * 8);
+  #endif
 
   switch (offset / 4)
   {
@@ -39910,7 +40104,7 @@ static void switch_buffer_by_offset_8x4_be_S (u32 w0[4], u32 w1[4], u32 w2[4], u
 
 static void switch_buffer_by_offset_8x4_carry_be_S (u32 w0[4], u32 w1[4], u32 w2[4], u32 w3[4], u32 w4[4], u32 w5[4], u32 w6[4], u32 w7[4], u32 c0[4], u32 c1[4], u32 c2[4], u32 c3[4], u32 c4[4], u32 c5[4], u32 c6[4], u32 c7[4], const u32 offset)
 {
-  #if defined IS_AMD || defined IS_GENERIC
+  #if defined IS_AMD_LEGACY || defined IS_GENERIC
   switch (offset / 4)
   {
     case  0:
@@ -41595,8 +41789,15 @@ static void switch_buffer_by_offset_8x4_carry_be_S (u32 w0[4], u32 w1[4], u32 w2
   }
   #endif
 
-  #ifdef IS_NV
+  #if defined IS_AMD_ROCM || defined IS_NV
+
+  #if defined IS_NV
   const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
+  #endif
+
+  #if defined IS_AMD_ROCM
+  const int selector = 0x0706050403020100 >> ((offset & 3) * 8);
+  #endif
 
   switch (offset / 4)
   {
@@ -43289,7 +43490,7 @@ static void switch_buffer_by_offset_1x64_le_S (u32 w[64], const u32 offset)
 
   const int offset_minus_4 = 4 - offset_mod_4;
 
-  #if defined IS_AMD || defined IS_GENERIC
+  #if defined IS_AMD_LEGACY || defined IS_GENERIC
 
   #pragma unroll
   for (int i = 0; i < 64; i++) w[i] = swap32_S (w[i]);
@@ -47654,8 +47855,15 @@ static void switch_buffer_by_offset_1x64_le_S (u32 w[64], const u32 offset)
 
   #endif
 
-  #ifdef IS_NV
+  #if defined IS_AMD_ROCM || defined IS_NV
+
+  #if defined IS_NV
   const int selector = (0x76543210 >> (offset_minus_4 * 4)) & 0xffff;
+  #endif
+
+  #if defined IS_AMD_ROCM
+  const int selector = 0x0706050403020100 >> (offset_minus_4 * 8);
+  #endif
 
   switch (offset / 4)
   {
@@ -52016,7 +52224,7 @@ static void switch_buffer_by_offset_1x64_le_S (u32 w[64], const u32 offset)
 
 static void switch_buffer_by_offset_1x64_be_S (u32 w[64], const u32 offset)
 {
-  #if defined IS_AMD || defined IS_GENERIC
+  #if defined IS_AMD_LEGACY || defined IS_GENERIC
   switch (offset / 4)
   {
     case  0:
@@ -56373,8 +56581,15 @@ static void switch_buffer_by_offset_1x64_be_S (u32 w[64], const u32 offset)
   }
   #endif
 
-  #ifdef IS_NV
+  #if defined IS_AMD_ROCM || defined IS_NV
+
+  #if defined IS_NV
   const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
+  #endif
+
+  #if defined IS_AMD_ROCM
+  const int selector = 0x0706050403020100 >> ((offset & 3) * 8);
+  #endif
 
   switch (offset / 4)
   {
