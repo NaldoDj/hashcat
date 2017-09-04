@@ -117,13 +117,17 @@ static int inner2_loop (hashcat_ctx_t *hashcat_ctx)
    * Update attack-mode specific stuff based on mask
    */
 
-  mask_ctx_update_loop (hashcat_ctx);
+  const int rc_mask_ctx_update_loop = mask_ctx_update_loop (hashcat_ctx);
+
+  if (rc_mask_ctx_update_loop == -1) return 0;
 
   /**
    * Update attack-mode specific stuff based on wordlist
    */
 
-  straight_ctx_update_loop (hashcat_ctx);
+  const int rc_straight_ctx_update_loop = straight_ctx_update_loop (hashcat_ctx);
+
+  if (rc_straight_ctx_update_loop == -1) return 0;
 
   // words base
 
@@ -155,6 +159,7 @@ static int inner2_loop (hashcat_ctx_t *hashcat_ctx)
    * limit kernel loops by the amplification count we have from:
    * - straight_ctx, combinator_ctx or mask_ctx for fast hashes
    * - hash iteration count for slow hashes
+   * this is required for autotune
    */
 
   opencl_ctx_devices_kernel_loops (hashcat_ctx);

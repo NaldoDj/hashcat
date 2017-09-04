@@ -25,8 +25,12 @@
 - Fixed a missing barrier() call in the RACF OpenCL kernel
 - Fixed a missing salt length value in benchmark mode for SIP
 - Fixed an invalid progress value in status view if words from the base wordlist get rejected because of length
+- Fixed an invalid optimization code in kernel 7700 depending on the input hash, causing the kernel to loop forever
 - Fixed an integer overflow in innerloop_step and innerloop_cnt variables
+- Fixed an integer overflow in masks not skipped when loaded from file
+- Fixed an integer overflow in hash buffer size calculation
 - Fixed a parser error for mode -m 9820 = MS Office <= 2003 $3, SHA1 + RC4, collider #2
+- Fixed a parser error in multiple modes not checking for return code, resulting in negative memory index writes
 - Fixed a problem with changed current working directory, for instance by using --restore together with --remove
 - Fixed a problem with the conversion to the $HEX[] format: convert/hexify also all passwords of the format $HEX[]
 - Fixed the calculation of device_name_chksum; should be done for each iteration
@@ -43,11 +47,13 @@
 
 - Charset: Add additional DES charsets with corrected parity
 - OpenCL Buffers: Do not allocate memory for amplifiers for fast hashes, it's simply not needed
+- OpenCL Kernels: Improved rule engine performance by 6% on for NVidia
 - OpenCL Kernels: Improved performance of SHA-3 Kernel (keccak) by hardcoding the 0x80 stopbit
 - OpenCL Kernels: Move from ld.global.v4.u32 to ld.const.v4.u32 in _a3 kernels
 - OpenCL Kernels: Replace bitwise swaps with rotate() versions for AMD
 - OpenCL Kernels: Rewritten SIP kernel from scratch
-- OpenCL Kernels: Updated default scrypt TMTO to be ideal for latest NV and AMD top models
+- OpenCL Kernels: Rewritten Keccak kernel to run fully on registers and partially reversed last round
+- OpenCL Kernels: Updated default scrypt TMTO to be ideal for latest NVidia and AMD top models
 - OpenCL Kernels: Vectorized tons of slow kernels to improve CPU cracking speed
 - OpenCL Runtime: Updated AMD ROCm driver version check, warn if version < 1.1
 - Startup: Show some attack-specific optimizer constraints on start, eg: minimum and maximum support password- and salt-length
@@ -65,8 +71,9 @@
 - OpenCL Kernels: Declared all include functions as static to reduce binary kernel cache size
 - OpenCL Kernels: On AMD GPU, optimized kernels for use with AMD ROCm driver
 - OpenCL Kernels: Removed some include functions that are no longer needed to reduce compile time
-- OpenCL Runtime: Fall back to 64 threads default (from 256) because modern GPU create too many workitems otherwise
+- OpenCL Runtime: Fall back to 64 threads default (from 256) on AMD GPU to prevent creating too many workitems
 - OpenCL Runtime: Forcing OpenCL 1.2 no longer needed. Option removed from build options
+- OpenCL Runtime: Set OpenCL build option -O2 fixed for ROCm and AMDGPU-PRO using AMD_OCL_BUILD_OPTIONS_APPEND
 - Restore: Fixed the version number used in the restore file header
 - Time: added new type for time measurements hc_time_t and related functions to force the use of 64 bit times
 
