@@ -225,7 +225,7 @@ static void make_utf16be (const u32x in[4], u32x out1[4], u32x out2[4])
   out1[1] = __byte_perm (in[0], 0, 0x3727);
   out1[0] = __byte_perm (in[0], 0, 0x1707);
 
-  #elif defined IS_AMD_ROCM
+  #elif defined IS_AMD && AMD_GCN >= 3
 
   out2[3] = __byte_perm (in[3], 0, 0x03070207);
   out2[2] = __byte_perm (in[3], 0, 0x01070007);
@@ -263,7 +263,7 @@ static void make_utf16beN (const u32x in[4], u32x out1[4], u32x out2[4])
   out1[1] = __byte_perm (in[0], 0, 0x1707);
   out1[0] = __byte_perm (in[0], 0, 0x3727);
 
-  #elif defined IS_AMD_ROCM
+  #elif defined IS_AMD && AMD_GCN >= 3
 
   out2[3] = __byte_perm (in[3], 0, 0x01070007);
   out2[2] = __byte_perm (in[3], 0, 0x03070207);
@@ -301,7 +301,7 @@ static void make_utf16le (const u32x in[4], u32x out1[4], u32x out2[4])
   out1[1] = __byte_perm (in[0], 0, 0x7372);
   out1[0] = __byte_perm (in[0], 0, 0x7170);
 
-  #elif defined IS_AMD_ROCM
+  #elif defined IS_AMD && AMD_GCN >= 3
 
   out2[3] = __byte_perm (in[3], 0, 0x07030702);
   out2[2] = __byte_perm (in[3], 0, 0x07010700);
@@ -339,7 +339,7 @@ static void make_utf16leN (const u32x in[4], u32x out1[4], u32x out2[4])
   out1[1] = __byte_perm (in[0], 0, 0x7170);
   out1[0] = __byte_perm (in[0], 0, 0x7372);
 
-  #elif defined IS_AMD_ROCM
+  #elif defined IS_AMD && AMD_GCN >= 3
 
   out2[3] = __byte_perm (in[3], 0, 0x07010700);
   out2[2] = __byte_perm (in[3], 0, 0x07030702);
@@ -373,7 +373,7 @@ static void undo_utf16be (const u32x in1[4], const u32x in2[4], u32x out[4])
   out[2] = __byte_perm (in2[0], in2[1], 0x4602);
   out[3] = __byte_perm (in2[2], in2[3], 0x4602);
 
-  #elif defined IS_AMD_ROCM
+  #elif defined IS_AMD && AMD_GCN >= 3
 
   out[0] = __byte_perm (in1[0], in1[1], 0x04060002);
   out[1] = __byte_perm (in1[2], in1[3], 0x04060002);
@@ -403,7 +403,7 @@ static void undo_utf16le (const u32x in1[4], const u32x in2[4], u32x out[4])
   out[2] = __byte_perm (in2[0], in2[1], 0x6420);
   out[3] = __byte_perm (in2[2], in2[3], 0x6420);
 
-  #elif defined IS_AMD_ROCM
+  #elif defined IS_AMD && AMD_GCN >= 3
 
   out[0] = __byte_perm (in1[0], in1[1], 0x06040200);
   out[1] = __byte_perm (in1[2], in1[3], 0x06040200);
@@ -1266,7 +1266,13 @@ static void switch_buffer_by_offset_le (u32x w0[4], u32x w1[4], u32x w2[4], u32x
 
   const int offset_minus_4 = 4 - offset_mod_4;
 
-  #if defined IS_AMD_LEGACY || defined IS_GENERIC
+  #ifdef IS_AMD
+  volatile const int offset_switch = offset / 4;
+  #else
+  const int offset_switch = offset / 4;
+  #endif
+
+  #if (defined IS_AMD && AMD_GCN < 3) || defined IS_GENERIC
   w0[0] = swap32 (w0[0]);
   w0[1] = swap32 (w0[1]);
   w0[2] = swap32 (w0[2]);
@@ -1284,7 +1290,7 @@ static void switch_buffer_by_offset_le (u32x w0[4], u32x w1[4], u32x w2[4], u32x
   w3[2] = swap32 (w3[2]);
   w3[3] = swap32 (w3[3]);
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       w3[3] = amd_bytealign (w3[2], w3[3], offset);
@@ -1625,17 +1631,17 @@ static void switch_buffer_by_offset_le (u32x w0[4], u32x w1[4], u32x w2[4], u32x
   w3[3] = swap32 (w3[3]);
   #endif
 
-  #if defined IS_AMD_ROCM || defined IS_NV
+  #if (defined IS_AMD && AMD_GCN >= 3) || defined IS_NV
 
   #if defined IS_NV
   const int selector = (0x76543210 >> (offset_minus_4 * 4)) & 0xffff;
   #endif
 
-  #if defined IS_AMD_ROCM
+  #if defined IS_AMD
   const int selector = 0x0706050403020100 >> (offset_minus_4 * 8);
   #endif
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       w3[3] = __byte_perm (w3[2], w3[3], selector);
@@ -1967,6 +1973,12 @@ static void switch_buffer_by_offset_carry_le (u32x w0[4], u32x w1[4], u32x w2[4]
 
   const int offset_minus_4 = 4 - offset_mod_4;
 
+  #ifdef IS_AMD
+  volatile const int offset_switch = offset / 4;
+  #else
+  const int offset_switch = offset / 4;
+  #endif
+
   #if defined IS_AMD || defined IS_GENERIC
   w0[0] = swap32 (w0[0]);
   w0[1] = swap32 (w0[1]);
@@ -1985,7 +1997,7 @@ static void switch_buffer_by_offset_carry_le (u32x w0[4], u32x w1[4], u32x w2[4]
   w3[2] = swap32 (w3[2]);
   w3[3] = swap32 (w3[3]);
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       c0[0] = amd_bytealign (w3[3],     0, offset);
@@ -2480,7 +2492,7 @@ static void switch_buffer_by_offset_carry_le (u32x w0[4], u32x w1[4], u32x w2[4]
 
   #ifdef IS_NV
   // todo
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case 0:
       c0[0] = amd_bytealign (    0, w3[3], offset_minus_4);
@@ -3279,9 +3291,15 @@ static void switch_buffer_by_offset_carry_le (u32x w0[4], u32x w1[4], u32x w2[4]
 
 static void switch_buffer_by_offset_be (u32x w0[4], u32x w1[4], u32x w2[4], u32x w3[4], const u32 offset)
 {
-  #if defined IS_AMD_LEGACY || defined IS_GENERIC
+  #ifdef IS_AMD
+  volatile const int offset_switch = offset / 4;
+  #else
+  const int offset_switch = offset / 4;
+  #endif
 
-  switch (offset / 4)
+  #if (defined IS_AMD && AMD_GCN < 3) || defined IS_GENERIC
+
+  switch (offset_switch)
   {
     case  0:
       w3[3] = amd_bytealign (w3[2], w3[3], offset);
@@ -3606,17 +3624,17 @@ static void switch_buffer_by_offset_be (u32x w0[4], u32x w1[4], u32x w2[4], u32x
 
   #endif
 
-  #if defined IS_AMD_ROCM || defined IS_NV
+  #if (defined IS_AMD && AMD_GCN >= 3) || defined IS_NV
 
   #if defined IS_NV
   const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
   #endif
 
-  #if defined IS_AMD_ROCM
+  #if defined IS_AMD
   const int selector = 0x0706050403020100 >> ((offset & 3) * 8);
   #endif
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       w3[3] = __byte_perm (w3[3], w3[2], selector);
@@ -3944,8 +3962,14 @@ static void switch_buffer_by_offset_be (u32x w0[4], u32x w1[4], u32x w2[4], u32x
 
 static void switch_buffer_by_offset_carry_be (u32x w0[4], u32x w1[4], u32x w2[4], u32x w3[4], u32x c0[4], u32x c1[4], u32x c2[4], u32x c3[4], const u32 offset)
 {
-  #if defined IS_AMD_LEGACY || defined IS_GENERIC
-  switch (offset / 4)
+  #ifdef IS_AMD
+  volatile const int offset_switch = offset / 4;
+  #else
+  const int offset_switch = offset / 4;
+  #endif
+
+  #if (defined IS_AMD && AMD_GCN < 3) || defined IS_GENERIC
+  switch (offset_switch)
   {
     case  0:
       c0[0] = amd_bytealign (w3[3],     0, offset);
@@ -4405,17 +4429,17 @@ static void switch_buffer_by_offset_carry_be (u32x w0[4], u32x w1[4], u32x w2[4]
   }
   #endif
 
-  #if defined IS_AMD_ROCM || defined IS_NV
+  #if (defined IS_AMD && AMD_GCN >= 3) || defined IS_NV
 
   #if defined IS_NV
   const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
   #endif
 
-  #if defined IS_AMD_ROCM
+  #if defined IS_AMD
   const int selector = 0x0706050403020100 >> ((offset & 3) * 8);
   #endif
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       c0[0] = __byte_perm (    0, w3[3], selector);
@@ -4882,7 +4906,13 @@ static void switch_buffer_by_offset_8x4_le (u32x w0[4], u32x w1[4], u32x w2[4], 
 
   const int offset_minus_4 = 4 - offset_mod_4;
 
-  #if defined IS_AMD_LEGACY || defined IS_GENERIC
+  #ifdef IS_AMD
+  volatile const int offset_switch = offset / 4;
+  #else
+  const int offset_switch = offset / 4;
+  #endif
+
+  #if (defined IS_AMD && AMD_GCN < 3) || defined IS_GENERIC
   w0[0] = swap32 (w0[0]);
   w0[1] = swap32 (w0[1]);
   w0[2] = swap32 (w0[2]);
@@ -4916,7 +4946,7 @@ static void switch_buffer_by_offset_8x4_le (u32x w0[4], u32x w1[4], u32x w2[4], 
   w7[2] = swap32 (w7[2]);
   w7[3] = swap32 (w7[3]);
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       w7[3] = amd_bytealign (w7[2], w7[3], offset);
@@ -6105,17 +6135,17 @@ static void switch_buffer_by_offset_8x4_le (u32x w0[4], u32x w1[4], u32x w2[4], 
   w7[3] = swap32 (w7[3]);
   #endif
 
-  #if defined IS_AMD_ROCM || defined IS_NV
+  #if (defined IS_AMD && AMD_GCN >= 3) || defined IS_NV
 
   #if defined IS_NV
   const int selector = (0x76543210 >> (offset_minus_4 * 4)) & 0xffff;
   #endif
 
-  #if defined IS_AMD_ROCM
+  #if defined IS_AMD
   const int selector = 0x0706050403020100 >> (offset_minus_4 * 8);
   #endif
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case 0:
       w7[3] = __byte_perm (w7[2], w7[3], selector);
@@ -6682,8 +6712,14 @@ static void switch_buffer_by_offset_8x4_le (u32x w0[4], u32x w1[4], u32x w2[4], 
 
 static void switch_buffer_by_offset_8x4_be (u32x w0[4], u32x w1[4], u32x w2[4], u32x w3[4], u32x w4[4], u32x w5[4], u32x w6[4], u32x w7[4], const u32 offset)
 {
-  #if defined IS_AMD_LEGACY || defined IS_GENERIC
-  switch (offset / 4)
+  #ifdef IS_AMD
+  volatile const int offset_switch = offset / 4;
+  #else
+  const int offset_switch = offset / 4;
+  #endif
+
+  #if (defined IS_AMD && AMD_GCN < 3) || defined IS_GENERIC
+  switch (offset_switch)
   {
     case  0:
       w7[3] = amd_bytealign (w7[2], w7[3], offset);
@@ -7839,17 +7875,17 @@ static void switch_buffer_by_offset_8x4_be (u32x w0[4], u32x w1[4], u32x w2[4], 
   }
   #endif
 
-  #if defined IS_AMD_ROCM || defined IS_NV
+  #if (defined IS_AMD && AMD_GCN >= 3) || defined IS_NV
 
   #if defined IS_NV
   const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
   #endif
 
-  #if defined IS_AMD_ROCM
+  #if defined IS_AMD
   const int selector = 0x0706050403020100 >> ((offset & 3) * 8);
   #endif
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       w7[3] = __byte_perm (w7[3], w7[2], selector);
@@ -9008,8 +9044,14 @@ static void switch_buffer_by_offset_8x4_be (u32x w0[4], u32x w1[4], u32x w2[4], 
 
 static void switch_buffer_by_offset_8x4_carry_be (u32x w0[4], u32x w1[4], u32x w2[4], u32x w3[4], u32x w4[4], u32x w5[4], u32x w6[4], u32x w7[4], u32x c0[4], u32x c1[4], u32x c2[4], u32x c3[4], u32x c4[4], u32x c5[4], u32x c6[4], u32x c7[4], const u32 offset)
 {
-  #if defined IS_AMD_LEGACY || defined IS_GENERIC
-  switch (offset / 4)
+  #ifdef IS_AMD
+  volatile const int offset_switch = offset / 4;
+  #else
+  const int offset_switch = offset / 4;
+  #endif
+
+  #if (defined IS_AMD && AMD_GCN < 3) || defined IS_GENERIC
+  switch (offset_switch)
   {
     case  0:
       c0[0] = amd_bytealign (w7[3],     0, offset);
@@ -10693,17 +10735,17 @@ static void switch_buffer_by_offset_8x4_carry_be (u32x w0[4], u32x w1[4], u32x w
   }
   #endif
 
-  #if defined IS_AMD_ROCM || defined IS_NV
+  #if (defined IS_AMD && AMD_GCN >= 3) || defined IS_NV
 
   #if defined IS_NV
   const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
   #endif
 
-  #if defined IS_AMD_ROCM
+  #if defined IS_AMD
   const int selector = 0x0706050403020100 >> ((offset & 3) * 8);
   #endif
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       c0[0] = __byte_perm (    0, w7[3], selector);
@@ -12394,12 +12436,18 @@ static void switch_buffer_by_offset_1x64_le (u32x w[64], const u32 offset)
 
   const int offset_minus_4 = 4 - offset_mod_4;
 
-  #if defined IS_AMD_LEGACY || defined IS_GENERIC
+  #ifdef IS_AMD
+  volatile const int offset_switch = offset / 4;
+  #else
+  const int offset_switch = offset / 4;
+  #endif
+
+  #if (defined IS_AMD && AMD_GCN < 3) || defined IS_GENERIC
 
   #pragma unroll
   for (int i = 0; i < 64; i++) w[i] = swap32 (w[i]);
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       w[63] = amd_bytealign (w[62], w[63], offset);
@@ -16759,17 +16807,17 @@ static void switch_buffer_by_offset_1x64_le (u32x w[64], const u32 offset)
 
   #endif
 
-  #if defined IS_AMD_ROCM || defined IS_NV
+  #if (defined IS_AMD && AMD_GCN >= 3) || defined IS_NV
 
   #if defined IS_NV
   const int selector = (0x76543210 >> (offset_minus_4 * 4)) & 0xffff;
   #endif
 
-  #if defined IS_AMD_ROCM
+  #if defined IS_AMD
   const int selector = 0x0706050403020100 >> (offset_minus_4 * 8);
   #endif
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       w[63] = __byte_perm (w[62], w[63], selector);
@@ -21128,8 +21176,14 @@ static void switch_buffer_by_offset_1x64_le (u32x w[64], const u32 offset)
 
 static void switch_buffer_by_offset_1x64_be (u32x w[64], const u32 offset)
 {
-  #if defined IS_AMD_LEGACY || defined IS_GENERIC
-  switch (offset / 4)
+  #ifdef IS_AMD
+  volatile const int offset_switch = offset / 4;
+  #else
+  const int offset_switch = offset / 4;
+  #endif
+
+  #if (defined IS_AMD && AMD_GCN < 3) || defined IS_GENERIC
+  switch (offset_switch)
   {
     case  0:
       w[63] = amd_bytealign (w[62], w[63], offset);
@@ -25485,17 +25539,17 @@ static void switch_buffer_by_offset_1x64_be (u32x w[64], const u32 offset)
   }
   #endif
 
-  #if defined IS_AMD_ROCM || defined IS_NV
+  #if (defined IS_AMD && AMD_GCN >= 3) || defined IS_NV
 
   #if defined IS_NV
   const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
   #endif
 
-  #if defined IS_AMD_ROCM
+  #if defined IS_AMD
   const int selector = 0x0706050403020100 >> ((offset & 3) * 8);
   #endif
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       w[63] = __byte_perm (w[63], w[62], selector);
@@ -32287,7 +32341,7 @@ static void make_utf16be_S (const u32 in[4], u32 out1[4], u32 out2[4])
   out1[1] = __byte_perm_S (in[0], 0, 0x3727);
   out1[0] = __byte_perm_S (in[0], 0, 0x1707);
 
-  #elif defined IS_AMD_ROCM
+  #elif defined IS_AMD && AMD_GCN >= 3
 
   out2[3] = __byte_perm_S (in[3], 0, 0x03070207);
   out2[2] = __byte_perm_S (in[3], 0, 0x01070007);
@@ -32325,7 +32379,7 @@ static void make_utf16le_S (const u32 in[4], u32 out1[4], u32 out2[4])
   out1[1] = __byte_perm_S (in[0], 0, 0x7372);
   out1[0] = __byte_perm_S (in[0], 0, 0x7170);
 
-  #elif defined IS_AMD_ROCM
+  #elif defined IS_AMD && AMD_GCN >= 3
 
   out2[3] = __byte_perm_S (in[3], 0, 0x07030702);
   out2[2] = __byte_perm_S (in[3], 0, 0x07010700);
@@ -32359,7 +32413,7 @@ static void undo_utf16be_S (const u32 in1[4], const u32 in2[4], u32 out[4])
   out[2] = __byte_perm_S (in2[0], in2[1], 0x4602);
   out[3] = __byte_perm_S (in2[2], in2[3], 0x4602);
 
-  #elif defined IS_AMD_ROCM
+  #elif defined IS_AMD && AMD_GCN >= 3
 
   out[0] = __byte_perm_S (in1[0], in1[1], 0x04060002);
   out[1] = __byte_perm_S (in1[2], in1[3], 0x04060002);
@@ -32389,7 +32443,7 @@ static void undo_utf16le_S (const u32 in1[4], const u32 in2[4], u32 out[4])
   out[2] = __byte_perm_S (in2[0], in2[1], 0x6420);
   out[3] = __byte_perm_S (in2[2], in2[3], 0x6420);
 
-  #elif defined IS_AMD_ROCM
+  #elif defined IS_AMD && AMD_GCN >= 3
 
   out[0] = __byte_perm_S (in1[0], in1[1], 0x06040200);
   out[1] = __byte_perm_S (in1[2], in1[3], 0x06040200);
@@ -32416,7 +32470,13 @@ static void switch_buffer_by_offset_le_S (u32 w0[4], u32 w1[4], u32 w2[4], u32 w
 
   const int offset_minus_4 = 4 - offset_mod_4;
 
-  #if defined IS_AMD_LEGACY || defined IS_GENERIC
+  #ifdef IS_AMD
+  volatile const int offset_switch = offset / 4;
+  #else
+  const int offset_switch = offset / 4;
+  #endif
+
+  #if (defined IS_AMD && AMD_GCN < 3) || defined IS_GENERIC
   w0[0] = swap32_S (w0[0]);
   w0[1] = swap32_S (w0[1]);
   w0[2] = swap32_S (w0[2]);
@@ -32434,7 +32494,7 @@ static void switch_buffer_by_offset_le_S (u32 w0[4], u32 w1[4], u32 w2[4], u32 w
   w3[2] = swap32_S (w3[2]);
   w3[3] = swap32_S (w3[3]);
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       w3[3] = amd_bytealign_S (w3[2], w3[3], offset);
@@ -32775,17 +32835,17 @@ static void switch_buffer_by_offset_le_S (u32 w0[4], u32 w1[4], u32 w2[4], u32 w
   w3[3] = swap32_S (w3[3]);
   #endif
 
-  #if defined IS_AMD_ROCM || defined IS_NV
+  #if (defined IS_AMD && AMD_GCN >= 3) || defined IS_NV
 
   #if defined IS_NV
   const int selector = (0x76543210 >> (offset_minus_4 * 4)) & 0xffff;
   #endif
 
-  #if defined IS_AMD_ROCM
+  #if defined IS_AMD
   const int selector = 0x0706050403020100 >> (offset_minus_4 * 8);
   #endif
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       w3[3] = __byte_perm_S (w3[2], w3[3], selector);
@@ -33116,6 +33176,12 @@ static void switch_buffer_by_offset_carry_le_S (u32 w0[4], u32 w1[4], u32 w2[4],
 
   const int offset_minus_4 = 4 - offset_mod_4;
 
+  #ifdef IS_AMD
+  volatile const int offset_switch = offset / 4;
+  #else
+  const int offset_switch = offset / 4;
+  #endif
+
   #if defined IS_AMD || defined IS_GENERIC
   w0[0] = swap32_S (w0[0]);
   w0[1] = swap32_S (w0[1]);
@@ -33134,7 +33200,7 @@ static void switch_buffer_by_offset_carry_le_S (u32 w0[4], u32 w1[4], u32 w2[4],
   w3[2] = swap32_S (w3[2]);
   w3[3] = swap32_S (w3[3]);
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       c0[0] = amd_bytealign_S (w3[3],     0, offset);
@@ -33629,7 +33695,7 @@ static void switch_buffer_by_offset_carry_le_S (u32 w0[4], u32 w1[4], u32 w2[4],
 
   #ifdef IS_NV
   // todo
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case 0:
       c0[0] = amd_bytealign_S (    0, w3[3], offset_minus_4);
@@ -34428,8 +34494,14 @@ static void switch_buffer_by_offset_carry_le_S (u32 w0[4], u32 w1[4], u32 w2[4],
 
 static void switch_buffer_by_offset_be_S (u32 w0[4], u32 w1[4], u32 w2[4], u32 w3[4], const u32 offset)
 {
-  #if defined IS_AMD_LEGACY || defined IS_GENERIC
-  switch (offset / 4)
+  #ifdef IS_AMD
+  volatile const int offset_switch = offset / 4;
+  #else
+  const int offset_switch = offset / 4;
+  #endif
+
+  #if (defined IS_AMD && AMD_GCN < 3) || defined IS_GENERIC
+  switch (offset_switch)
   {
     case  0:
       w3[3] = amd_bytealign_S (w3[2], w3[3], offset);
@@ -34753,17 +34825,17 @@ static void switch_buffer_by_offset_be_S (u32 w0[4], u32 w1[4], u32 w2[4], u32 w
   }
   #endif
 
-  #if defined IS_AMD_ROCM || defined IS_NV
+  #if (defined IS_AMD && AMD_GCN >= 3) || defined IS_NV
 
   #if defined IS_NV
   const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
   #endif
 
-  #if defined IS_AMD_ROCM
+  #if defined IS_AMD
   const int selector = 0x0706050403020100 >> ((offset & 3) * 8);
   #endif
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       w3[3] = __byte_perm_S (w3[3], w3[2], selector);
@@ -35090,8 +35162,14 @@ static void switch_buffer_by_offset_be_S (u32 w0[4], u32 w1[4], u32 w2[4], u32 w
 
 static void switch_buffer_by_offset_carry_be_S (u32 w0[4], u32 w1[4], u32 w2[4], u32 w3[4], u32 c0[4], u32 c1[4], u32 c2[4], u32 c3[4], const u32 offset)
 {
-  #if defined IS_AMD_LEGACY || defined IS_GENERIC
-  switch (offset / 4)
+  #ifdef IS_AMD
+  volatile const int offset_switch = offset / 4;
+  #else
+  const int offset_switch = offset / 4;
+  #endif
+
+  #if (defined IS_AMD && AMD_GCN < 3) || defined IS_GENERIC
+  switch (offset_switch)
   {
     case  0:
       c0[0] = amd_bytealign_S (w3[3],     0, offset);
@@ -35551,17 +35629,17 @@ static void switch_buffer_by_offset_carry_be_S (u32 w0[4], u32 w1[4], u32 w2[4],
   }
   #endif
 
-  #if defined IS_AMD_ROCM || defined IS_NV
+  #if (defined IS_AMD && AMD_GCN >= 3) || defined IS_NV
 
   #if defined IS_NV
   const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
   #endif
 
-  #if defined IS_AMD_ROCM
+  #if defined IS_AMD
   const int selector = 0x0706050403020100 >> ((offset & 3) * 8);
   #endif
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       c0[0] = __byte_perm_S (    0, w3[3], selector);
@@ -36028,7 +36106,13 @@ static void switch_buffer_by_offset_8x4_le_S (u32 w0[4], u32 w1[4], u32 w2[4], u
 
   const int offset_minus_4 = 4 - offset_mod_4;
 
-  #if defined IS_AMD_LEGACY || defined IS_GENERIC
+  #ifdef IS_AMD
+  volatile const int offset_switch = offset / 4;
+  #else
+  const int offset_switch = offset / 4;
+  #endif
+
+  #if (defined IS_AMD && AMD_GCN < 3) || defined IS_GENERIC
   w0[0] = swap32_S (w0[0]);
   w0[1] = swap32_S (w0[1]);
   w0[2] = swap32_S (w0[2]);
@@ -36062,7 +36146,7 @@ static void switch_buffer_by_offset_8x4_le_S (u32 w0[4], u32 w1[4], u32 w2[4], u
   w7[2] = swap32_S (w7[2]);
   w7[3] = swap32_S (w7[3]);
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       w7[3] = amd_bytealign_S (w7[2], w7[3], offset);
@@ -37251,17 +37335,17 @@ static void switch_buffer_by_offset_8x4_le_S (u32 w0[4], u32 w1[4], u32 w2[4], u
   w7[3] = swap32_S (w7[3]);
   #endif
 
-  #if defined IS_AMD_ROCM || defined IS_NV
+  #if (defined IS_AMD && AMD_GCN >= 3) || defined IS_NV
 
   #if defined IS_NV
   const int selector = (0x76543210 >> (offset_minus_4 * 4)) & 0xffff;
   #endif
 
-  #if defined IS_AMD_ROCM
+  #if defined IS_AMD
   const int selector = 0x0706050403020100 >> (offset_minus_4 * 8);
   #endif
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case 0:
       w7[3] = __byte_perm_S (w7[2], w7[3], selector);
@@ -37828,8 +37912,14 @@ static void switch_buffer_by_offset_8x4_le_S (u32 w0[4], u32 w1[4], u32 w2[4], u
 
 static void switch_buffer_by_offset_8x4_be_S (u32 w0[4], u32 w1[4], u32 w2[4], u32 w3[4], u32 w4[4], u32 w5[4], u32 w6[4], u32 w7[4], const u32 offset)
 {
-  #if defined IS_AMD_LEGACY || defined IS_GENERIC
-  switch (offset / 4)
+  #ifdef IS_AMD
+  volatile const int offset_switch = offset / 4;
+  #else
+  const int offset_switch = offset / 4;
+  #endif
+
+  #if (defined IS_AMD && AMD_GCN < 3) || defined IS_GENERIC
+  switch (offset_switch)
   {
     case  0:
       w7[3] = amd_bytealign_S (w7[2], w7[3], offset);
@@ -38985,17 +39075,17 @@ static void switch_buffer_by_offset_8x4_be_S (u32 w0[4], u32 w1[4], u32 w2[4], u
   }
   #endif
 
-  #if defined IS_AMD_ROCM || defined IS_NV
+  #if (defined IS_AMD && AMD_GCN >= 3) || defined IS_NV
 
   #if defined IS_NV
   const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
   #endif
 
-  #if defined IS_AMD_ROCM
+  #if defined IS_AMD
   const int selector = 0x0706050403020100 >> ((offset & 3) * 8);
   #endif
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       w7[3] = __byte_perm_S (w7[3], w7[2], selector);
@@ -40154,8 +40244,14 @@ static void switch_buffer_by_offset_8x4_be_S (u32 w0[4], u32 w1[4], u32 w2[4], u
 
 static void switch_buffer_by_offset_8x4_carry_be_S (u32 w0[4], u32 w1[4], u32 w2[4], u32 w3[4], u32 w4[4], u32 w5[4], u32 w6[4], u32 w7[4], u32 c0[4], u32 c1[4], u32 c2[4], u32 c3[4], u32 c4[4], u32 c5[4], u32 c6[4], u32 c7[4], const u32 offset)
 {
-  #if defined IS_AMD_LEGACY || defined IS_GENERIC
-  switch (offset / 4)
+  #ifdef IS_AMD
+  volatile const int offset_switch = offset / 4;
+  #else
+  const int offset_switch = offset / 4;
+  #endif
+
+  #if (defined IS_AMD && AMD_GCN < 3) || defined IS_GENERIC
+  switch (offset_switch)
   {
     case  0:
       c0[0] = amd_bytealign_S (w7[3],     0, offset);
@@ -41839,17 +41935,17 @@ static void switch_buffer_by_offset_8x4_carry_be_S (u32 w0[4], u32 w1[4], u32 w2
   }
   #endif
 
-  #if defined IS_AMD_ROCM || defined IS_NV
+  #if (defined IS_AMD && AMD_GCN >= 3) || defined IS_NV
 
   #if defined IS_NV
   const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
   #endif
 
-  #if defined IS_AMD_ROCM
+  #if defined IS_AMD
   const int selector = 0x0706050403020100 >> ((offset & 3) * 8);
   #endif
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       c0[0] = __byte_perm_S (    0, w7[3], selector);
@@ -43540,12 +43636,18 @@ static void switch_buffer_by_offset_1x64_le_S (u32 w[64], const u32 offset)
 
   const int offset_minus_4 = 4 - offset_mod_4;
 
-  #if defined IS_AMD_LEGACY || defined IS_GENERIC
+  #ifdef IS_AMD
+  volatile const int offset_switch = offset / 4;
+  #else
+  const int offset_switch = offset / 4;
+  #endif
+
+  #if (defined IS_AMD && AMD_GCN < 3) || defined IS_GENERIC
 
   #pragma unroll
   for (int i = 0; i < 64; i++) w[i] = swap32_S (w[i]);
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       w[63] = amd_bytealign_S (w[62], w[63], offset);
@@ -47905,17 +48007,17 @@ static void switch_buffer_by_offset_1x64_le_S (u32 w[64], const u32 offset)
 
   #endif
 
-  #if defined IS_AMD_ROCM || defined IS_NV
+  #if (defined IS_AMD && AMD_GCN >= 3) || defined IS_NV
 
   #if defined IS_NV
   const int selector = (0x76543210 >> (offset_minus_4 * 4)) & 0xffff;
   #endif
 
-  #if defined IS_AMD_ROCM
+  #if defined IS_AMD
   const int selector = 0x0706050403020100 >> (offset_minus_4 * 8);
   #endif
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       w[63] = __byte_perm_S (w[62], w[63], selector);
@@ -52274,8 +52376,14 @@ static void switch_buffer_by_offset_1x64_le_S (u32 w[64], const u32 offset)
 
 static void switch_buffer_by_offset_1x64_be_S (u32 w[64], const u32 offset)
 {
-  #if defined IS_AMD_LEGACY || defined IS_GENERIC
-  switch (offset / 4)
+  #ifdef IS_AMD
+  volatile const int offset_switch = offset / 4;
+  #else
+  const int offset_switch = offset / 4;
+  #endif
+
+  #if (defined IS_AMD && AMD_GCN < 3) || defined IS_GENERIC
+  switch (offset_switch)
   {
     case  0:
       w[63] = amd_bytealign_S (w[62], w[63], offset);
@@ -56631,17 +56739,17 @@ static void switch_buffer_by_offset_1x64_be_S (u32 w[64], const u32 offset)
   }
   #endif
 
-  #if defined IS_AMD_ROCM || defined IS_NV
+  #if (defined IS_AMD && AMD_GCN >= 3) || defined IS_NV
 
   #if defined IS_NV
   const int selector = (0x76543210 >> ((offset & 3) * 4)) & 0xffff;
   #endif
 
-  #if defined IS_AMD_ROCM
+  #if defined IS_AMD
   const int selector = 0x0706050403020100 >> ((offset & 3) * 8);
   #endif
 
-  switch (offset / 4)
+  switch (offset_switch)
   {
     case  0:
       w[63] = __byte_perm_S (w[63], w[62], selector);
