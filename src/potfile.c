@@ -353,27 +353,26 @@ int potfile_remove_parse (hashcat_ctx_t *hashcat_ctx)
   hash_buf.hash_info = NULL;
   hash_buf.cracked   = 0;
 
-  if (hashconfig->is_salted)
+  if (hashconfig->is_salted == true)
   {
     hash_buf.salt = (salt_t *) hcmalloc (sizeof (salt_t));
   }
 
-  if (hashconfig->esalt_size)
+  if (hashconfig->esalt_size > 0)
   {
     hash_buf.esalt = hcmalloc (hashconfig->esalt_size);
   }
 
-  if (hashconfig->hook_salt_size)
+  if (hashconfig->hook_salt_size > 0)
   {
     hash_buf.hook_salt = hcmalloc (hashconfig->hook_salt_size);
   }
 
-  // this is usually detected by weak-hash-check
-  // but not if bitslice
+  // special case for a split hash
 
   if (hashconfig->hash_mode == 3000)
   {
-    int parser_status = hashconfig->parse_func ((u8 *) LM_WEAK_HASH, 16, &hash_buf, hashconfig);
+    int parser_status = hashconfig->parse_func ((u8 *) LM_ZERO_HASH, 16, &hash_buf, hashconfig);
 
     if (parser_status == PARSER_OK)
     {
@@ -418,20 +417,17 @@ int potfile_remove_parse (hashcat_ctx_t *hashcat_ctx)
 
     if (line_hash_len == 0) continue;
 
-    // we should allow length 0 passwords (detected by weak hash check)
-    //if (line_pw_len == 0) continue;
-
-    if (hashconfig->is_salted)
+    if (hashconfig->is_salted == true)
     {
       memset (hash_buf.salt, 0, sizeof (salt_t));
     }
 
-    if (hashconfig->esalt_size)
+    if (hashconfig->esalt_size > 0)
     {
       memset (hash_buf.esalt, 0, hashconfig->esalt_size);
     }
 
-    if (hashconfig->hook_salt_size)
+    if (hashconfig->hook_salt_size > 0)
     {
       memset (hash_buf.hook_salt, 0, hashconfig->hook_salt_size);
     }
@@ -450,7 +446,7 @@ int potfile_remove_parse (hashcat_ctx_t *hashcat_ctx)
         found = (hash_t *) bsearch (&hash_buf, hashes_buf, hashes_cnt, sizeof (hash_t), sort_by_hash_t_salt);
       }
     }
-    else if ((hashconfig->hash_mode == 2500) || (hashconfig->hash_mode == 2501) || (hashconfig->hash_mode == 15800))
+    else if ((hashconfig->hash_mode == 2500) || (hashconfig->hash_mode == 2501))
     {
       // here we have in line_hash_buf: hash:macap:macsta:essid:password
 
@@ -477,7 +473,7 @@ int potfile_remove_parse (hashcat_ctx_t *hashcat_ctx)
 
       if (essid_len > 32) continue;
 
-      if (hashconfig->is_salted)
+      if (hashconfig->is_salted == true)
       {
         // this should be always true, but we need it to make scan-build happy
 
@@ -514,7 +510,7 @@ int potfile_remove_parse (hashcat_ctx_t *hashcat_ctx)
 
       if (parser_status == PARSER_OK)
       {
-        if (hashconfig->is_salted)
+        if (hashconfig->is_salted == true)
         {
           if (potfile_ctx->keep_all_hashes == true)
           {
@@ -546,17 +542,17 @@ int potfile_remove_parse (hashcat_ctx_t *hashcat_ctx)
 
   potfile_read_close (hashcat_ctx);
 
-  if (hashconfig->esalt_size)
+  if (hashconfig->esalt_size > 0)
   {
     hcfree (hash_buf.esalt);
   }
 
-  if (hashconfig->hook_salt_size)
+  if (hashconfig->hook_salt_size > 0)
   {
     hcfree (hash_buf.hook_salt);
   }
 
-  if (hashconfig->is_salted)
+  if (hashconfig->is_salted == true)
   {
     hcfree (hash_buf.salt);
   }

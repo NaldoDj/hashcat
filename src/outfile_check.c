@@ -27,7 +27,7 @@ static int outfile_remove (hashcat_ctx_t *hashcat_ctx)
   user_options_t *user_options = hashcat_ctx->user_options;
 
   u32  dgst_size      = hashconfig->dgst_size;
-  u32  is_salted      = hashconfig->is_salted;
+  bool is_salted      = hashconfig->is_salted;
   u32  esalt_size     = hashconfig->esalt_size;
   u32  hook_salt_size = hashconfig->hook_salt_size;
   u32  hash_mode      = hashconfig->hash_mode;
@@ -41,9 +41,9 @@ static int outfile_remove (hashcat_ctx_t *hashcat_ctx)
 
   hash_buf.digest = hcmalloc (dgst_size);
 
-  if (is_salted)      hash_buf.salt      = (salt_t *) hcmalloc (sizeof (salt_t));
-  if (esalt_size)     hash_buf.esalt     = (void   *) hcmalloc (esalt_size);
-  if (hook_salt_size) hash_buf.hook_salt = (void   *) hcmalloc (hook_salt_size);
+  if (is_salted == true)  hash_buf.salt      = (salt_t *) hcmalloc (sizeof (salt_t));
+  if (esalt_size > 0)     hash_buf.esalt     = (void   *) hcmalloc (esalt_size);
+  if (hook_salt_size > 0) hash_buf.hook_salt = (void   *) hcmalloc (hook_salt_size);
 
   u32 digest_buf[64] = { 0 };
 
@@ -179,7 +179,7 @@ static int outfile_remove (hashcat_ctx_t *hashcat_ctx)
 
                   int parser_status = PARSER_OK;
 
-                  if ((hash_mode != 2500) && (hash_mode != 2501) && (hash_mode != 6800) && (hash_mode != 15800))
+                  if ((hash_mode != 2500) && (hash_mode != 2501) && (hash_mode != 6800))
                   {
                     parser_status = hashconfig->parse_func ((u8 *) line_buf, line_len - 1, &hash_buf, hashconfig);
                   }
@@ -209,7 +209,7 @@ static int outfile_remove (hashcat_ctx_t *hashcat_ctx)
                             cracked = (memcmp (line_buf, salt_buf->salt_buf, salt_buf->salt_len) == 0);
                           }
                         }
-                        else if ((hash_mode == 2500) || (hash_mode == 2501) || (hash_mode == 15800))
+                        else if ((hash_mode == 2500) || (hash_mode == 2501))
                         {
                           // this comparison is a bit inaccurate as we compare only ESSID
                           // call it a bug, but it's good enough for a special case used in a special case

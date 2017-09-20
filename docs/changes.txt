@@ -10,12 +10,14 @@
 - Added option --self-test-disable to disable self-test functionality on startup
 - Added option --wordlist-autohex-disable to disable the automatical conversion of $HEX[] words from the word list
 - Added option --example-hashes to show an example hash for each hash-mode
+- Removed option --weak-hash-check (zero-length password check) to increase startup time, it also causes many Trap 6 error on OSX
 
 ##
 ## Algorithms
 ##
 
-- Added hash-mode  2501 = WPA/WPA2 PMK
+- Added hash-mode 2500 = WPA/WPA2 (SHA256-AES-CMAC)
+- Added hash-mode 2501 = WPA/WPA2 PMK
 
 ##
 ## Bugs
@@ -39,7 +41,9 @@
 - Fixed the parsing of DCC2 hashes by allowing the "#" character within the user name
 - Fixed the parsing of descrypt hashes if the hashes do have non-standard characters within the salt
 - Fixed the output of --show when used together with the collider modes -m 9710, 9810 or 10410
+- Fixed the use of --veracrypt-pim option. It was completely ignored without showing an error
 - Fixed the version number used in the restore file header
+- Fixed overflow in mangle_dupechar_last function
 
 ##
 ## Improvements
@@ -65,6 +69,8 @@
 
 - General: Update C standard from c99 to gnu99
 - Hash Parser: Improved salt-length checks for generic hash modes
+- HCdict File: Renamed file from hashcat.hcdict to hashcat.hcdict2 and add header because versions are incompatible
+- HCstat File: Renamed file from hashcat.hcstat to hashcat.hcstat2 and add header because versions are incompatible
 - HCstat File: Add code to read LZMA compressed hashcat.hcstat2
 - HCstat File: Add hcstat2 support to enable masks of length up to 256, also adds a filetype header
 - OpenCL Kernels: Added code generator for most of the switch_* functions and replaced existing code
@@ -687,6 +693,7 @@ It combines all features of all hashcat projects in one project.
 - Fixed a bug in implementation of DCC2: forced default iteration count for hashes to 10240
 - Fixed a bug in implementation of WPA/WPA2: MAC and nonce stay one their original position as in the hccap file
 - Fixed a bug in implementation of GOST R 34.11-94: zero length passwords were not cracked
+- Fixed a bug in implementation of BLAKE2-512 kernels: incorrect access of the esalt buffer
 
 ##
 ## Technical

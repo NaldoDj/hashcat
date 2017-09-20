@@ -476,7 +476,7 @@ static void main_outerloop_mainscreen (MAYBE_UNUSED hashcat_ctx_t *hashcat_ctx, 
   event_log_info (hashcat_ctx, "Password length minimum: %u", hashconfig->pw_min);
   event_log_info (hashcat_ctx, "Password length maximum: %u", hashconfig->pw_max);
 
-  if (hashconfig->is_salted)
+  if (hashconfig->is_salted == true)
   {
     if (hashconfig->opti_type & OPTI_TYPE_RAW_HASH)
     {
@@ -486,6 +486,17 @@ static void main_outerloop_mainscreen (MAYBE_UNUSED hashcat_ctx_t *hashcat_ctx, 
   }
 
   event_log_info (hashcat_ctx, NULL);
+
+  if ((hashconfig->opti_type & OPTI_TYPE_OPTIMIZED_KERNEL) == 0)
+  {
+    if (hashconfig->has_optimized_kernel == true)
+    {
+      event_log_advice (hashcat_ctx, "ATTENTION! Pure (unoptimized) OpenCL kernels selected.");
+      event_log_advice (hashcat_ctx, "This enables cracking passwords and salts > length 32 but for the price of drastical reduced performance.");
+      event_log_advice (hashcat_ctx, "If you want to switch to optimized OpenCL kernels, append -O to your commandline.");
+      event_log_advice (hashcat_ctx, NULL);
+    }
+  }
 
   /**
    * Watchdog and Temperature balance
@@ -537,34 +548,6 @@ static void main_opencl_session_post (MAYBE_UNUSED hashcat_ctx_t *hashcat_ctx, M
   if (user_options->quiet == true) return;
 
   event_log_info_nn (hashcat_ctx, "Initialized device kernels and memory...");
-}
-
-static void main_weak_hash_pre (MAYBE_UNUSED hashcat_ctx_t *hashcat_ctx, MAYBE_UNUSED const void *buf, MAYBE_UNUSED const size_t len)
-{
-  const user_options_t *user_options = hashcat_ctx->user_options;
-
-  if (user_options->quiet == true) return;
-
-  event_log_info_nn (hashcat_ctx, "Checking for weak hashes...");
-}
-
-static void main_weak_hash_post (MAYBE_UNUSED hashcat_ctx_t *hashcat_ctx, MAYBE_UNUSED const void *buf, MAYBE_UNUSED const size_t len)
-{
-  const user_options_t *user_options = hashcat_ctx->user_options;
-
-  if (user_options->quiet == true) return;
-
-  event_log_info_nn (hashcat_ctx, "Checked for weak hashes...");
-}
-
-static void main_weak_hash_all_cracked (MAYBE_UNUSED hashcat_ctx_t *hashcat_ctx, MAYBE_UNUSED const void *buf, MAYBE_UNUSED const size_t len)
-{
-  const user_options_t *user_options = hashcat_ctx->user_options;
-
-  if (user_options->quiet == true) return;
-
-  event_log_info (hashcat_ctx, "INFO: All hashes found during weak hashes check! Use --show to display them.");
-  event_log_info (hashcat_ctx, NULL);
 }
 
 static void main_bitmap_init_pre (MAYBE_UNUSED hashcat_ctx_t *hashcat_ctx, MAYBE_UNUSED const void *buf, MAYBE_UNUSED const size_t len)
@@ -668,6 +651,7 @@ static void main_monitor_throttle3 (MAYBE_UNUSED hashcat_ctx_t *hashcat_ctx, MAY
 
 static void main_monitor_performance_hint (MAYBE_UNUSED hashcat_ctx_t *hashcat_ctx, MAYBE_UNUSED const void *buf, MAYBE_UNUSED const size_t len)
 {
+  const hashconfig_t         *hashconfig         = hashcat_ctx->hashconfig;
   const user_options_t       *user_options       = hashcat_ctx->user_options;
   const user_options_extra_t *user_options_extra = hashcat_ctx->user_options_extra;
 
@@ -678,22 +662,33 @@ static void main_monitor_performance_hint (MAYBE_UNUSED hashcat_ctx_t *hashcat_c
     clear_prompt ();
   }
 
+  event_log_advice (hashcat_ctx, "Cracking performance lower than expected?");
+  event_log_advice (hashcat_ctx, NULL);
+
+  if ((hashconfig->opti_type & OPTI_TYPE_OPTIMIZED_KERNEL) == 0)
+  {
+    if (hashconfig->has_optimized_kernel == true)
+    {
+      event_log_advice (hashcat_ctx, "* Append -O to the commandline.");
+      event_log_advice (hashcat_ctx, "  This lowers the maximum supported password- and salt-length (typically down to 32).");
+      event_log_advice (hashcat_ctx, NULL);
+    }
+  }
+
   if (user_options->workload_profile < 3)
   {
-    event_log_advice (hashcat_ctx, "Cracking performance lower than expected? Append -w 3 to the commandline.");
+    event_log_advice (hashcat_ctx, "* Append -w 3 to the commandline.");
+    event_log_advice (hashcat_ctx, "  This can cause your screen to lag.");
     event_log_advice (hashcat_ctx, NULL);
   }
-  else
-  {
-    event_log_advice (hashcat_ctx, "Cracking performance lower than expected?");
-    event_log_advice (hashcat_ctx, NULL);
-    event_log_advice (hashcat_ctx, "* Update your OpenCL runtime / driver the right way:");
-    event_log_advice (hashcat_ctx, "  https://hashcat.net/faq/wrongdriver");
-    event_log_advice (hashcat_ctx, NULL);
-    event_log_advice (hashcat_ctx, "* Create more work items to make use of your parallelization power:");
-    event_log_advice (hashcat_ctx, "  https://hashcat.net/faq/morework");
-    event_log_advice (hashcat_ctx, NULL);
-  }
+
+  event_log_advice (hashcat_ctx, "* Update your OpenCL runtime / driver the right way:");
+  event_log_advice (hashcat_ctx, "  https://hashcat.net/faq/wrongdriver");
+  event_log_advice (hashcat_ctx, NULL);
+  event_log_advice (hashcat_ctx, "* Create more work items to make use of your parallelization power:");
+  event_log_advice (hashcat_ctx, "  https://hashcat.net/faq/morework");
+  event_log_advice (hashcat_ctx, NULL);
+
 
   if ((user_options_extra->wordlist_mode == WL_MODE_FILE) || (user_options_extra->wordlist_mode == WL_MODE_MASK))
   {
@@ -965,9 +960,6 @@ static void event (const u32 id, hashcat_ctx_t *hashcat_ctx, const void *buf, co
     case EVENT_POTFILE_REMOVE_PARSE_POST: main_potfile_remove_parse_post (hashcat_ctx, buf, len); break;
     case EVENT_POTFILE_REMOVE_PARSE_PRE:  main_potfile_remove_parse_pre  (hashcat_ctx, buf, len); break;
     case EVENT_SET_KERNEL_POWER_FINAL:    main_set_kernel_power_final    (hashcat_ctx, buf, len); break;
-    case EVENT_WEAK_HASH_POST:            main_weak_hash_post            (hashcat_ctx, buf, len); break;
-    case EVENT_WEAK_HASH_PRE:             main_weak_hash_pre             (hashcat_ctx, buf, len); break;
-    case EVENT_WEAK_HASH_ALL_CRACKED:     main_weak_hash_all_cracked     (hashcat_ctx, buf, len); break;
     case EVENT_WORDLIST_CACHE_GENERATE:   main_wordlist_cache_generate   (hashcat_ctx, buf, len); break;
     case EVENT_WORDLIST_CACHE_HIT:        main_wordlist_cache_hit        (hashcat_ctx, buf, len); break;
   }
