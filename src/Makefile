@@ -5,7 +5,7 @@
 
 SHARED                  := 0
 DEBUG                   := 0
-PRODUCTION              := 0
+PRODUCTION              := 1
 
 ##
 ## Detect Operating System
@@ -123,7 +123,8 @@ WIN_ICONV_64             := /opt/win-iconv-64
 COMPTIME                := $(shell date +%s)
 
 VERSION_EXPORT          := $Format:%D$
-VERSION_TAG             := $(shell test -d .git && git describe --tags --dirty=+ || echo "$(VERSION_EXPORT)"|cut -d, -f2|$(SED) -r 's|.* (\w+/)?([^ ]+)|\2|')
+#VERSION_TAG             := $(shell test -d .git && git describe --tags --dirty=+ || echo "$(VERSION_EXPORT)"|cut -d, -f2|$(SED) -r 's|.* (\w+/)?([^ ]+)|\2|')
+VERSION_TAG             := 4.0.0-rc1
 
 ##
 ## General compiler and linker options
@@ -162,7 +163,7 @@ endif
 # default linux and freebsd thread stack size is 2MB
 # default windows thread stack size is 1MB
 # default OSX thread stack size is 512kB
-# unfortionally, this option isn't supported by older GCC and clang versions
+# unfortunately, this option isn't supported by older GCC and clang versions
 
 #CFLAGS                  += -Wstack-usage=524288
 
