@@ -124,7 +124,7 @@ COMPTIME                := $(shell date +%s)
 
 VERSION_EXPORT          := $Format:%D$
 #VERSION_TAG             := $(shell test -d .git && git describe --tags --dirty=+ || echo "$(VERSION_EXPORT)"|cut -d, -f2|$(SED) -r 's|.* (\w+/)?([^ ]+)|\2|')
-VERSION_TAG             := 4.0.0-rc1
+VERSION_TAG             := 4.0.0-rc2
 
 ##
 ## General compiler and linker options
@@ -153,11 +153,14 @@ CFLAGS                  += -Wwrite-strings
 
 # the following compiler options produce warnings that should be fixed at some time
 
-#CFLAGS                  += -Wsizeof-pointer-memaccess
-#CFLAGS                  += -Wcast-align
-#CFLAGS                  += -Wcast-qual
-#CFLAGS                  += -Wsign-conversion
-#CFLAGS                  += -pedantic
+CFLAGS                  += -Wno-cast-align
+CFLAGS                  += -Wno-cast-qual
+CFLAGS                  += -Wno-conversion
+CFLAGS                  += -Wno-padded
+CFLAGS                  += -Wno-pedantic
+CFLAGS                  += -Wno-sizeof-pointer-memaccess
+#CFLAGS                  += -Wno-reserved-id-macro      //clang specific
+#CFLAGS                  += -Wno-used-but-marked-unused //    ^^
 endif
 
 # default linux and freebsd thread stack size is 2MB
