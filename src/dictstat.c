@@ -19,8 +19,8 @@ int sort_by_dictstat (const void *s1, const void *s2)
 
   d2->stat.st_atime = d1->stat.st_atime;
 
-  #if defined (WITH_NANOSECONDS_IN_STAT)
-  d2->stat.st_atim.tv_nsec = d1->stat.st_atim.tv_nsec;
+  #if defined (STAT_NANOSECONDS_ACCESS_TIME)
+  d2->stat.STAT_NANOSECONDS_ACCESS_TIME = d1->stat.STAT_NANOSECONDS_ACCESS_TIME;
   #endif
 
   const int rc_from = strcmp (d1->encoding_from, d2->encoding_from);
@@ -103,22 +103,37 @@ void dictstat_read (hashcat_ctx_t *hashcat_ctx)
   {
     event_log_error (hashcat_ctx, "%s: Invalid header", dictstat_ctx->filename);
 
+    fclose (fp);
+
     return;
   }
 
   v = byte_swap_64 (v);
   z = byte_swap_64 (z);
 
-  if (v != DICTSTAT_VERSION)
+  if ((v & 0xffffffffffffff00) != (DICTSTAT_VERSION & 0xffffffffffffff00))
   {
-    event_log_error (hashcat_ctx, "%s: Invalid header", dictstat_ctx->filename);
+    event_log_error (hashcat_ctx, "%s: Invalid header, ignoring content", dictstat_ctx->filename);
+
+    fclose (fp);
 
     return;
   }
 
   if (z != 0)
   {
-    event_log_error (hashcat_ctx, "%s: Invalid header", dictstat_ctx->filename);
+    event_log_error (hashcat_ctx, "%s: Invalid header, ignoring content", dictstat_ctx->filename);
+
+    fclose (fp);
+
+    return;
+  }
+
+  if ((v & 0xff) < (DICTSTAT_VERSION & 0xff))
+  {
+    event_log_warning (hashcat_ctx, "%s: Outdated header version, ignoring content", dictstat_ctx->filename);
+
+    fclose (fp);
 
     return;
   }
