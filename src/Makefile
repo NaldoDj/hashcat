@@ -89,7 +89,7 @@ SED_IN_PLACE            := -i
 
 ifeq ($(UNAME),Darwin)
 CC                      := clang
-# the sed -i option of OSX requires a parameter for the backup file (we just use "")
+# the sed -i option of macOS requires a parameter for the backup file (we just use "")
 SED_IN_PLACE            := -i ""
 endif
 
@@ -124,7 +124,7 @@ COMPTIME                := $(shell date +%s)
 
 VERSION_EXPORT          := $Format:%D$
 #VERSION_TAG             := $(shell test -d .git && git describe --tags --dirty=+ || echo "$(VERSION_EXPORT)"|cut -d, -f2|$(SED) -r 's|.* (\w+/)?([^ ]+)|\2|')
-VERSION_TAG             := 4.0.0-rc4
+VERSION_TAG             := 4.0.0-rc6
 
 ##
 ## General compiler and linker options
@@ -163,9 +163,9 @@ CFLAGS                  += -Wno-sizeof-pointer-memaccess
 #CFLAGS                  += -Wno-used-but-marked-unused //    ^^
 endif
 
-# default linux and freebsd thread stack size is 2MB
-# default windows thread stack size is 1MB
-# default OSX thread stack size is 512kB
+# default Linux and freebsd thread stack size is 2MB
+# default Windows thread stack size is 1MB
+# default macOS thread stack size is 512kB
 # unfortunately, this option isn't supported by older GCC and clang versions
 
 #CFLAGS                  += -Wstack-usage=524288

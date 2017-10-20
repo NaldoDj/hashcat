@@ -1,7 +1,7 @@
 hashcat v4.0.0
 ==============
 
-AMD GPUs on Linux require "RadeonOpenCompute (ROCm)" Software Platform (1.6.0 or later)
+AMD GPUs on Linux require "RadeonOpenCompute (ROCm)" Software Platform (1.6.180 or later)
 AMD GPUs on Windows require "AMD Radeon Software Crimson Edition" (15.12 or later)
 Intel CPUs require "OpenCL Runtime for Intel Core and Intel Xeon Processors" (16.1.1 or later)
 Intel GPUs on Linux require "OpenCL 2.0 GPU Driver Package for Linux" (2.0 or later)
@@ -16,7 +16,7 @@ NVIDIA GPUs require "NVIDIA Driver" (367.x or later)
 - World's first and only in-kernel rule engine
 - Free
 - Open-Source (MIT License)
-- Multi-OS (Linux, Windows and OSX)
+- Multi-OS (Linux, Windows and macOS)
 - Multi-Platform (CPU, GPU, DSP, FPGA, etc., everything that comes with an OpenCL runtime)
 - Multi-Hash (Cracking multiple hashes at the same time)
 - Multi-Devices (Utilizing multiple devices in same system)
@@ -155,13 +155,13 @@ NVIDIA GPUs require "NVIDIA Driver" (367.x or later)
 - sha512crypt
 - bcrypt
 - scrypt
-- OSX v10.4
-- OSX v10.5
-- OSX v10.6
-- OSX v10.7
-- OSX v10.8
-- OSX v10.9
-- OSX v10.10
+- macOS v10.4
+- macOS v10.5
+- macOS v10.6
+- macOS v10.7
+- macOS v10.8
+- macOS v10.9
+- macOS v10.10
 - iTunes backup < 10.0
 - iTunes backup >= 10.0
 - AIX {smd5}

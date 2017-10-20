@@ -149,11 +149,14 @@ typedef enum event_identifier
 
 typedef enum amplifier_count
 {
-  KERNEL_BFS              = 1024,
-  KERNEL_COMBS            = 1024,
-  KERNEL_RULES            = 256,
-  KERNEL_THREADS_MAX      = 256,
-  KERNEL_THREADS_MAX_CPU  = 1
+  KERNEL_BFS                        = 1024,
+  KERNEL_COMBS                      = 1024,
+  KERNEL_RULES                      = 256,
+  KERNEL_THREADS_MAX_CPU            = 1,
+  KERNEL_THREADS_MAX_GPU            = 8,  // ex: intel integrated
+  KERNEL_THREADS_MAX_GPU_NV         = 32, // optimized NV  size: warps
+  KERNEL_THREADS_MAX_GPU_AMD        = 64, // optimized AMD size: wavefronts
+  KERNEL_THREADS_MAX_OTHER          = 8,  // ex: intel MIC
 
 } amplifier_count_t;
 
@@ -1334,6 +1337,32 @@ typedef struct potfile_ctx
   u8      *tmp_buf; // allocates [HCBUFSIZ_LARGE];
 
 } potfile_ctx_t;
+
+// this is a linked list structure of all the hashes with the same "key" (hash or hash + salt)
+
+typedef struct pot_hash_node
+{
+  hash_t *hash_buf;
+
+  struct pot_hash_node *next;
+
+} pot_hash_node_t;
+
+// Attention: this is only used when --show and --username are used together
+// there could be multiple entries for each identical hash+salt combination
+// (e.g. same hashes, but different user names... we want to print all of them!)
+// that is why we use a linked list here
+
+typedef struct pot_tree_entry
+{
+  pot_hash_node_t *nodes; // head of the linked list (under the field "hash_buf" it contains the sorting keys)
+
+  // the hashconfig is required to distinguish between salted and non-salted hashes and to make sure
+  // we compare the correct dgst_pos0...dgst_pos3
+
+  hashconfig_t *hashconfig;
+
+} pot_tree_entry_t;
 
 typedef struct restore_data
 {

@@ -456,7 +456,7 @@ int ocl_init (hashcat_ctx_t *hashcat_ctx)
 
     #if defined (__linux__)
     event_log_warning (hashcat_ctx, "* AMD GPUs on Linux require this runtime and/or driver:");
-    event_log_warning (hashcat_ctx, "  \"RadeonOpenCompute (ROCm)\" Software Platform (1.6.0 or later)");
+    event_log_warning (hashcat_ctx, "  \"RadeonOpenCompute (ROCm)\" Software Platform (1.6.180 or later)");
     #elif defined (_WIN)
     event_log_warning (hashcat_ctx, "* AMD GPUs on Windows require this runtime and/or driver:");
     event_log_warning (hashcat_ctx, "  \"AMD Radeon Software Crimson Edition\" (15.12 or later)");
@@ -2266,6 +2266,13 @@ int run_cracker (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, co
 
       if (user_options->speed_only == true)
       {
+        for (int i = 0; i < 16; i++)
+        {
+          const int rc = choose_kernel (hashcat_ctx, device_param, highest_pw_len, pws_cnt, fast_iteration, salt_pos);
+
+          if (rc == -1) return -1;
+        }
+
         hc_timer_set (&device_param->timer_speed);
       }
 
@@ -2835,6 +2842,14 @@ int opencl_ctx_devices_init (hashcat_ctx_t *hashcat_ctx, const int comptime)
       {
         device_vendor_id = VENDOR_ID_APPLE;
       }
+      else if (strcmp (device_vendor, CL_VENDOR_APPLE_USE_AMD) == 0)
+      {
+        device_vendor_id = VENDOR_ID_AMD;
+      }
+      else if (strcmp (device_vendor, CL_VENDOR_APPLE_USE_NV) == 0)
+      {
+        device_vendor_id = VENDOR_ID_NV;
+      }
       else if (strcmp (device_vendor, CL_VENDOR_INTEL_BEIGNET) == 0)
       {
         device_vendor_id = VENDOR_ID_INTEL_BEIGNET;
@@ -3306,10 +3321,8 @@ int opencl_ctx_devices_init (hashcat_ctx_t *hashcat_ctx, const int comptime)
               #if defined (__linux__)
               if (device_param->is_rocm == false)
               {
-                // ROCm is so much better, give the user some hint.
-                // They can still use --force to use AMDGPU-Pro.
+                // ROCm is so much better, we should give the user some hint and remove this block
 
-                /*
                 // AMDGPU-PRO Driver 16.40 and higher
                 if (atoi (device_param->driver_version) >= 2117) amd_warn = false;
                 // AMDGPU-PRO Driver 16.50 is known to be broken
@@ -3319,7 +3332,6 @@ int opencl_ctx_devices_init (hashcat_ctx_t *hashcat_ctx, const int comptime)
                 // AMDGPU-PRO Driver 17.10 is known to be broken
                 if (atoi (device_param->driver_version) == 2348) amd_warn = true;
                 // AMDGPU-PRO Driver 17.20 (2416) is fine, doesn't need check will match >= 2117
-                */
               }
               else
               {
@@ -3650,39 +3662,41 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
 
     if (device_param->skipped == true) continue;
 
+    bool skipped_temp = false;
+
     #if defined (__APPLE__)
 
     /**
      * If '--force' is not set, we proceed to excluding unstable hash-modes,
-     * because some of them cause segfault or inconclusive attack.
+     * too high kernel runtime, even on -u1 -n1, therefore likely to run into trap 6
      */
 
-    bool skipped_temp = false;
-
-    if (hashconfig->opts_type & OPTS_TYPE_PT_BITSLICE)
+    if ((user_options->hash_mode ==  1500)
+     || (user_options->hash_mode ==  3000)
+     || (user_options->hash_mode ==  3200)
+     || (user_options->hash_mode ==  8900)
+     || (user_options->hash_mode ==  9300)
+     || (user_options->hash_mode ==  9800)
+     || (user_options->hash_mode == 12500)
+     || (user_options->hash_mode == 14000)
+     || (user_options->hash_mode == 14100)
+     || (user_options->hash_mode == 15700))
     {
-      // bitsliced des, uses 2 dimensional work items
-
       skipped_temp = true;
     }
 
-    if (device_param->device_type & CL_DEVICE_TYPE_GPU)
+    #endif // __APPLE__
+
+    if (device_param->platform_vendor_id == VENDOR_ID_AMD)
     {
-      if (user_options->hash_mode == 14100)
+      if (device_param->is_rocm == false)
       {
-        // 3des not bitsliced, largely depend on local memory, maybe to large code size?
-
-        skipped_temp = true;
-      }
-    }
-
-    if (device_param->device_type & CL_DEVICE_TYPE_CPU)
-    {
-      if ((user_options->hash_mode == 3200) || (user_options->hash_mode == 9000))
-      {
-        // both blowfish, largely depend on local memory, kernel threads to fixed 8
-
-        skipped_temp = true;
+        if ((user_options->hash_mode ==  7900)
+         || (user_options->hash_mode == 10700)
+         || (user_options->hash_mode == 13731))
+        {
+          skipped_temp = true;
+        }
       }
     }
 
@@ -3691,14 +3705,12 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
       event_log_warning (hashcat_ctx, "* Device #%u: Skipping unstable hash-mode %u for this device.", device_id + 1, user_options->hash_mode);
       event_log_warning (hashcat_ctx, "             You can use --force to override, but do not report related errors.");
 
-      device_param->skipped_temp = true;
-
       device_param->skipped = true;
+
+      device_param->skipped_temp = true;
 
       continue;
     }
-
-    #endif // __APPLE__
 
     // vector_width
 
@@ -4202,7 +4214,7 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
     #endif
 
     // include check
-    // this test needs to be done manually because of osx opencl runtime
+    // this test needs to be done manually because of macOS opencl runtime
     // if there's a problem with permission, its not reporting back and erroring out silently
 
     #define files_cnt 16
@@ -5471,7 +5483,7 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
     hardware_power_all += device_param->hardware_power;
   }
 
-  // Prevent exit from benchmark mode if all devices are skipped due to unstable hash-modes (OSX)
+  // Prevent exit from benchmark mode if all devices are skipped due to unstable hash-modes (macOS)
 
   bool has_skipped_temp = false;
 
