@@ -5,7 +5,7 @@
 
 SHARED                  := 0
 DEBUG                   := 0
-PRODUCTION              := 1
+PRODUCTION              := 0
 
 ##
 ## Detect Operating System
@@ -127,8 +127,7 @@ COMPTIME                := $(shell date +%s)
 # the value will be something like this: "tag: vX.Y.Z, refs/pull/Y/head"
 
 VERSION_EXPORT          := $Format:%D$
-#VERSION_TAG             := $(shell test -d .git && git describe --tags --dirty=+ || echo "$(VERSION_EXPORT)" | $(SED) 's/.*: v\([\.0-9]*\),.*/v\1/')
-VERSION_TAG             := 4.0.0-rc6
+VERSION_TAG             := $(shell test -d .git && git describe --tags --dirty=+ || echo "$(VERSION_EXPORT)" | $(SED) 's/.*: v\([\.0-9]*\).*/v\1/')
 
 ##
 ## General compiler and linker options
@@ -181,10 +180,10 @@ CFLAGS                  += -O2
 LFLAGS                  += -s
 else
 ifeq ($(DEBUG),1)
-CFLAGS                  += -DDEBUG -g -ggdb
+CFLAGS                  += -DDEBUG -Og -ggdb
 else
 ifeq ($(DEBUG),2)
-CFLAGS                  += -DDEBUG -g -ggdb
+CFLAGS                  += -DDEBUG -Og -ggdb
 CFLAGS                  += -fsanitize=address -fno-omit-frame-pointer
 endif
 endif

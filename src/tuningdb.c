@@ -239,13 +239,15 @@ int tuning_db_init (hashcat_ctx_t *hashcat_ctx)
 
           continue;
         }
-        else if ((user_options_extra->attack_kern == ATTACK_KERN_COMBI) && (kernel_loops > KERNEL_COMBS))
+
+        if ((user_options_extra->attack_kern == ATTACK_KERN_COMBI) && (kernel_loops > KERNEL_COMBS))
         {
           event_log_warning (hashcat_ctx, "Tuning-db: Invalid kernel_loops '%d' in Line '%d'", kernel_loops, line_num);
 
           continue;
         }
-        else if ((user_options_extra->attack_kern == ATTACK_KERN_BF) && (kernel_loops > KERNEL_BFS))
+
+        if ((user_options_extra->attack_kern == ATTACK_KERN_BF) && (kernel_loops > KERNEL_BFS))
         {
           event_log_warning (hashcat_ctx, "Tuning-db: Invalid kernel_loops '%d' in Line '%d'", kernel_loops, line_num);
 
@@ -340,9 +342,20 @@ tuning_db_entry_t *tuning_db_search (hashcat_ctx_t *hashcat_ctx, const char *dev
 
   a.device_name = device_name_nospace;
 
-  tuning_db_alias_t *alias = bsearch (&a, tuning_db->alias_buf, tuning_db->alias_cnt, sizeof (tuning_db_alias_t), sort_by_tuning_db_alias);
+  char *alias_name = NULL;
 
-  char *alias_name = (alias == NULL) ? NULL : alias->alias_name;
+  for (i = device_name_length; i >= 1; i--)
+  {
+    device_name_nospace[i] = 0;
+
+    tuning_db_alias_t *alias = bsearch (&a, tuning_db->alias_buf, tuning_db->alias_cnt, sizeof (tuning_db_alias_t), sort_by_tuning_db_alias);
+
+    if (alias == NULL) continue;
+
+    alias_name = alias->alias_name;
+
+    break;
+  }
 
   // attack-mode 6 and 7 are attack-mode 1 basically
 
