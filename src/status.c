@@ -20,25 +20,25 @@
 #include "status.h"
 #include "shared.h"
 
-static const char ST_0000[] = "Initializing";
-static const char ST_0001[] = "Autotuning";
-static const char ST_0002[] = "Selftest";
-static const char ST_0003[] = "Running";
-static const char ST_0004[] = "Paused";
-static const char ST_0005[] = "Exhausted";
-static const char ST_0006[] = "Cracked";
-static const char ST_0007[] = "Aborted";
-static const char ST_0008[] = "Quit";
-static const char ST_0009[] = "Bypass";
-static const char ST_0010[] = "Aborted (Checkpoint)";
-static const char ST_0011[] = "Aborted (Runtime)";
-static const char ST_0012[] = "Running (Checkpoint Quit requested)";
-static const char ST_9999[] = "Unknown! Bug!";
+static const char *ST_0000 = "Initializing";
+static const char *ST_0001 = "Autotuning";
+static const char *ST_0002 = "Selftest";
+static const char *ST_0003 = "Running";
+static const char *ST_0004 = "Paused";
+static const char *ST_0005 = "Exhausted";
+static const char *ST_0006 = "Cracked";
+static const char *ST_0007 = "Aborted";
+static const char *ST_0008 = "Quit";
+static const char *ST_0009 = "Bypass";
+static const char *ST_0010 = "Aborted (Checkpoint)";
+static const char *ST_0011 = "Aborted (Runtime)";
+static const char *ST_0012 = "Running (Checkpoint Quit requested)";
+static const char *ST_9999 = "Unknown! Bug!";
 
 static const char UNITS[7] = { ' ', 'k', 'M', 'G', 'T', 'P', 'E' };
 
-static const char ETA_ABSOLUTE_MAX_EXCEEDED[] = "Next Big Bang"; // in honor of ighashgpu
-static const char ETA_RELATIVE_MAX_EXCEEDED[] = "> 10 years";
+static const char *ETA_ABSOLUTE_MAX_EXCEEDED = "Next Big Bang"; // in honor of ighashgpu
+static const char *ETA_RELATIVE_MAX_EXCEEDED = "> 10 years";
 
 static char *status_get_rules_file (const hashcat_ctx_t *hashcat_ctx)
 {
@@ -74,35 +74,35 @@ void format_timer_display (struct tm *tm, char *buf, size_t len)
 
   if (tm->tm_year - 70)
   {
-    char *time_entity1 = ((tm->tm_year - 70) == 1) ? (char *) time_entities_s[0] : (char *) time_entities_m[0];
-    char *time_entity2 = ( tm->tm_yday       == 1) ? (char *) time_entities_s[1] : (char *) time_entities_m[1];
+    const char *time_entity1 = ((tm->tm_year - 70) == 1) ? time_entities_s[0] : time_entities_m[0];
+    const char *time_entity2 = ( tm->tm_yday       == 1) ? time_entities_s[1] : time_entities_m[1];
 
     snprintf (buf, len - 1, "%d %s, %d %s", tm->tm_year - 70, time_entity1, tm->tm_yday, time_entity2);
   }
   else if (tm->tm_yday)
   {
-    char *time_entity1 = (tm->tm_yday == 1) ? (char *) time_entities_s[1] : (char *) time_entities_m[1];
-    char *time_entity2 = (tm->tm_hour == 1) ? (char *) time_entities_s[2] : (char *) time_entities_m[2];
+    const char *time_entity1 = (tm->tm_yday == 1) ? time_entities_s[1] : time_entities_m[1];
+    const char *time_entity2 = (tm->tm_hour == 1) ? time_entities_s[2] : time_entities_m[2];
 
     snprintf (buf, len - 1, "%d %s, %d %s", tm->tm_yday, time_entity1, tm->tm_hour, time_entity2);
   }
   else if (tm->tm_hour)
   {
-    char *time_entity1 = (tm->tm_hour == 1) ? (char *) time_entities_s[2] : (char *) time_entities_m[2];
-    char *time_entity2 = (tm->tm_min  == 1) ? (char *) time_entities_s[3] : (char *) time_entities_m[3];
+    const char *time_entity1 = (tm->tm_hour == 1) ? time_entities_s[2] : time_entities_m[2];
+    const char *time_entity2 = (tm->tm_min  == 1) ? time_entities_s[3] : time_entities_m[3];
 
     snprintf (buf, len - 1, "%d %s, %d %s", tm->tm_hour, time_entity1, tm->tm_min, time_entity2);
   }
   else if (tm->tm_min)
   {
-    char *time_entity1 = (tm->tm_min == 1) ? (char *) time_entities_s[3] : (char *) time_entities_m[3];
-    char *time_entity2 = (tm->tm_sec == 1) ? (char *) time_entities_s[4] : (char *) time_entities_m[4];
+    const char *time_entity1 = (tm->tm_min == 1) ? time_entities_s[3] : time_entities_m[3];
+    const char *time_entity2 = (tm->tm_sec == 1) ? time_entities_s[4] : time_entities_m[4];
 
     snprintf (buf, len - 1, "%d %s, %d %s", tm->tm_min, time_entity1, tm->tm_sec, time_entity2);
   }
   else
   {
-    char *time_entity1 = (tm->tm_sec == 1) ? (char *) time_entities_s[4] : (char *) time_entities_m[4];
+    const char *time_entity1 = (tm->tm_sec == 1) ? time_entities_s[4] : time_entities_m[4];
 
     snprintf (buf, len - 1, "%d %s", tm->tm_sec, time_entity1);
   }
@@ -197,7 +197,7 @@ char *status_get_session (const hashcat_ctx_t *hashcat_ctx)
   return strdup (user_options->session);
 }
 
-char *status_get_status_string (const hashcat_ctx_t *hashcat_ctx)
+const char *status_get_status_string (const hashcat_ctx_t *hashcat_ctx)
 {
   const status_ctx_t *status_ctx = hashcat_ctx->status_ctx;
 
@@ -209,27 +209,27 @@ char *status_get_status_string (const hashcat_ctx_t *hashcat_ctx)
   {
     if (status_ctx->checkpoint_shutdown == true)
     {
-      return ((char *) ST_0012);
+      return ST_0012;
     }
   }
 
   switch (devices_status)
   {
-    case STATUS_INIT:               return ((char *) ST_0000);
-    case STATUS_AUTOTUNE:           return ((char *) ST_0001);
-    case STATUS_SELFTEST:           return ((char *) ST_0002);
-    case STATUS_RUNNING:            return ((char *) ST_0003);
-    case STATUS_PAUSED:             return ((char *) ST_0004);
-    case STATUS_EXHAUSTED:          return ((char *) ST_0005);
-    case STATUS_CRACKED:            return ((char *) ST_0006);
-    case STATUS_ABORTED:            return ((char *) ST_0007);
-    case STATUS_QUIT:               return ((char *) ST_0008);
-    case STATUS_BYPASS:             return ((char *) ST_0009);
-    case STATUS_ABORTED_CHECKPOINT: return ((char *) ST_0010);
-    case STATUS_ABORTED_RUNTIME:    return ((char *) ST_0011);
+    case STATUS_INIT:               return ST_0000;
+    case STATUS_AUTOTUNE:           return ST_0001;
+    case STATUS_SELFTEST:           return ST_0002;
+    case STATUS_RUNNING:            return ST_0003;
+    case STATUS_PAUSED:             return ST_0004;
+    case STATUS_EXHAUSTED:          return ST_0005;
+    case STATUS_CRACKED:            return ST_0006;
+    case STATUS_ABORTED:            return ST_0007;
+    case STATUS_QUIT:               return ST_0008;
+    case STATUS_BYPASS:             return ST_0009;
+    case STATUS_ABORTED_CHECKPOINT: return ST_0010;
+    case STATUS_ABORTED_RUNTIME:    return ST_0011;
   }
 
-  return ((char *) ST_9999);
+  return ST_9999;
 }
 
 int status_get_status_number (const hashcat_ctx_t *hashcat_ctx)
@@ -239,7 +239,7 @@ int status_get_status_number (const hashcat_ctx_t *hashcat_ctx)
   return status_ctx->devices_status;
 }
 
-char *status_get_hash_type (const hashcat_ctx_t *hashcat_ctx)
+const char *status_get_hash_type (const hashcat_ctx_t *hashcat_ctx)
 {
   const hashconfig_t *hashconfig = hashcat_ctx->hashconfig;
 
@@ -389,7 +389,8 @@ int status_get_guess_mode (const hashcat_ctx_t *hashcat_ctx)
       }
     }
   }
-  else if (user_options->attack_mode == ATTACK_MODE_COMBI)
+
+  if (user_options->attack_mode == ATTACK_MODE_COMBI)
   {
     if (has_base_left == true)
     {
@@ -400,7 +401,8 @@ int status_get_guess_mode (const hashcat_ctx_t *hashcat_ctx)
       return GUESS_MODE_COMBINATOR_BASE_RIGHT;
     }
   }
-  else if (user_options->attack_mode == ATTACK_MODE_BF)
+
+  if (user_options->attack_mode == ATTACK_MODE_BF)
   {
     if (has_mask_cs == true)
     {
@@ -411,7 +413,8 @@ int status_get_guess_mode (const hashcat_ctx_t *hashcat_ctx)
       return GUESS_MODE_MASK;
     }
   }
-  else if (user_options->attack_mode == ATTACK_MODE_HYBRID1)
+
+  if (user_options->attack_mode == ATTACK_MODE_HYBRID1)
   {
     if (has_mask_cs == true)
     {
@@ -422,7 +425,8 @@ int status_get_guess_mode (const hashcat_ctx_t *hashcat_ctx)
       return GUESS_MODE_HYBRID1;
     }
   }
-  else if (user_options->attack_mode == ATTACK_MODE_HYBRID2)
+
+  if (user_options->attack_mode == ATTACK_MODE_HYBRID2)
   {
     if (has_mask_cs == true)
     {
@@ -452,7 +456,8 @@ char *status_get_guess_base (const hashcat_ctx_t *hashcat_ctx)
       return strdup (straight_ctx->dict);
     }
   }
-  else if (user_options->attack_mode == ATTACK_MODE_COMBI)
+
+  if (user_options->attack_mode == ATTACK_MODE_COMBI)
   {
     const combinator_ctx_t *combinator_ctx = hashcat_ctx->combinator_ctx;
 
@@ -465,19 +470,22 @@ char *status_get_guess_base (const hashcat_ctx_t *hashcat_ctx)
       return strdup (combinator_ctx->dict2);
     }
   }
-  else if (user_options->attack_mode == ATTACK_MODE_BF)
+
+  if (user_options->attack_mode == ATTACK_MODE_BF)
   {
     const mask_ctx_t *mask_ctx = hashcat_ctx->mask_ctx;
 
     return strdup (mask_ctx->mask);
   }
-  else if (user_options->attack_mode == ATTACK_MODE_HYBRID1)
+
+  if (user_options->attack_mode == ATTACK_MODE_HYBRID1)
   {
     const straight_ctx_t *straight_ctx = hashcat_ctx->straight_ctx;
 
     return strdup (straight_ctx->dict);
   }
-  else if (user_options->attack_mode == ATTACK_MODE_HYBRID2)
+
+  if (user_options->attack_mode == ATTACK_MODE_HYBRID2)
   {
     if (hashconfig->opti_type & OPTI_TYPE_OPTIMIZED_KERNEL)
     {
@@ -507,23 +515,27 @@ int status_get_guess_base_offset (const hashcat_ctx_t *hashcat_ctx)
 
     return straight_ctx->dicts_pos + 1;
   }
-  else if (user_options->attack_mode == ATTACK_MODE_COMBI)
+
+  if (user_options->attack_mode == ATTACK_MODE_COMBI)
   {
     return 1;
   }
-  else if (user_options->attack_mode == ATTACK_MODE_BF)
+
+  if (user_options->attack_mode == ATTACK_MODE_BF)
   {
     const mask_ctx_t *mask_ctx = hashcat_ctx->mask_ctx;
 
     return mask_ctx->masks_pos + 1;
   }
-  else if (user_options->attack_mode == ATTACK_MODE_HYBRID1)
+
+  if (user_options->attack_mode == ATTACK_MODE_HYBRID1)
   {
     const straight_ctx_t *straight_ctx = hashcat_ctx->straight_ctx;
 
     return straight_ctx->dicts_pos + 1;
   }
-  else if (user_options->attack_mode == ATTACK_MODE_HYBRID2)
+
+  if (user_options->attack_mode == ATTACK_MODE_HYBRID2)
   {
     if (hashconfig->opti_type & OPTI_TYPE_OPTIMIZED_KERNEL)
     {
@@ -553,23 +565,27 @@ int status_get_guess_base_count (const hashcat_ctx_t *hashcat_ctx)
 
     return straight_ctx->dicts_cnt;
   }
-  else if (user_options->attack_mode == ATTACK_MODE_COMBI)
+
+  if (user_options->attack_mode == ATTACK_MODE_COMBI)
   {
     return 1;
   }
-  else if (user_options->attack_mode == ATTACK_MODE_BF)
+
+  if (user_options->attack_mode == ATTACK_MODE_BF)
   {
     const mask_ctx_t *mask_ctx = hashcat_ctx->mask_ctx;
 
     return mask_ctx->masks_cnt;
   }
-  else if (user_options->attack_mode == ATTACK_MODE_HYBRID1)
+
+  if (user_options->attack_mode == ATTACK_MODE_HYBRID1)
   {
     const straight_ctx_t *straight_ctx = hashcat_ctx->straight_ctx;
 
     return straight_ctx->dicts_cnt;
   }
-  else if (user_options->attack_mode == ATTACK_MODE_HYBRID2)
+
+  if (user_options->attack_mode == ATTACK_MODE_HYBRID2)
   {
     if (hashconfig->opti_type & OPTI_TYPE_OPTIMIZED_KERNEL)
     {
@@ -662,21 +678,25 @@ int status_get_guess_mod_offset (const hashcat_ctx_t *hashcat_ctx)
   {
     return 1;
   }
-  else if (user_options->attack_mode == ATTACK_MODE_COMBI)
+
+  if (user_options->attack_mode == ATTACK_MODE_COMBI)
   {
     return 1;
   }
-  else if (user_options->attack_mode == ATTACK_MODE_BF)
+
+  if (user_options->attack_mode == ATTACK_MODE_BF)
   {
     return 1;
   }
-  else if (user_options->attack_mode == ATTACK_MODE_HYBRID1)
+
+  if (user_options->attack_mode == ATTACK_MODE_HYBRID1)
   {
     const mask_ctx_t *mask_ctx = hashcat_ctx->mask_ctx;
 
     return mask_ctx->masks_pos + 1;
   }
-  else if (user_options->attack_mode == ATTACK_MODE_HYBRID2)
+
+  if (user_options->attack_mode == ATTACK_MODE_HYBRID2)
   {
     if (hashconfig->opti_type & OPTI_TYPE_OPTIMIZED_KERNEL)
     {
@@ -704,21 +724,25 @@ int status_get_guess_mod_count (const hashcat_ctx_t *hashcat_ctx)
   {
     return 1;
   }
-  else if (user_options->attack_mode == ATTACK_MODE_COMBI)
+
+  if (user_options->attack_mode == ATTACK_MODE_COMBI)
   {
     return 1;
   }
-  else if (user_options->attack_mode == ATTACK_MODE_BF)
+
+  if (user_options->attack_mode == ATTACK_MODE_BF)
   {
     return 1;
   }
-  else if (user_options->attack_mode == ATTACK_MODE_HYBRID1)
+
+  if (user_options->attack_mode == ATTACK_MODE_HYBRID1)
   {
     const mask_ctx_t *mask_ctx = hashcat_ctx->mask_ctx;
 
     return mask_ctx->masks_cnt;
   }
-  else if (user_options->attack_mode == ATTACK_MODE_HYBRID2)
+
+  if (user_options->attack_mode == ATTACK_MODE_HYBRID2)
   {
     if (hashconfig->opti_type & OPTI_TYPE_OPTIMIZED_KERNEL)
     {

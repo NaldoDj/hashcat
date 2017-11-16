@@ -861,8 +861,8 @@ struct hashconfig
 
   int (*parse_func) (u8 *, u32, hash_t *, const struct hashconfig *);
 
-  char *st_hash;
-  char *st_pass;
+  const char *st_hash;
+  const char *st_pass;
 };
 
 typedef struct hashconfig hashconfig_t;
@@ -1534,13 +1534,13 @@ typedef struct user_options
   bool         username;
   bool         version;
   char        *cpu_affinity;
-  char        *custom_charset_1;
-  char        *custom_charset_2;
-  char        *custom_charset_3;
+  const char  *custom_charset_1;
+  const char  *custom_charset_2;
+  const char  *custom_charset_3;
   char        *custom_charset_4;
   char        *debug_file;
-  char        *encoding_from;
-  char        *encoding_to;
+  const char  *encoding_from;
+  const char  *encoding_to;
   char        *induction_dir;
   char        *markov_hcstat;
   char        *opencl_devices;
@@ -1551,8 +1551,8 @@ typedef struct user_options
   char        *potfile_path;
   char        *restore_file_path;
   char       **rp_files;
-  char        *rule_buf_l;
-  char        *rule_buf_r;
+  const char  *rule_buf_l;
+  const char  *rule_buf_r;
   char         separator;
   const char  *session;
   char        *truecrypt_keyfiles;
@@ -1753,7 +1753,7 @@ typedef struct device_info
 typedef struct hashcat_status
 {
   const char *hash_target;
-  char       *hash_type;
+  const char *hash_type;
   int         guess_mode;
   char       *guess_base;
   int         guess_base_offset;
@@ -1766,7 +1766,7 @@ typedef struct hashcat_status
   char       *guess_charset;
   int         guess_mask_length;
   char       *session;
-  char       *status_string;
+  const char *status_string;
   int         status_number;
   char       *time_estimated_absolute;
   char       *time_estimated_relative;
@@ -1894,7 +1894,7 @@ typedef struct hashcat_user
 
 typedef struct cache_hit
 {
-  char *dictfile;
+  const char *dictfile;
 
   hc_stat_t stat;
 
@@ -1905,7 +1905,7 @@ typedef struct cache_hit
 
 typedef struct cache_generate
 {
-  char *dictfile;
+  const char *dictfile;
 
   double percent;
 

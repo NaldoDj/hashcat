@@ -1281,6 +1281,8 @@ typedef enum display_len
   DISPLAY_LEN_MAX_15700 = 11 + 1 + 6 + 1 + 1 + 1 + 1 + 1 + 64 + 1 + 64 + 1 + 64,
   DISPLAY_LEN_MIN_15900 =  1 + 7 + 1 + 1 + 1 + 1 + 1 +  10 + 1 + 4 + 1 + 4 + 1 +  1 + 1 + 32 + 1 + 3 + 1 + 128,
   DISPLAY_LEN_MAX_15900 =  1 + 7 + 1 + 1 + 1 + 1 + 1 + 100 + 1 + 6 + 1 + 6 + 1 + 10 + 1 + 32 + 1 + 4 + 1 + 512,
+  DISPLAY_LEN_MIN_16000 = 10,
+  DISPLAY_LEN_MAX_16000 = 10,
   DISPLAY_LEN_MIN_99999 = 1,
   DISPLAY_LEN_MAX_99999 = 55,
 
@@ -1605,6 +1607,7 @@ typedef enum kern_type
   KERN_TYPE_ETHEREUM_PBKDF2         = 15600,
   KERN_TYPE_ETHEREUM_SCRYPT         = 15700,
   KERN_TYPE_DPAPIMK_V2              = 15900,
+  KERN_TYPE_TRIPCODE                = 16000,
   KERN_TYPE_PLAINTEXT               = 99999,
 
 } kern_type_t;
@@ -1862,7 +1865,7 @@ int dpapimk_parse_hash            (u8 *input_buf, u32 input_len, hash_t *hash_bu
 int jks_sha1_parse_hash           (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
 int ethereum_pbkdf2_parse_hash    (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
 int ethereum_scrypt_parse_hash    (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
-
+int tripcode_parse_hash           (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
 /**
  * hook functions
  */
@@ -1873,9 +1876,9 @@ void seven_zip_hook_func (hc_device_param_t *device_param, void *hook_salts_buf,
  * output functions
  */
 
-char *stroptitype (const u32 opti_type);
-char *strhashtype (const u32 hash_mode);
-char *strparser   (const u32 parser_status);
+const char *stroptitype (const u32 opti_type);
+const char *strhashtype (const u32 hash_mode);
+const char *strparser   (const u32 parser_status);
 
 int check_old_hccap (const char *hashfile);
 void to_hccapx_t (hashcat_ctx_t *hashcat_ctx, hccapx_t *hccapx, const u32 salt_pos, const u32 digest_pos);

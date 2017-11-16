@@ -1,3 +1,17 @@
+* changes v4.0.1 -> xxx:
+
+##
+## Algorithms
+##
+
+- Added hash-mode 16000 = Tripcode
+
+##
+## Bugs
+##
+
+- Fixed a hash parsing problem when using --show/--left together with hashes with long salts that require pure kernels
+
 * changes v4.0.0 -> v4.0.1:
 
 ##
