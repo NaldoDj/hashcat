@@ -2631,7 +2631,6 @@ int opencl_ctx_devices_init (hashcat_ctx_t *hashcat_ctx, const int comptime)
   bool need_adl     = false;
   bool need_nvml    = false;
   bool need_nvapi   = false;
-  bool need_xnvctrl = false;
   bool need_sysfs   = false;
 
   u32 devices_cnt = 0;
@@ -3170,10 +3169,6 @@ int opencl_ctx_devices_init (hashcat_ctx_t *hashcat_ctx, const int comptime)
         {
           need_nvml = true;
 
-          #if defined (__linux__)
-          need_xnvctrl = true;
-          #endif
-
           #if defined (_WIN)
           need_nvapi = true;
           #endif
@@ -3457,18 +3452,17 @@ int opencl_ctx_devices_init (hashcat_ctx_t *hashcat_ctx, const int comptime)
     }
   }
 
-  opencl_ctx->target_msec         = TARGET_MSEC_PROFILE[user_options->workload_profile - 1];
+  opencl_ctx->target_msec     = TARGET_MSEC_PROFILE[user_options->workload_profile - 1];
 
-  opencl_ctx->devices_cnt         = devices_cnt;
-  opencl_ctx->devices_active      = devices_active;
+  opencl_ctx->devices_cnt     = devices_cnt;
+  opencl_ctx->devices_active  = devices_active;
 
-  opencl_ctx->need_adl            = need_adl;
-  opencl_ctx->need_nvml           = need_nvml;
-  opencl_ctx->need_nvapi          = need_nvapi;
-  opencl_ctx->need_xnvctrl        = need_xnvctrl;
-  opencl_ctx->need_sysfs          = need_sysfs;
+  opencl_ctx->need_adl        = need_adl;
+  opencl_ctx->need_nvml       = need_nvml;
+  opencl_ctx->need_nvapi      = need_nvapi;
+  opencl_ctx->need_sysfs      = need_sysfs;
 
-  opencl_ctx->comptime            = comptime;
+  opencl_ctx->comptime        = comptime;
 
   return 0;
 }
@@ -3501,11 +3495,10 @@ void opencl_ctx_devices_destroy (hashcat_ctx_t *hashcat_ctx)
   opencl_ctx->devices_cnt    = 0;
   opencl_ctx->devices_active = 0;
 
-  opencl_ctx->need_adl       = false;
-  opencl_ctx->need_nvml      = false;
-  opencl_ctx->need_nvapi     = false;
-  opencl_ctx->need_xnvctrl   = false;
-  opencl_ctx->need_sysfs     = false;
+  opencl_ctx->need_adl    = false;
+  opencl_ctx->need_nvml   = false;
+  opencl_ctx->need_nvapi  = false;
+  opencl_ctx->need_sysfs  = false;
 }
 
 void opencl_ctx_devices_update_power (hashcat_ctx_t *hashcat_ctx)
@@ -4263,6 +4256,24 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
       }
     }
 
+    // return back to the folder we came from initially (workaround)
+
+    #if defined (_WIN)
+    if (chdir ("..") == -1)
+    {
+      event_log_error (hashcat_ctx, "%s: %s", "..", strerror (errno));
+
+      return -1;
+    }
+    #else
+    if (chdir (folder_config->cwd) == -1)
+    {
+      event_log_error (hashcat_ctx, "%s: %s", folder_config->cwd, strerror (errno));
+
+      return -1;
+    }
+    #endif
+
     // we don't have sm_* on vendors not NV but it doesn't matter
 
     char build_opts_new[1024] = { 0 };
@@ -4804,15 +4815,6 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
 
     hcfree (device_name_chksum);
     hcfree (device_name_chksum_amp_mp);
-
-    // return back to the folder we came from initially (workaround)
-
-    if (chdir (folder_config->cwd) == -1)
-    {
-      event_log_error (hashcat_ctx, "%s: %s", folder_config->cwd, strerror (errno));
-
-      return -1;
-    }
 
     // some algorithm collide too fast, make that impossible
 

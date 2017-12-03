@@ -1,10 +1,18 @@
 * changes v4.0.1 -> xxx:
 
 ##
+## Features
+##
+
+- Removed option --gpu-temp-retain that tried to retain GPU temperature at X degrees celsius, please use driver specific tools
+- Removed option --powertune-enable to enable power tuning, please use driver specific tools
+
+##
 ## Algorithms
 ##
 
 - Added hash-mode 16000 = Tripcode
+- Added hash-mode 16100 = TACACS+
 
 ##
 ## Bugs
@@ -20,6 +28,7 @@
 ##
 
 - Show [r]esume in prompt in pause mode only and show [p]ause in prompt in resume mode only
+- Reset PID controller history data for GPU fan speed in case user resumes from a paused session
 
 ##
 ## Technical
