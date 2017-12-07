@@ -4,6 +4,7 @@
 ## Features
 ##
 
+- Added option --benchmark-all to benchmark all hash-modes not just the default selection
 - Removed option --gpu-temp-retain that tried to retain GPU temperature at X degrees celsius, please use driver specific tools
 - Removed option --powertune-enable to enable power tuning, please use driver specific tools
 
@@ -34,8 +35,13 @@
 ## Technical
 ##
 
-- Changed the way large strings are handled/truncated within the event buffer if they are too large to fit
-- Fixed our use of strtok_r () calls
+- Documents: Added docs/limits.txt
+- Files: Switched back to relative current working directory on windows to workaround problems with unicode characters
+- Hash Parser: Changed the way large strings are handled/truncated within the event buffer if they are too large to fit
+- Hash Parser: Fixed our use of strtok_r () calls
+- Self Test: Skip self-test for mode 8900 user-configurable scrypt settings are incompatible to fixed settings in the self-test hash
+- Self Test: Skip self-test for mode 15700 because settings are too high and create a too long startup time
+- Terminal: Send clear line code to the same output stream as the next message following
 
 * changes v4.0.0 -> v4.0.1:
 
