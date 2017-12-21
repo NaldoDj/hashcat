@@ -469,6 +469,14 @@ typedef struct ethereum_scrypt
 
 } ethereum_scrypt_t;
 
+typedef struct ethereum_presale
+{
+  u32 iv[4];
+  u32 enc_seed[152];
+  u32 enc_seed_len;
+
+} ethereum_presale_t;
+
 typedef struct tacacs_plus
 {
   u32 session_buf[16];
@@ -479,6 +487,15 @@ typedef struct tacacs_plus
   u32 sequence_buf[16];
 
 } tacacs_plus_t;
+
+typedef struct apple_secure_notes
+{
+  u32 Z_PK;
+  u32 ZCRYPTOITERATIONCOUNT;
+  u32 ZCRYPTOSALT[16];
+  u32 ZCRYPTOWRAPPEDKEY[16];
+
+} apple_secure_notes_t;
 
 typedef struct luks_tmp
 {
@@ -914,6 +931,16 @@ typedef struct dpapimk_tmp_v2
 
 } dpapimk_tmp_v2_t;
 
+typedef struct apple_secure_notes_tmp
+{
+  u32 ipad[8];
+  u32 opad[8];
+
+  u32 dgst[8];
+  u32 out[8];
+
+} apple_secure_notes_tmp_t;
+
 typedef struct seven_zip_hook
 {
   u32 ukey[8];
@@ -1296,6 +1323,10 @@ typedef enum display_len
   DISPLAY_LEN_MAX_16000 = 10,
   DISPLAY_LEN_MIN_16100 = 1 + 11 + 1 + 1 + 1 + 8 +  12 + 1 + 4,
   DISPLAY_LEN_MAX_16100 = 1 + 11 + 1 + 1 + 1 + 8 + 256 + 1 + 4,
+  DISPLAY_LEN_MIN_16200 = 5 + 1 + 1 + 1 + 5 + 1 + 32 + 1 + 48,
+  DISPLAY_LEN_MAX_16200 = 5 + 1 + 6 + 1 + 5 + 1 + 32 + 1 + 48,
+  DISPLAY_LEN_MIN_16300 = 11 + 1 +   64 + 1 + 40 + 1 + 32,
+  DISPLAY_LEN_MAX_16300 = 11 + 1 + 1248 + 1 + 40 + 1 + 32,
   DISPLAY_LEN_MIN_99999 = 1,
   DISPLAY_LEN_MAX_99999 = 55,
 
@@ -1425,6 +1456,7 @@ typedef enum hash_type
   HASH_TYPE_DPAPIMK             = 61,
   HASH_TYPE_JKS_SHA1            = 62,
   HASH_TYPE_TACACS_PLUS         = 63,
+  HASH_TYPE_APPLE_SECURE_NOTES  = 64,
 
 } hash_type_t;
 
@@ -1623,6 +1655,8 @@ typedef enum kern_type
   KERN_TYPE_DPAPIMK_V2              = 15900,
   KERN_TYPE_TRIPCODE                = 16000,
   KERN_TYPE_TACACS_PLUS             = 16100,
+  KERN_TYPE_APPLE_SECURE_NOTES      = 16200,
+  KERN_TYPE_ETHEREUM_PRESALE        = 16300,
   KERN_TYPE_PLAINTEXT               = 99999,
 
 } kern_type_t;
@@ -1697,6 +1731,8 @@ typedef enum rounds_count
    ROUNDS_DPAPIMK_V1         = 24000 - 1, // from 4000 to 24000 (possibly more)
    ROUNDS_DPAPIMK_V2         = 8000  - 1, // from 4000 to 24000 (possibly more)
    ROUNDS_ETHEREUM_PBKDF2    = 262144 - 1,
+   ROUNDS_APPLE_SECURE_NOTES = 20000,
+   ROUNDS_ETHEREUM_PRESALE   = 2000 - 1,
    ROUNDS_STDOUT             = 0
 
 } rounds_count_t;
@@ -1882,6 +1918,8 @@ int ethereum_pbkdf2_parse_hash    (u8 *input_buf, u32 input_len, hash_t *hash_bu
 int ethereum_scrypt_parse_hash    (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
 int tripcode_parse_hash           (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
 int tacacs_plus_parse_hash        (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
+int apple_secure_notes_parse_hash (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
+int ethereum_presale_parse_hash   (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig);
 
 /**
  * hook functions

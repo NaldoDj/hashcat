@@ -203,15 +203,16 @@ NVIDIA GPUs require "NVIDIA Driver" (367.x or later)
 - RAR5
 - AxCrypt
 - AxCrypt in-memory SHA1
-- PDF 1.1 - 1.3 (Acrobat 2 - 4)
-- PDF 1.4 - 1.6 (Acrobat 5 - 8)
-- PDF 1.7 Level 3 (Acrobat 9)
-- PDF 1.7 Level 8 (Acrobat 10 - 11)
 - MS Office <= 2003 MD5
 - MS Office <= 2003 SHA1
 - MS Office 2007
 - MS Office 2010
 - MS Office 2013
+- PDF 1.1 - 1.3 (Acrobat 2 - 4)
+- PDF 1.4 - 1.6 (Acrobat 5 - 8)
+- PDF 1.7 Level 3 (Acrobat 9)
+- PDF 1.7 Level 8 (Acrobat 10 - 11)
+- Apple Secure Notes
 - Lotus Notes/Domino 5
 - Lotus Notes/Domino 6
 - Lotus Notes/Domino 8
@@ -225,6 +226,7 @@ NVIDIA GPUs require "NVIDIA Driver" (367.x or later)
 - Password Safe v3
 - KeePass 1 (AES/Twofish) and KeePass 2 (AES)
 - JKS Java Key Store Private Keys (SHA1)
+- Ethereum Pre-Sale Wallet, PBKDF2-HMAC-SHA256
 - Ethereum Wallet, PBKDF2-HMAC-SHA256
 - Ethereum Wallet, SCRYPT
 - eCryptfs

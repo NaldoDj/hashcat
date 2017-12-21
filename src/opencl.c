@@ -245,9 +245,9 @@ static int read_kernel_binary (hashcat_ctx_t *hashcat_ctx, const char *kernel_fi
 
   if (fp != NULL)
   {
-    hc_stat_t st;
+    struct stat st;
 
-    if (hc_stat (kernel_file, &st))
+    if (stat (kernel_file, &st))
     {
       fclose (fp);
 
@@ -3169,11 +3169,7 @@ int opencl_ctx_devices_init (hashcat_ctx_t *hashcat_ctx, const int comptime)
         {
           need_nvml = true;
 
-          #if defined (_WIN)
-          need_nvapi = true;
-          #endif
-
-          #if defined (__CYGWIN__)
+          #if defined (_WIN) || defined (__CYGWIN__)
           need_nvapi = true;
           #endif
         }

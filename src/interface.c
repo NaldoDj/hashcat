@@ -269,6 +269,8 @@ static const char *ST_HASH_15600 = "$ethereum$p*1024*383531313538313333383131383
 static const char *ST_HASH_15900 = "$DPAPImk$2*1*S-15-21-439882973-489230393-482956683-1522*aes256*sha512*12900*79f7ca399f2626e21aad108c3922af7c*288*c47bc8a985ca6aa708b01c97b004bff20cc52379dc2635b4acf59ce17970a2cb47ace98c7e8de977f265243c5c03d0a97e4b954b494d9e38d9158d0c1e729d16a28ba69e2e7c6c3bc0e3afc9c9b6306b83372ccb35d89b98925728fd36315b8ee95b4d4eccdcb31564769f9a4b9ee10828184e16d4af336675d5e31d987dd87233d34fbbb98880c5e1f64cbb9b043ad8";
 static const char *ST_HASH_16000 = "pfaRCwDe0U";
 static const char *ST_HASH_16100 = "$tacacs-plus$0$5fde8e68$4e13e8fb33df$c006";
+static const char *ST_HASH_16200 = "$ASN$*1*20000*80771171105233481004850004085037*d04b17af7f6b184346aad3efefe8bec0987ee73418291a41";
+static const char *ST_HASH_16300 = "$ethereum$w*e94a8e49deac2d62206bf9bfb7d2aaea7eb06c1a378cfc1ac056cc599a569793c0ecc40e6a0c242dee2812f06b644d70f43331b1fa2ce4bd6cbb9f62dd25b443235bdb4c1ffb222084c9ded8c719624b338f17e0fd827b34d79801298ac75f74ed97ae16f72fccecf862d09a03498b1b8bd1d984fc43dd507ede5d4b6223a582352386407266b66c671077eefc1e07b5f42508bf926ab5616658c984968d8eec25c9d5197a4a30eed54c161595c3b4d558b17ab8a75ccca72b3d949919d197158ea5cfbc43ac7dd73cf77807dc2c8fe4ef1e942ccd11ec24fe8a410d48ef4b8a35c93ecf1a21c51a51a08f3225fbdcc338b1e7fdafd7d94b82a81d88c2e9a429acc3f8a5974eafb7af8c912597eb6fdcd80578bd12efddd99de47b44e7c8f6c38f2af3116b08796172eda89422e9ea9b99c7f98a7e331aeb4bb1b06f611e95082b629332c31dbcfd878aed77d300c9ed5c74af9cd6f5a8c4a261dd124317fb790a04481d93aec160af4ad8ec84c04d943a869f65f07f5ccf8295dc1c876f30408eac77f62192cbb25842470b4a5bdb4c8096f56da7e9ed05c21f61b94c54ef1c2e9e417cce627521a40a99e357dd9b7a7149041d589cbacbe0302db57ddc983b9a6d79ce3f2e9ae8ad45fa40b934ed6b36379b780549ae7553dbb1cab238138c05743d0103335325bd90e27d8ae1ea219eb8905503c5ad54fa12d22e9a7d296eee07c8a7b5041b8d56b8af290274d01eb0e4ad174eb26b23b5e9fb46ff7f88398e6266052292acb36554ccb9c2c03139fe72d3f5d30bd5d10bd79d7cb48d2ab24187d8efc3750d5a24980fb12122591455d14e75421a2074599f1cc9fdfc8f498c92ad8b904d3c4307f80c46921d8128*f3abede76ac15228f1b161dd9660bb9094e81b1b*d201ccd492c284484c7824c4d37b1593";
 static const char *ST_HASH_99999 = "hashcat";
 
 static const char *OPTI_STR_OPTIMIZED_KERNEL     = "Optimized-Kernel";
@@ -503,6 +505,8 @@ static const char *HT_15700 = "Ethereum Wallet, SCRYPT";
 static const char *HT_15900 = "DPAPI masterkey file v2";
 static const char *HT_16000 = "Tripcode";
 static const char *HT_16100 = "TACACS+";
+static const char *HT_16200 = "Apple Secure Notes";
+static const char *HT_16300 = "Ethereum Pre-Sale Wallet, PBKDF2-HMAC-SHA256";
 static const char *HT_99999 = "Plaintext";
 
 static const char *HT_00011 = "Joomla < 2.5.18";
@@ -565,89 +569,91 @@ static const char *HT_13762 = "VeraCrypt PBKDF2-HMAC-SHA256 + XTS 1024 bit + boo
 static const char *HT_13763 = "VeraCrypt PBKDF2-HMAC-SHA256 + XTS 1536 bit + boot-mode";
 static const char *HT_12001 = "Atlassian (PBKDF2-HMAC-SHA1)";
 
-static const char *SIGNATURE_ANDROIDFDE       = "$fde$";
-static const char *SIGNATURE_AXCRYPT          = "$axcrypt$*1";
-static const char *SIGNATURE_AXCRYPT_SHA1     = "$axcrypt_sha1";
-static const char *SIGNATURE_BCRYPT1          = "$2a$";
-static const char *SIGNATURE_BCRYPT2          = "$2b$";
-static const char *SIGNATURE_BCRYPT3          = "$2x$";
-static const char *SIGNATURE_BCRYPT4          = "$2y$";
-static const char *SIGNATURE_BITCOIN_WALLET   = "$bitcoin$";
-static const char *SIGNATURE_BSDICRYPT        = "_";
-static const char *SIGNATURE_CISCO8           = "$8$";
-static const char *SIGNATURE_CISCO9           = "$9$";
-static const char *SIGNATURE_CRAM_MD5         = "$cram_md5$";
-static const char *SIGNATURE_DCC2             = "$DCC2$";
-static const char *SIGNATURE_DJANGOPBKDF2     = "pbkdf2_sha256$";
-static const char *SIGNATURE_DJANGOSHA1       = "sha1$";
-static const char *SIGNATURE_DPAPIMK          = "$DPAPImk$";
-static const char *SIGNATURE_DRUPAL7          = "$S$";
-static const char *SIGNATURE_ECRYPTFS         = "$ecryptfs$";
-static const char *SIGNATURE_EPISERVER4       = "$episerver$*1*";
-static const char *SIGNATURE_EPISERVER        = "$episerver$*0*";
-static const char *SIGNATURE_KEEPASS          = "$keepass$";
-static const char *SIGNATURE_KRB5PA           = "$krb5pa$23";
-static const char *SIGNATURE_KRB5TGS          = "$krb5tgs$23";
-static const char *SIGNATURE_MD5AIX           = "{smd5}";
-static const char *SIGNATURE_MD5APR1          = "$apr1$";
-static const char *SIGNATURE_MD5CRYPT         = "$1$";
-static const char *SIGNATURE_MEDIAWIKI_B      = "$B$";
-static const char *SIGNATURE_MS_DRSR          = "v1;PPH1_MD4";
-static const char *SIGNATURE_MSSQL            = "0x0100";
-static const char *SIGNATURE_MSSQL2012        = "0x0200";
-static const char *SIGNATURE_MYSQL_AUTH       = "$mysqlna$";
-static const char *SIGNATURE_MYWALLET         = "$blockchain$";
-static const char *SIGNATURE_MYWALLETV2       = "$blockchain$v2$";
-static const char *SIGNATURE_NETSCALER        = "1";
-static const char *SIGNATURE_OFFICE2007       = "$office$";
-static const char *SIGNATURE_OFFICE2010       = "$office$";
-static const char *SIGNATURE_OFFICE2013       = "$office$";
-static const char *SIGNATURE_OLDOFFICE0       = "$oldoffice$0";
-static const char *SIGNATURE_OLDOFFICE1       = "$oldoffice$1";
-static const char *SIGNATURE_OLDOFFICE3       = "$oldoffice$3";
-static const char *SIGNATURE_OLDOFFICE4       = "$oldoffice$4";
-static const char *SIGNATURE_PBKDF2_MD5       = "md5:";
-static const char *SIGNATURE_PBKDF2_SHA1      = "sha1:";
-static const char *SIGNATURE_PBKDF2_SHA256    = "sha256:";
-static const char *SIGNATURE_PBKDF2_SHA512    = "sha512:";
-static const char *SIGNATURE_PDF              = "$pdf$";
-static const char *SIGNATURE_PHPASS1          = "$P$";
-static const char *SIGNATURE_PHPASS2          = "$H$";
-static const char *SIGNATURE_PHPS             = "$PHPS$";
-static const char *SIGNATURE_POSTGRESQL_AUTH  = "$postgres$";
-static const char *SIGNATURE_PSAFE3           = "PWS3";
-static const char *SIGNATURE_RACF             = "$racf$";
-static const char *SIGNATURE_RAR3             = "$RAR3$";
-static const char *SIGNATURE_RAR5             = "$rar5$";
-static const char *SIGNATURE_SAPH_SHA1        = "{x-issha, ";
-static const char *SIGNATURE_SCRYPT           = "SCRYPT";
-static const char *SIGNATURE_SEVEN_ZIP        = "$7z$";
-static const char *SIGNATURE_SHA1AIX          = "{ssha1}";
-static const char *SIGNATURE_SHA1B64          = "{SHA}";
-static const char *SIGNATURE_SHA256AIX        = "{ssha256}";
-static const char *SIGNATURE_SHA256B64S       = "{SSHA256}";
-static const char *SIGNATURE_SHA256CRYPT      = "$5$";
-static const char *SIGNATURE_SHA512AIX        = "{ssha512}";
-static const char *SIGNATURE_SHA512B64S       = "{SSHA512}";
-static const char *SIGNATURE_SHA512CRYPT      = "$6$";
-static const char *SIGNATURE_SHA512GRUB       = "grub.pbkdf2.sha512.";
-static const char *SIGNATURE_SHA512MACOS      = "$ml$";
-static const char *SIGNATURE_SIP_AUTH         = "$sip$*";
-static const char *SIGNATURE_SSHA1B64_lower   = "{ssha}";
-static const char *SIGNATURE_SSHA1B64_upper   = "{SSHA}";
-static const char *SIGNATURE_SYBASEASE        = "0xc007";
-static const char *SIGNATURE_ZIP2_START       = "$zip2$";
-static const char *SIGNATURE_ZIP2_STOP        = "$/zip2$";
-static const char *SIGNATURE_ITUNES_BACKUP    = "$itunes_backup$";
-static const char *SIGNATURE_FORTIGATE        = "AK1";
-static const char *SIGNATURE_ATLASSIAN        = "{PKCS5S2}";
-static const char *SIGNATURE_NETBSD_SHA1CRYPT = "$sha1$";
-static const char *SIGNATURE_BLAKE2B          = "$BLAKE2$";
-static const char *SIGNATURE_CHACHA20         = "$chacha20$";
-static const char *SIGNATURE_JKS_SHA1         = "$jksprivk$";
-static const char *SIGNATURE_ETHEREUM_PBKDF2  = "$ethereum$p";
-static const char *SIGNATURE_ETHEREUM_SCRYPT  = "$ethereum$s";
-static const char *SIGNATURE_TACACS_PLUS      = "$tacacs-plus$0$";
+static const char *SIGNATURE_ANDROIDFDE         = "$fde$";
+static const char *SIGNATURE_AXCRYPT            = "$axcrypt$*1";
+static const char *SIGNATURE_AXCRYPT_SHA1       = "$axcrypt_sha1";
+static const char *SIGNATURE_BCRYPT1            = "$2a$";
+static const char *SIGNATURE_BCRYPT2            = "$2b$";
+static const char *SIGNATURE_BCRYPT3            = "$2x$";
+static const char *SIGNATURE_BCRYPT4            = "$2y$";
+static const char *SIGNATURE_BITCOIN_WALLET     = "$bitcoin$";
+static const char *SIGNATURE_BSDICRYPT          = "_";
+static const char *SIGNATURE_CISCO8             = "$8$";
+static const char *SIGNATURE_CISCO9             = "$9$";
+static const char *SIGNATURE_CRAM_MD5           = "$cram_md5$";
+static const char *SIGNATURE_DCC2               = "$DCC2$";
+static const char *SIGNATURE_DJANGOPBKDF2       = "pbkdf2_sha256$";
+static const char *SIGNATURE_DJANGOSHA1         = "sha1$";
+static const char *SIGNATURE_DPAPIMK            = "$DPAPImk$";
+static const char *SIGNATURE_DRUPAL7            = "$S$";
+static const char *SIGNATURE_ECRYPTFS           = "$ecryptfs$";
+static const char *SIGNATURE_EPISERVER4         = "$episerver$*1*";
+static const char *SIGNATURE_EPISERVER          = "$episerver$*0*";
+static const char *SIGNATURE_KEEPASS            = "$keepass$";
+static const char *SIGNATURE_KRB5PA             = "$krb5pa$23";
+static const char *SIGNATURE_KRB5TGS            = "$krb5tgs$23";
+static const char *SIGNATURE_MD5AIX             = "{smd5}";
+static const char *SIGNATURE_MD5APR1            = "$apr1$";
+static const char *SIGNATURE_MD5CRYPT           = "$1$";
+static const char *SIGNATURE_MEDIAWIKI_B        = "$B$";
+static const char *SIGNATURE_MS_DRSR            = "v1;PPH1_MD4";
+static const char *SIGNATURE_MSSQL              = "0x0100";
+static const char *SIGNATURE_MSSQL2012          = "0x0200";
+static const char *SIGNATURE_MYSQL_AUTH         = "$mysqlna$";
+static const char *SIGNATURE_MYWALLET           = "$blockchain$";
+static const char *SIGNATURE_MYWALLETV2         = "$blockchain$v2$";
+static const char *SIGNATURE_NETSCALER          = "1";
+static const char *SIGNATURE_OFFICE2007         = "$office$";
+static const char *SIGNATURE_OFFICE2010         = "$office$";
+static const char *SIGNATURE_OFFICE2013         = "$office$";
+static const char *SIGNATURE_OLDOFFICE0         = "$oldoffice$0";
+static const char *SIGNATURE_OLDOFFICE1         = "$oldoffice$1";
+static const char *SIGNATURE_OLDOFFICE3         = "$oldoffice$3";
+static const char *SIGNATURE_OLDOFFICE4         = "$oldoffice$4";
+static const char *SIGNATURE_PBKDF2_MD5         = "md5:";
+static const char *SIGNATURE_PBKDF2_SHA1        = "sha1:";
+static const char *SIGNATURE_PBKDF2_SHA256      = "sha256:";
+static const char *SIGNATURE_PBKDF2_SHA512      = "sha512:";
+static const char *SIGNATURE_PDF                = "$pdf$";
+static const char *SIGNATURE_PHPASS1            = "$P$";
+static const char *SIGNATURE_PHPASS2            = "$H$";
+static const char *SIGNATURE_PHPS               = "$PHPS$";
+static const char *SIGNATURE_POSTGRESQL_AUTH    = "$postgres$";
+static const char *SIGNATURE_PSAFE3             = "PWS3";
+static const char *SIGNATURE_RACF               = "$racf$";
+static const char *SIGNATURE_RAR3               = "$RAR3$";
+static const char *SIGNATURE_RAR5               = "$rar5$";
+static const char *SIGNATURE_SAPH_SHA1          = "{x-issha, ";
+static const char *SIGNATURE_SCRYPT             = "SCRYPT";
+static const char *SIGNATURE_SEVEN_ZIP          = "$7z$";
+static const char *SIGNATURE_SHA1AIX            = "{ssha1}";
+static const char *SIGNATURE_SHA1B64            = "{SHA}";
+static const char *SIGNATURE_SHA256AIX          = "{ssha256}";
+static const char *SIGNATURE_SHA256B64S         = "{SSHA256}";
+static const char *SIGNATURE_SHA256CRYPT        = "$5$";
+static const char *SIGNATURE_SHA512AIX          = "{ssha512}";
+static const char *SIGNATURE_SHA512B64S         = "{SSHA512}";
+static const char *SIGNATURE_SHA512CRYPT        = "$6$";
+static const char *SIGNATURE_SHA512GRUB         = "grub.pbkdf2.sha512.";
+static const char *SIGNATURE_SHA512MACOS        = "$ml$";
+static const char *SIGNATURE_SIP_AUTH           = "$sip$*";
+static const char *SIGNATURE_SSHA1B64_lower     = "{ssha}";
+static const char *SIGNATURE_SSHA1B64_upper     = "{SSHA}";
+static const char *SIGNATURE_SYBASEASE          = "0xc007";
+static const char *SIGNATURE_ZIP2_START         = "$zip2$";
+static const char *SIGNATURE_ZIP2_STOP          = "$/zip2$";
+static const char *SIGNATURE_ITUNES_BACKUP      = "$itunes_backup$";
+static const char *SIGNATURE_FORTIGATE          = "AK1";
+static const char *SIGNATURE_ATLASSIAN          = "{PKCS5S2}";
+static const char *SIGNATURE_NETBSD_SHA1CRYPT   = "$sha1$";
+static const char *SIGNATURE_BLAKE2B            = "$BLAKE2$";
+static const char *SIGNATURE_CHACHA20           = "$chacha20$";
+static const char *SIGNATURE_JKS_SHA1           = "$jksprivk$";
+static const char *SIGNATURE_ETHEREUM_PBKDF2    = "$ethereum$p";
+static const char *SIGNATURE_ETHEREUM_SCRYPT    = "$ethereum$s";
+static const char *SIGNATURE_TACACS_PLUS        = "$tacacs-plus$0$";
+static const char *SIGNATURE_APPLE_SECURE_NOTES = "$ASN$";
+static const char *SIGNATURE_ETHEREUM_PRESALE   = "$ethereum$w";
 
 /**
  * decoder / encoder
@@ -15828,6 +15834,233 @@ int tacacs_plus_parse_hash (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYB
   return (PARSER_OK);
 }
 
+int apple_secure_notes_parse_hash (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig)
+{
+  if ((input_len < DISPLAY_LEN_MIN_16200) || (input_len > DISPLAY_LEN_MAX_16200)) return (PARSER_GLOBAL_LENGTH);
+
+  if (memcmp (SIGNATURE_APPLE_SECURE_NOTES, input_buf, 5) != 0) return (PARSER_SIGNATURE_UNMATCHED);
+
+  u32 *digest = (u32 *) hash_buf->digest;
+
+  salt_t *salt = hash_buf->salt;
+
+  apple_secure_notes_t *apple_secure_notes = (apple_secure_notes_t *) hash_buf->esalt;
+
+  /**
+   * parse line
+   */
+
+  // Z_PK
+
+  u8 *Z_PK_pos = input_buf + 5 + 1;
+
+  // ZCRYPTOITERATIONCOUNT
+
+  u8 *ZCRYPTOITERATIONCOUNT_pos = (u8 *) strchr ((const char *) Z_PK_pos, '*');
+
+  if (ZCRYPTOITERATIONCOUNT_pos == NULL) return (PARSER_SEPARATOR_UNMATCHED);
+
+  u32 Z_PK_len = ZCRYPTOITERATIONCOUNT_pos - Z_PK_pos;
+
+  ZCRYPTOITERATIONCOUNT_pos++;
+
+  // ZCRYPTOSALT
+
+  u8 *ZCRYPTOSALT_pos = (u8 *) strchr ((const char *) ZCRYPTOITERATIONCOUNT_pos, '*');
+
+  if (ZCRYPTOSALT_pos == NULL) return (PARSER_SEPARATOR_UNMATCHED);
+
+  u32 ZCRYPTOITERATIONCOUNT_len = ZCRYPTOSALT_pos - ZCRYPTOITERATIONCOUNT_pos;
+
+  ZCRYPTOSALT_pos++;
+
+  // ZCRYPTOWRAPPEDKEY
+
+  u8 *ZCRYPTOWRAPPEDKEY_pos = (u8 *) strchr ((const char *) ZCRYPTOSALT_pos, '*');
+
+  if (ZCRYPTOWRAPPEDKEY_pos == NULL) return (PARSER_SEPARATOR_UNMATCHED);
+
+  u32 ZCRYPTOSALT_len = ZCRYPTOWRAPPEDKEY_pos - ZCRYPTOSALT_pos;
+
+  ZCRYPTOWRAPPEDKEY_pos++;
+
+  u32 ZCRYPTOWRAPPEDKEY_len = input_len - 5 - 1 - Z_PK_len - 1 - ZCRYPTOITERATIONCOUNT_len - 1 - ZCRYPTOSALT_len - 1;
+
+  /**
+   * verify some data
+   */
+
+  const u32 Z_PK                  = strtoul ((const char *) Z_PK_pos,                  NULL, 10);
+  const u32 ZCRYPTOITERATIONCOUNT = strtoul ((const char *) ZCRYPTOITERATIONCOUNT_pos, NULL, 10);
+
+  if (ZCRYPTOSALT_len       != 32) return (PARSER_SALT_ENCODING);
+  if (ZCRYPTOWRAPPEDKEY_len != 48) return (PARSER_SALT_ENCODING);
+
+  if (is_valid_hex_string (ZCRYPTOSALT_pos,       ZCRYPTOSALT_len)        == false) return (PARSER_SALT_ENCODING);
+  if (is_valid_hex_string (ZCRYPTOWRAPPEDKEY_pos, ZCRYPTOWRAPPEDKEY_len)  == false) return (PARSER_SALT_ENCODING);
+
+  //if (ZCRYPTOITERATIONCOUNT != 20000) return (PARSER_SALT_ENCODING);
+
+  /**
+   * store data
+   */
+
+  apple_secure_notes->Z_PK = Z_PK;
+
+  apple_secure_notes->ZCRYPTOITERATIONCOUNT = ZCRYPTOITERATIONCOUNT;
+
+  apple_secure_notes->ZCRYPTOSALT[ 0] = hex_to_u32 ((const u8 *) &ZCRYPTOSALT_pos[ 0]);
+  apple_secure_notes->ZCRYPTOSALT[ 1] = hex_to_u32 ((const u8 *) &ZCRYPTOSALT_pos[ 8]);
+  apple_secure_notes->ZCRYPTOSALT[ 2] = hex_to_u32 ((const u8 *) &ZCRYPTOSALT_pos[16]);
+  apple_secure_notes->ZCRYPTOSALT[ 3] = hex_to_u32 ((const u8 *) &ZCRYPTOSALT_pos[24]);
+  apple_secure_notes->ZCRYPTOSALT[ 4] = 0;
+  apple_secure_notes->ZCRYPTOSALT[ 5] = 0;
+  apple_secure_notes->ZCRYPTOSALT[ 6] = 0;
+  apple_secure_notes->ZCRYPTOSALT[ 7] = 0;
+  apple_secure_notes->ZCRYPTOSALT[ 8] = 0;
+  apple_secure_notes->ZCRYPTOSALT[ 9] = 0;
+  apple_secure_notes->ZCRYPTOSALT[10] = 0;
+  apple_secure_notes->ZCRYPTOSALT[11] = 0;
+  apple_secure_notes->ZCRYPTOSALT[12] = 0;
+  apple_secure_notes->ZCRYPTOSALT[13] = 0;
+  apple_secure_notes->ZCRYPTOSALT[14] = 0;
+  apple_secure_notes->ZCRYPTOSALT[15] = 0;
+
+  apple_secure_notes->ZCRYPTOWRAPPEDKEY[0] = hex_to_u32 ((const u8 *) &ZCRYPTOWRAPPEDKEY_pos[ 0]);
+  apple_secure_notes->ZCRYPTOWRAPPEDKEY[1] = hex_to_u32 ((const u8 *) &ZCRYPTOWRAPPEDKEY_pos[ 8]);
+  apple_secure_notes->ZCRYPTOWRAPPEDKEY[2] = hex_to_u32 ((const u8 *) &ZCRYPTOWRAPPEDKEY_pos[16]);
+  apple_secure_notes->ZCRYPTOWRAPPEDKEY[3] = hex_to_u32 ((const u8 *) &ZCRYPTOWRAPPEDKEY_pos[24]);
+  apple_secure_notes->ZCRYPTOWRAPPEDKEY[4] = hex_to_u32 ((const u8 *) &ZCRYPTOWRAPPEDKEY_pos[32]);
+  apple_secure_notes->ZCRYPTOWRAPPEDKEY[5] = hex_to_u32 ((const u8 *) &ZCRYPTOWRAPPEDKEY_pos[40]);
+
+  // fake salt
+
+  salt->salt_buf[0] = apple_secure_notes->ZCRYPTOSALT[0];
+  salt->salt_buf[1] = apple_secure_notes->ZCRYPTOSALT[1];
+  salt->salt_buf[2] = apple_secure_notes->ZCRYPTOSALT[2];
+  salt->salt_buf[3] = apple_secure_notes->ZCRYPTOSALT[3];
+  salt->salt_buf[4] = apple_secure_notes->Z_PK;
+
+  salt->salt_iter = apple_secure_notes->ZCRYPTOITERATIONCOUNT - 1;
+  salt->salt_len  = 20;
+
+  // fake hash
+
+  digest[0] = apple_secure_notes->ZCRYPTOWRAPPEDKEY[0];
+  digest[1] = apple_secure_notes->ZCRYPTOWRAPPEDKEY[1];
+  digest[2] = apple_secure_notes->ZCRYPTOWRAPPEDKEY[2];
+  digest[3] = apple_secure_notes->ZCRYPTOWRAPPEDKEY[3];
+
+  return (PARSER_OK);
+}
+
+int ethereum_presale_parse_hash (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UNUSED const hashconfig_t *hashconfig)
+{
+  if ((input_len < DISPLAY_LEN_MIN_16300) || (input_len > DISPLAY_LEN_MAX_16300)) return (PARSER_GLOBAL_LENGTH);
+
+  if (memcmp (SIGNATURE_ETHEREUM_PRESALE, input_buf, 11) != 0) return (PARSER_SIGNATURE_UNMATCHED);
+
+  u32 *digest = (u32 *) hash_buf->digest;
+
+  salt_t *salt = hash_buf->salt;
+
+  ethereum_presale_t *ethereum_presale = (ethereum_presale_t *) hash_buf->esalt;
+
+  /**
+   * parse line
+   */
+
+  // encseed
+
+  u8 *encseed_pos = input_buf + 11 + 1;
+
+  // address
+
+  u8 *ethaddr_pos = (u8 *) strchr ((const char *) encseed_pos, '*');
+
+  if (ethaddr_pos == NULL) return (PARSER_SEPARATOR_UNMATCHED);
+
+  u32 encseed_len = ethaddr_pos - encseed_pos;
+
+  ethaddr_pos++;
+
+  // hash (bkp)
+
+  u8 *bkp_pos = (u8 *) strchr ((const char *) ethaddr_pos, '*');
+
+  if (bkp_pos == NULL) return (PARSER_SEPARATOR_UNMATCHED);
+
+  u32 ethaddr_len = bkp_pos - ethaddr_pos;
+
+  bkp_pos++;
+
+  u32 bkp_len = input_len - 11 - 1 - encseed_len - 1 - ethaddr_len - 1;
+
+  /**
+   * verify some data
+   */
+
+  if (encseed_len  <   64) return (PARSER_SALT_LENGTH);
+  if (encseed_len  > 1248) return (PARSER_SALT_LENGTH);
+  if (ethaddr_len !=   40) return (PARSER_SALT_LENGTH);
+  if (bkp_len     !=   32) return (PARSER_SALT_LENGTH);
+
+  if ((encseed_len % 16) != 0) return (PARSER_SALT_LENGTH);
+
+  if (is_valid_hex_string (encseed_pos, encseed_len) == false) return (PARSER_SALT_ENCODING);
+  if (is_valid_hex_string (ethaddr_pos, ethaddr_len) == false) return (PARSER_HASH_ENCODING);
+  if (is_valid_hex_string (bkp_pos    , bkp_len    ) == false) return (PARSER_HASH_ENCODING);
+
+  /**
+   * store data
+   */
+
+  // iv (16 bytes)
+
+  ethereum_presale->iv[0] = hex_to_u32 ((const u8 *) &encseed_pos[ 0]);
+  ethereum_presale->iv[1] = hex_to_u32 ((const u8 *) &encseed_pos[ 8]);
+  ethereum_presale->iv[2] = hex_to_u32 ((const u8 *) &encseed_pos[16]);
+  ethereum_presale->iv[3] = hex_to_u32 ((const u8 *) &encseed_pos[24]);
+
+  ethereum_presale->iv[0] = byte_swap_32 (ethereum_presale->iv[0]);
+  ethereum_presale->iv[1] = byte_swap_32 (ethereum_presale->iv[1]);
+  ethereum_presale->iv[2] = byte_swap_32 (ethereum_presale->iv[2]);
+  ethereum_presale->iv[3] = byte_swap_32 (ethereum_presale->iv[3]);
+
+  // encseed
+
+  u32 *esalt_buf_ptr = ethereum_presale->enc_seed;
+
+  for (u32 i = 32, j = 0; i < encseed_len; i += 8, j++)
+  {
+    esalt_buf_ptr[j] = hex_to_u32 ((const u8 *) &encseed_pos [i]);
+
+    esalt_buf_ptr[j] = byte_swap_32 (esalt_buf_ptr[j]);
+  }
+
+  ethereum_presale->enc_seed_len = (encseed_len - 32) / 2; // encseed length without IV (raw bytes, not hex)
+
+  // salt
+
+  u8 *salt_buf_ptr = (u8 *) salt->salt_buf;
+
+  u32 salt_len = parse_and_store_salt (salt_buf_ptr, ethaddr_pos, 40, hashconfig);
+
+  if (salt_len == UINT_MAX) return (PARSER_SALT_LENGTH);
+
+  salt->salt_len  = salt_len;
+  salt->salt_iter = ROUNDS_ETHEREUM_PRESALE;
+
+  // hash
+
+  digest[0] = hex_to_u32 ((const u8 *) &bkp_pos[ 0]);
+  digest[1] = hex_to_u32 ((const u8 *) &bkp_pos[ 8]);
+  digest[2] = hex_to_u32 ((const u8 *) &bkp_pos[16]);
+  digest[3] = hex_to_u32 ((const u8 *) &bkp_pos[24]);
+
+  return (PARSER_OK);
+}
+
 /**
  * hook functions
  */
@@ -16260,6 +16493,8 @@ const char *strhashtype (const u32 hash_mode)
     case 15900: return HT_15900;
     case 16000: return HT_16000;
     case 16100: return HT_16100;
+    case 16200: return HT_16200;
+    case 16300: return HT_16300;
     case 99999: return HT_99999;
   }
 
@@ -19692,6 +19927,79 @@ int ascii_digest (hashcat_ctx_t *hashcat_ctx, char *out_buf, const size_t out_le
       ct_data,
       sequence_ptr[0],
       sequence_ptr[1]);
+  }
+  else if (hash_mode == 16200)
+  {
+    apple_secure_notes_t *apple_secure_notess = (apple_secure_notes_t *) esalts_buf;
+
+    apple_secure_notes_t *apple_secure_notes = &apple_secure_notess[digest_cur];
+
+    snprintf (out_buf, out_len - 1, "%s*%u*%u*%08x%08x%08x%08x*%08x%08x%08x%08x%08x%08x",
+      SIGNATURE_APPLE_SECURE_NOTES,
+      apple_secure_notes->Z_PK,
+      apple_secure_notes->ZCRYPTOITERATIONCOUNT,
+      byte_swap_32 (apple_secure_notes->ZCRYPTOSALT[0]),
+      byte_swap_32 (apple_secure_notes->ZCRYPTOSALT[1]),
+      byte_swap_32 (apple_secure_notes->ZCRYPTOSALT[2]),
+      byte_swap_32 (apple_secure_notes->ZCRYPTOSALT[3]),
+      byte_swap_32 (apple_secure_notes->ZCRYPTOWRAPPEDKEY[0]),
+      byte_swap_32 (apple_secure_notes->ZCRYPTOWRAPPEDKEY[1]),
+      byte_swap_32 (apple_secure_notes->ZCRYPTOWRAPPEDKEY[2]),
+      byte_swap_32 (apple_secure_notes->ZCRYPTOWRAPPEDKEY[3]),
+      byte_swap_32 (apple_secure_notes->ZCRYPTOWRAPPEDKEY[4]),
+      byte_swap_32 (apple_secure_notes->ZCRYPTOWRAPPEDKEY[5]));
+  }
+  else if (hash_mode == 16300)
+  {
+    ethereum_presale_t *ethereum_presales = (ethereum_presale_t *) esalts_buf;
+    ethereum_presale_t *ethereum_presale  = &ethereum_presales[digest_cur];
+
+    // get the initialization vector:
+
+    u8 encseed[1248 + 1] = { 0 };
+
+    u32 iv[4];
+
+    iv[0] = byte_swap_32 (ethereum_presale->iv[0]);
+    iv[1] = byte_swap_32 (ethereum_presale->iv[1]);
+    iv[2] = byte_swap_32 (ethereum_presale->iv[2]);
+    iv[3] = byte_swap_32 (ethereum_presale->iv[3]);
+
+    u32_to_hex_lower (iv[0], encseed +  0);
+    u32_to_hex_lower (iv[1], encseed +  8);
+    u32_to_hex_lower (iv[2], encseed + 16);
+    u32_to_hex_lower (iv[3], encseed + 24);
+
+    // get the raw enc_seed (without iv):
+
+    u32 *enc_seed_ptr = ethereum_presale->enc_seed;
+
+    for (u32 i = 0, j = 32; i < ethereum_presale->enc_seed_len / 4; i++, j += 8)
+    {
+      u32 tmp = enc_seed_ptr[i];
+
+      tmp = byte_swap_32 (tmp);
+
+      u32_to_hex_lower (tmp, encseed + j);
+    }
+
+    const u32 max_hex_len = (16 + ethereum_presale->enc_seed_len) * 2; // 16 bytes IV + encrypted seed (in hex)
+
+    const u32 max_pos = MIN (sizeof (encseed) - 1, max_hex_len);
+
+    encseed[max_pos] = 0;
+
+    // output:
+
+    snprintf (out_buf, out_len - 1, "%s*%s*%s*%08x%08x%08x%08x",
+      SIGNATURE_ETHEREUM_PRESALE,
+      encseed,
+      (char *) salt.salt_buf,
+      digest_buf[0],
+      digest_buf[1],
+      digest_buf[2],
+      digest_buf[3]
+    );
   }
   else if (hash_mode == 99999)
   {
@@ -24672,6 +24980,40 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
                  hashconfig->st_pass        = ST_PASS_HASHCAT_PLAIN;
                  break;
 
+    case 16200:  hashconfig->hash_type      = HASH_TYPE_APPLE_SECURE_NOTES;
+                 hashconfig->salt_type      = SALT_TYPE_EMBEDDED;
+                 hashconfig->attack_exec    = ATTACK_EXEC_OUTSIDE_KERNEL;
+                 hashconfig->opts_type      = OPTS_TYPE_PT_GENERATE_LE;
+                 hashconfig->kern_type      = KERN_TYPE_APPLE_SECURE_NOTES;
+                 hashconfig->dgst_size      = DGST_SIZE_4_4; // originally DGST_SIZE_4_2
+                 hashconfig->parse_func     = apple_secure_notes_parse_hash;
+                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE;
+                 hashconfig->dgst_pos0      = 0;
+                 hashconfig->dgst_pos1      = 1;
+                 hashconfig->dgst_pos2      = 2;
+                 hashconfig->dgst_pos3      = 3;
+                 hashconfig->st_hash        = ST_HASH_16200;
+                 hashconfig->st_pass        = ST_PASS_HASHCAT_PLAIN;
+                 break;
+
+    case 16300:  hashconfig->hash_type      = HASH_TYPE_PBKDF2_SHA256;
+                 hashconfig->salt_type      = SALT_TYPE_EMBEDDED;
+                 hashconfig->attack_exec    = ATTACK_EXEC_OUTSIDE_KERNEL;
+                 hashconfig->opts_type      = OPTS_TYPE_PT_GENERATE_LE
+                                            | OPTS_TYPE_ST_HEX;
+                 hashconfig->kern_type      = KERN_TYPE_ETHEREUM_PRESALE;
+                 hashconfig->dgst_size      = DGST_SIZE_4_8;
+                 hashconfig->parse_func     = ethereum_presale_parse_hash;
+                 hashconfig->opti_type      = OPTI_TYPE_ZERO_BYTE
+                                            | OPTI_TYPE_SLOW_HASH_SIMD_LOOP;
+                 hashconfig->dgst_pos0      = 0;
+                 hashconfig->dgst_pos1      = 1;
+                 hashconfig->dgst_pos2      = 2;
+                 hashconfig->dgst_pos3      = 3;
+                 hashconfig->st_hash        = ST_HASH_16300;
+                 hashconfig->st_pass        = ST_PASS_HASHCAT_PLAIN;
+                 break;
+
     case 99999:  hashconfig->hash_type      = HASH_TYPE_PLAINTEXT;
                  hashconfig->salt_type      = SALT_TYPE_NONE;
                  hashconfig->attack_exec    = ATTACK_EXEC_INSIDE_KERNEL;
@@ -24796,91 +25138,93 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
 
   switch (hashconfig->hash_mode)
   {
-    case   600: hashconfig->esalt_size = sizeof (blake2_t);          break;
-    case  2500: hashconfig->esalt_size = sizeof (wpa_t);             break;
-    case  2501: hashconfig->esalt_size = sizeof (wpa_t);             break;
-    case  5300: hashconfig->esalt_size = sizeof (ikepsk_t);          break;
-    case  5400: hashconfig->esalt_size = sizeof (ikepsk_t);          break;
-    case  5500: hashconfig->esalt_size = sizeof (netntlm_t);         break;
-    case  5600: hashconfig->esalt_size = sizeof (netntlm_t);         break;
-    case  6211: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case  6212: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case  6213: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case  6221: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case  6222: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case  6223: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case  6231: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case  6232: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case  6233: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case  6241: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case  6242: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case  6243: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case  6600: hashconfig->esalt_size = sizeof (agilekey_t);        break;
-    case  7100: hashconfig->esalt_size = sizeof (pbkdf2_sha512_t);   break;
-    case  7200: hashconfig->esalt_size = sizeof (pbkdf2_sha512_t);   break;
-    case  7300: hashconfig->esalt_size = sizeof (rakp_t);            break;
-    case  7500: hashconfig->esalt_size = sizeof (krb5pa_t);          break;
-    case  8200: hashconfig->esalt_size = sizeof (cloudkey_t);        break;
-    case  8800: hashconfig->esalt_size = sizeof (androidfde_t);      break;
-    case  9200: hashconfig->esalt_size = sizeof (pbkdf2_sha256_t);   break;
-    case  9400: hashconfig->esalt_size = sizeof (office2007_t);      break;
-    case  9500: hashconfig->esalt_size = sizeof (office2010_t);      break;
-    case  9600: hashconfig->esalt_size = sizeof (office2013_t);      break;
-    case  9700: hashconfig->esalt_size = sizeof (oldoffice01_t);     break;
-    case  9710: hashconfig->esalt_size = sizeof (oldoffice01_t);     break;
-    case  9720: hashconfig->esalt_size = sizeof (oldoffice01_t);     break;
-    case  9800: hashconfig->esalt_size = sizeof (oldoffice34_t);     break;
-    case  9810: hashconfig->esalt_size = sizeof (oldoffice34_t);     break;
-    case  9820: hashconfig->esalt_size = sizeof (oldoffice34_t);     break;
-    case 10000: hashconfig->esalt_size = sizeof (pbkdf2_sha256_t);   break;
-    case 10200: hashconfig->esalt_size = sizeof (cram_md5_t);        break;
-    case 10400: hashconfig->esalt_size = sizeof (pdf_t);             break;
-    case 10410: hashconfig->esalt_size = sizeof (pdf_t);             break;
-    case 10420: hashconfig->esalt_size = sizeof (pdf_t);             break;
-    case 10500: hashconfig->esalt_size = sizeof (pdf_t);             break;
-    case 10600: hashconfig->esalt_size = sizeof (pdf_t);             break;
-    case 10700: hashconfig->esalt_size = sizeof (pdf_t);             break;
-    case 10900: hashconfig->esalt_size = sizeof (pbkdf2_sha256_t);   break;
-    case 11300: hashconfig->esalt_size = sizeof (bitcoin_wallet_t);  break;
-    case 11400: hashconfig->esalt_size = sizeof (sip_t);             break;
-    case 11900: hashconfig->esalt_size = sizeof (pbkdf2_md5_t);      break;
-    case 12000: hashconfig->esalt_size = sizeof (pbkdf2_sha1_t);     break;
-    case 12001: hashconfig->esalt_size = sizeof (pbkdf2_sha1_t);     break;
-    case 12100: hashconfig->esalt_size = sizeof (pbkdf2_sha512_t);   break;
-    case 13000: hashconfig->esalt_size = sizeof (rar5_t);            break;
-    case 13100: hashconfig->esalt_size = sizeof (krb5tgs_t);         break;
-    case 13400: hashconfig->esalt_size = sizeof (keepass_t);         break;
-    case 13500: hashconfig->esalt_size = sizeof (pstoken_t);         break;
-    case 13600: hashconfig->esalt_size = sizeof (zip2_t);            break;
-    case 13711: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case 13712: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case 13713: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case 13721: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case 13722: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case 13723: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case 13731: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case 13732: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case 13733: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case 13741: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case 13742: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case 13743: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case 13751: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case 13752: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case 13753: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case 13761: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case 13762: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case 13763: hashconfig->esalt_size = sizeof (tc_t);              break;
-    case 13800: hashconfig->esalt_size = sizeof (win8phone_t);       break;
-    case 14600: hashconfig->esalt_size = sizeof (luks_t);            break;
-    case 14700: hashconfig->esalt_size = sizeof (itunes_backup_t);   break;
-    case 14800: hashconfig->esalt_size = sizeof (itunes_backup_t);   break;
-    case 15300: hashconfig->esalt_size = sizeof (dpapimk_t);         break;
-    case 15400: hashconfig->esalt_size = sizeof (chacha20_t);        break;
-    case 15500: hashconfig->esalt_size = sizeof (jks_sha1_t);        break;
-    case 15600: hashconfig->esalt_size = sizeof (ethereum_pbkdf2_t); break;
-    case 15700: hashconfig->esalt_size = sizeof (ethereum_scrypt_t); break;
-    case 15900: hashconfig->esalt_size = sizeof (dpapimk_t);         break;
-    case 16100: hashconfig->esalt_size = sizeof (tacacs_plus_t);     break;
+    case   600: hashconfig->esalt_size = sizeof (blake2_t);             break;
+    case  2500: hashconfig->esalt_size = sizeof (wpa_t);                break;
+    case  2501: hashconfig->esalt_size = sizeof (wpa_t);                break;
+    case  5300: hashconfig->esalt_size = sizeof (ikepsk_t);             break;
+    case  5400: hashconfig->esalt_size = sizeof (ikepsk_t);             break;
+    case  5500: hashconfig->esalt_size = sizeof (netntlm_t);            break;
+    case  5600: hashconfig->esalt_size = sizeof (netntlm_t);            break;
+    case  6211: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case  6212: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case  6213: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case  6221: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case  6222: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case  6223: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case  6231: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case  6232: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case  6233: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case  6241: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case  6242: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case  6243: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case  6600: hashconfig->esalt_size = sizeof (agilekey_t);           break;
+    case  7100: hashconfig->esalt_size = sizeof (pbkdf2_sha512_t);      break;
+    case  7200: hashconfig->esalt_size = sizeof (pbkdf2_sha512_t);      break;
+    case  7300: hashconfig->esalt_size = sizeof (rakp_t);               break;
+    case  7500: hashconfig->esalt_size = sizeof (krb5pa_t);             break;
+    case  8200: hashconfig->esalt_size = sizeof (cloudkey_t);           break;
+    case  8800: hashconfig->esalt_size = sizeof (androidfde_t);         break;
+    case  9200: hashconfig->esalt_size = sizeof (pbkdf2_sha256_t);      break;
+    case  9400: hashconfig->esalt_size = sizeof (office2007_t);         break;
+    case  9500: hashconfig->esalt_size = sizeof (office2010_t);         break;
+    case  9600: hashconfig->esalt_size = sizeof (office2013_t);         break;
+    case  9700: hashconfig->esalt_size = sizeof (oldoffice01_t);        break;
+    case  9710: hashconfig->esalt_size = sizeof (oldoffice01_t);        break;
+    case  9720: hashconfig->esalt_size = sizeof (oldoffice01_t);        break;
+    case  9800: hashconfig->esalt_size = sizeof (oldoffice34_t);        break;
+    case  9810: hashconfig->esalt_size = sizeof (oldoffice34_t);        break;
+    case  9820: hashconfig->esalt_size = sizeof (oldoffice34_t);        break;
+    case 10000: hashconfig->esalt_size = sizeof (pbkdf2_sha256_t);      break;
+    case 10200: hashconfig->esalt_size = sizeof (cram_md5_t);           break;
+    case 10400: hashconfig->esalt_size = sizeof (pdf_t);                break;
+    case 10410: hashconfig->esalt_size = sizeof (pdf_t);                break;
+    case 10420: hashconfig->esalt_size = sizeof (pdf_t);                break;
+    case 10500: hashconfig->esalt_size = sizeof (pdf_t);                break;
+    case 10600: hashconfig->esalt_size = sizeof (pdf_t);                break;
+    case 10700: hashconfig->esalt_size = sizeof (pdf_t);                break;
+    case 10900: hashconfig->esalt_size = sizeof (pbkdf2_sha256_t);      break;
+    case 11300: hashconfig->esalt_size = sizeof (bitcoin_wallet_t);     break;
+    case 11400: hashconfig->esalt_size = sizeof (sip_t);                break;
+    case 11900: hashconfig->esalt_size = sizeof (pbkdf2_md5_t);         break;
+    case 12000: hashconfig->esalt_size = sizeof (pbkdf2_sha1_t);        break;
+    case 12001: hashconfig->esalt_size = sizeof (pbkdf2_sha1_t);        break;
+    case 12100: hashconfig->esalt_size = sizeof (pbkdf2_sha512_t);      break;
+    case 13000: hashconfig->esalt_size = sizeof (rar5_t);               break;
+    case 13100: hashconfig->esalt_size = sizeof (krb5tgs_t);            break;
+    case 13400: hashconfig->esalt_size = sizeof (keepass_t);            break;
+    case 13500: hashconfig->esalt_size = sizeof (pstoken_t);            break;
+    case 13600: hashconfig->esalt_size = sizeof (zip2_t);               break;
+    case 13711: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case 13712: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case 13713: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case 13721: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case 13722: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case 13723: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case 13731: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case 13732: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case 13733: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case 13741: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case 13742: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case 13743: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case 13751: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case 13752: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case 13753: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case 13761: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case 13762: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case 13763: hashconfig->esalt_size = sizeof (tc_t);                 break;
+    case 13800: hashconfig->esalt_size = sizeof (win8phone_t);          break;
+    case 14600: hashconfig->esalt_size = sizeof (luks_t);               break;
+    case 14700: hashconfig->esalt_size = sizeof (itunes_backup_t);      break;
+    case 14800: hashconfig->esalt_size = sizeof (itunes_backup_t);      break;
+    case 15300: hashconfig->esalt_size = sizeof (dpapimk_t);            break;
+    case 15400: hashconfig->esalt_size = sizeof (chacha20_t);           break;
+    case 15500: hashconfig->esalt_size = sizeof (jks_sha1_t);           break;
+    case 15600: hashconfig->esalt_size = sizeof (ethereum_pbkdf2_t);    break;
+    case 15700: hashconfig->esalt_size = sizeof (ethereum_scrypt_t);    break;
+    case 15900: hashconfig->esalt_size = sizeof (dpapimk_t);            break;
+    case 16100: hashconfig->esalt_size = sizeof (tacacs_plus_t);        break;
+    case 16200: hashconfig->esalt_size = sizeof (apple_secure_notes_t); break;
+    case 16300: hashconfig->esalt_size = sizeof (ethereum_presale_t);   break;
   }
 
   // hook_salt_size
@@ -24898,96 +25242,98 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
 
   switch (hashconfig->hash_mode)
   {
-    case   400: hashconfig->tmp_size = sizeof (phpass_tmp_t);          break;
-    case   500: hashconfig->tmp_size = sizeof (md5crypt_tmp_t);        break;
-    case   501: hashconfig->tmp_size = sizeof (md5crypt_tmp_t);        break;
-    case  1600: hashconfig->tmp_size = sizeof (md5crypt_tmp_t);        break;
-    case  1800: hashconfig->tmp_size = sizeof (sha512crypt_tmp_t);     break;
-    case  2100: hashconfig->tmp_size = sizeof (dcc2_tmp_t);            break;
-    case  2500: hashconfig->tmp_size = sizeof (wpa_tmp_t);             break;
-    case  2501: hashconfig->tmp_size = sizeof (wpapmk_tmp_t);          break;
-    case  3200: hashconfig->tmp_size = sizeof (bcrypt_tmp_t);          break;
-    case  5200: hashconfig->tmp_size = sizeof (pwsafe3_tmp_t);         break;
-    case  5800: hashconfig->tmp_size = sizeof (androidpin_tmp_t);      break;
-    case  6211: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case  6212: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case  6213: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case  6221: hashconfig->tmp_size = sizeof (tc64_tmp_t);            break;
-    case  6222: hashconfig->tmp_size = sizeof (tc64_tmp_t);            break;
-    case  6223: hashconfig->tmp_size = sizeof (tc64_tmp_t);            break;
-    case  6231: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case  6232: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case  6233: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case  6241: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case  6242: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case  6243: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case  6300: hashconfig->tmp_size = sizeof (md5crypt_tmp_t);        break;
-    case  6400: hashconfig->tmp_size = sizeof (sha256aix_tmp_t);       break;
-    case  6500: hashconfig->tmp_size = sizeof (sha512aix_tmp_t);       break;
-    case  6600: hashconfig->tmp_size = sizeof (agilekey_tmp_t);        break;
-    case  6700: hashconfig->tmp_size = sizeof (sha1aix_tmp_t);         break;
-    case  6800: hashconfig->tmp_size = sizeof (lastpass_tmp_t);        break;
-    case  7100: hashconfig->tmp_size = sizeof (pbkdf2_sha512_tmp_t);   break;
-    case  7200: hashconfig->tmp_size = sizeof (pbkdf2_sha512_tmp_t);   break;
-    case  7400: hashconfig->tmp_size = sizeof (sha256crypt_tmp_t);     break;
-    case  7900: hashconfig->tmp_size = sizeof (drupal7_tmp_t);         break;
-    case  8200: hashconfig->tmp_size = sizeof (pbkdf2_sha512_tmp_t);   break;
-    case  8800: hashconfig->tmp_size = sizeof (androidfde_tmp_t);      break;
-    case  9000: hashconfig->tmp_size = sizeof (pwsafe2_tmp_t);         break;
-    case  9100: hashconfig->tmp_size = sizeof (lotus8_tmp_t);          break;
-    case  9200: hashconfig->tmp_size = sizeof (pbkdf2_sha256_tmp_t);   break;
-    case  9400: hashconfig->tmp_size = sizeof (office2007_tmp_t);      break;
-    case  9500: hashconfig->tmp_size = sizeof (office2010_tmp_t);      break;
-    case  9600: hashconfig->tmp_size = sizeof (office2013_tmp_t);      break;
-    case 10000: hashconfig->tmp_size = sizeof (pbkdf2_sha256_tmp_t);   break;
-    case 10200: hashconfig->tmp_size = sizeof (cram_md5_t);            break;
-    case 10300: hashconfig->tmp_size = sizeof (saph_sha1_tmp_t);       break;
-    case 10500: hashconfig->tmp_size = sizeof (pdf14_tmp_t);           break;
-    case 10700: hashconfig->tmp_size = sizeof (pdf17l8_tmp_t);         break;
-    case 10900: hashconfig->tmp_size = sizeof (pbkdf2_sha256_tmp_t);   break;
-    case 11300: hashconfig->tmp_size = sizeof (bitcoin_wallet_tmp_t);  break;
-    case 11600: hashconfig->tmp_size = sizeof (seven_zip_tmp_t);       break;
-    case 11900: hashconfig->tmp_size = sizeof (pbkdf2_md5_tmp_t);      break;
-    case 12000: hashconfig->tmp_size = sizeof (pbkdf2_sha1_tmp_t);     break;
-    case 12001: hashconfig->tmp_size = sizeof (pbkdf2_sha1_tmp_t);     break;
-    case 12100: hashconfig->tmp_size = sizeof (pbkdf2_sha512_tmp_t);   break;
-    case 12200: hashconfig->tmp_size = sizeof (ecryptfs_tmp_t);        break;
-    case 12300: hashconfig->tmp_size = sizeof (oraclet_tmp_t);         break;
-    case 12400: hashconfig->tmp_size = sizeof (bsdicrypt_tmp_t);       break;
-    case 12500: hashconfig->tmp_size = sizeof (rar3_tmp_t);            break;
-    case 12700: hashconfig->tmp_size = sizeof (mywallet_tmp_t);        break;
-    case 12800: hashconfig->tmp_size = sizeof (pbkdf2_sha256_tmp_t);   break;
-    case 12900: hashconfig->tmp_size = sizeof (pbkdf2_sha256_tmp_t);   break;
-    case 13000: hashconfig->tmp_size = sizeof (pbkdf2_sha256_tmp_t);   break;
-    case 13200: hashconfig->tmp_size = sizeof (axcrypt_tmp_t);         break;
-    case 13400: hashconfig->tmp_size = sizeof (keepass_tmp_t);         break;
-    case 13600: hashconfig->tmp_size = sizeof (pbkdf2_sha1_tmp_t);     break;
-    case 13711: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case 13712: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case 13713: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case 13721: hashconfig->tmp_size = sizeof (tc64_tmp_t);            break;
-    case 13722: hashconfig->tmp_size = sizeof (tc64_tmp_t);            break;
-    case 13723: hashconfig->tmp_size = sizeof (tc64_tmp_t);            break;
-    case 13731: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case 13732: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case 13733: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case 13741: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case 13742: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case 13743: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case 13751: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case 13752: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case 13753: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case 13761: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case 13762: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case 13763: hashconfig->tmp_size = sizeof (tc_tmp_t);              break;
-    case 14600: hashconfig->tmp_size = sizeof (luks_tmp_t);            break;
-    case 14700: hashconfig->tmp_size = sizeof (pbkdf2_sha1_tmp_t);     break;
-    case 14800: hashconfig->tmp_size = sizeof (pbkdf2_sha256_tmp_t);   break;
-    case 15100: hashconfig->tmp_size = sizeof (pbkdf1_sha1_tmp_t);     break;
-    case 15200: hashconfig->tmp_size = sizeof (mywallet_tmp_t);        break;
-    case 15300: hashconfig->tmp_size = sizeof (dpapimk_tmp_v1_t);      break;
-    case 15600: hashconfig->tmp_size = sizeof (pbkdf2_sha256_tmp_t);   break;
-    case 15900: hashconfig->tmp_size = sizeof (dpapimk_tmp_v2_t);      break;
+    case   400: hashconfig->tmp_size = sizeof (phpass_tmp_t);             break;
+    case   500: hashconfig->tmp_size = sizeof (md5crypt_tmp_t);           break;
+    case   501: hashconfig->tmp_size = sizeof (md5crypt_tmp_t);           break;
+    case  1600: hashconfig->tmp_size = sizeof (md5crypt_tmp_t);           break;
+    case  1800: hashconfig->tmp_size = sizeof (sha512crypt_tmp_t);        break;
+    case  2100: hashconfig->tmp_size = sizeof (dcc2_tmp_t);               break;
+    case  2500: hashconfig->tmp_size = sizeof (wpa_tmp_t);                break;
+    case  2501: hashconfig->tmp_size = sizeof (wpapmk_tmp_t);             break;
+    case  3200: hashconfig->tmp_size = sizeof (bcrypt_tmp_t);             break;
+    case  5200: hashconfig->tmp_size = sizeof (pwsafe3_tmp_t);            break;
+    case  5800: hashconfig->tmp_size = sizeof (androidpin_tmp_t);         break;
+    case  6211: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case  6212: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case  6213: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case  6221: hashconfig->tmp_size = sizeof (tc64_tmp_t);               break;
+    case  6222: hashconfig->tmp_size = sizeof (tc64_tmp_t);               break;
+    case  6223: hashconfig->tmp_size = sizeof (tc64_tmp_t);               break;
+    case  6231: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case  6232: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case  6233: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case  6241: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case  6242: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case  6243: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case  6300: hashconfig->tmp_size = sizeof (md5crypt_tmp_t);           break;
+    case  6400: hashconfig->tmp_size = sizeof (sha256aix_tmp_t);          break;
+    case  6500: hashconfig->tmp_size = sizeof (sha512aix_tmp_t);          break;
+    case  6600: hashconfig->tmp_size = sizeof (agilekey_tmp_t);           break;
+    case  6700: hashconfig->tmp_size = sizeof (sha1aix_tmp_t);            break;
+    case  6800: hashconfig->tmp_size = sizeof (lastpass_tmp_t);           break;
+    case  7100: hashconfig->tmp_size = sizeof (pbkdf2_sha512_tmp_t);      break;
+    case  7200: hashconfig->tmp_size = sizeof (pbkdf2_sha512_tmp_t);      break;
+    case  7400: hashconfig->tmp_size = sizeof (sha256crypt_tmp_t);        break;
+    case  7900: hashconfig->tmp_size = sizeof (drupal7_tmp_t);            break;
+    case  8200: hashconfig->tmp_size = sizeof (pbkdf2_sha512_tmp_t);      break;
+    case  8800: hashconfig->tmp_size = sizeof (androidfde_tmp_t);         break;
+    case  9000: hashconfig->tmp_size = sizeof (pwsafe2_tmp_t);            break;
+    case  9100: hashconfig->tmp_size = sizeof (lotus8_tmp_t);             break;
+    case  9200: hashconfig->tmp_size = sizeof (pbkdf2_sha256_tmp_t);      break;
+    case  9400: hashconfig->tmp_size = sizeof (office2007_tmp_t);         break;
+    case  9500: hashconfig->tmp_size = sizeof (office2010_tmp_t);         break;
+    case  9600: hashconfig->tmp_size = sizeof (office2013_tmp_t);         break;
+    case 10000: hashconfig->tmp_size = sizeof (pbkdf2_sha256_tmp_t);      break;
+    case 10200: hashconfig->tmp_size = sizeof (cram_md5_t);               break;
+    case 10300: hashconfig->tmp_size = sizeof (saph_sha1_tmp_t);          break;
+    case 10500: hashconfig->tmp_size = sizeof (pdf14_tmp_t);              break;
+    case 10700: hashconfig->tmp_size = sizeof (pdf17l8_tmp_t);            break;
+    case 10900: hashconfig->tmp_size = sizeof (pbkdf2_sha256_tmp_t);      break;
+    case 11300: hashconfig->tmp_size = sizeof (bitcoin_wallet_tmp_t);     break;
+    case 11600: hashconfig->tmp_size = sizeof (seven_zip_tmp_t);          break;
+    case 11900: hashconfig->tmp_size = sizeof (pbkdf2_md5_tmp_t);         break;
+    case 12000: hashconfig->tmp_size = sizeof (pbkdf2_sha1_tmp_t);        break;
+    case 12001: hashconfig->tmp_size = sizeof (pbkdf2_sha1_tmp_t);        break;
+    case 12100: hashconfig->tmp_size = sizeof (pbkdf2_sha512_tmp_t);      break;
+    case 12200: hashconfig->tmp_size = sizeof (ecryptfs_tmp_t);           break;
+    case 12300: hashconfig->tmp_size = sizeof (oraclet_tmp_t);            break;
+    case 12400: hashconfig->tmp_size = sizeof (bsdicrypt_tmp_t);          break;
+    case 12500: hashconfig->tmp_size = sizeof (rar3_tmp_t);               break;
+    case 12700: hashconfig->tmp_size = sizeof (mywallet_tmp_t);           break;
+    case 12800: hashconfig->tmp_size = sizeof (pbkdf2_sha256_tmp_t);      break;
+    case 12900: hashconfig->tmp_size = sizeof (pbkdf2_sha256_tmp_t);      break;
+    case 13000: hashconfig->tmp_size = sizeof (pbkdf2_sha256_tmp_t);      break;
+    case 13200: hashconfig->tmp_size = sizeof (axcrypt_tmp_t);            break;
+    case 13400: hashconfig->tmp_size = sizeof (keepass_tmp_t);            break;
+    case 13600: hashconfig->tmp_size = sizeof (pbkdf2_sha1_tmp_t);        break;
+    case 13711: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case 13712: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case 13713: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case 13721: hashconfig->tmp_size = sizeof (tc64_tmp_t);               break;
+    case 13722: hashconfig->tmp_size = sizeof (tc64_tmp_t);               break;
+    case 13723: hashconfig->tmp_size = sizeof (tc64_tmp_t);               break;
+    case 13731: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case 13732: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case 13733: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case 13741: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case 13742: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case 13743: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case 13751: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case 13752: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case 13753: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case 13761: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case 13762: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case 13763: hashconfig->tmp_size = sizeof (tc_tmp_t);                 break;
+    case 14600: hashconfig->tmp_size = sizeof (luks_tmp_t);               break;
+    case 14700: hashconfig->tmp_size = sizeof (pbkdf2_sha1_tmp_t);        break;
+    case 14800: hashconfig->tmp_size = sizeof (pbkdf2_sha256_tmp_t);      break;
+    case 15100: hashconfig->tmp_size = sizeof (pbkdf1_sha1_tmp_t);        break;
+    case 15200: hashconfig->tmp_size = sizeof (mywallet_tmp_t);           break;
+    case 15300: hashconfig->tmp_size = sizeof (dpapimk_tmp_v1_t);         break;
+    case 15600: hashconfig->tmp_size = sizeof (pbkdf2_sha256_tmp_t);      break;
+    case 15900: hashconfig->tmp_size = sizeof (dpapimk_tmp_v2_t);         break;
+    case 16200: hashconfig->tmp_size = sizeof (apple_secure_notes_tmp_t); break;
+    case 16300: hashconfig->tmp_size = sizeof (pbkdf2_sha256_tmp_t);      break;
   };
 
   // hook_size
@@ -25616,72 +25962,78 @@ void hashconfig_benchmark_defaults (hashcat_ctx_t *hashcat_ctx, salt_t *salt, vo
                   salt->scrypt_r = 1;
                   salt->scrypt_p = 8;
                   break;
+      case 16200: salt->salt_len = 16;
+                  break;
+      case 16300: salt->salt_len = 20;
+                  break;
     }
 
     // special esalt handling
 
     switch (hashconfig->hash_mode)
     {
-      case  2500: ((wpa_t *)           esalt)->eapol_len    = 128;
+      case  2500: ((wpa_t *)              esalt)->eapol_len    = 128;
                   break;
-      case  2501: ((wpa_t *)           esalt)->eapol_len    = 128;
+      case  2501: ((wpa_t *)              esalt)->eapol_len    = 128;
                   break;
-      case  5300: ((ikepsk_t *)        esalt)->nr_len        = 1;
-                  ((ikepsk_t *)        esalt)->msg_len       = 1;
+      case  5300: ((ikepsk_t *)           esalt)->nr_len        = 1;
+                  ((ikepsk_t *)           esalt)->msg_len       = 1;
                   break;
-      case  5400: ((ikepsk_t *)        esalt)->nr_len        = 1;
-                  ((ikepsk_t *)        esalt)->msg_len       = 1;
+      case  5400: ((ikepsk_t *)           esalt)->nr_len        = 1;
+                  ((ikepsk_t *)           esalt)->msg_len       = 1;
                   break;
-      case  5500: ((netntlm_t *)       esalt)->user_len      = 1;
-                  ((netntlm_t *)       esalt)->domain_len    = 1;
-                  ((netntlm_t *)       esalt)->srvchall_len  = 1;
-                  ((netntlm_t *)       esalt)->clichall_len  = 1;
+      case  5500: ((netntlm_t *)          esalt)->user_len      = 1;
+                  ((netntlm_t *)          esalt)->domain_len    = 1;
+                  ((netntlm_t *)          esalt)->srvchall_len  = 1;
+                  ((netntlm_t *)          esalt)->clichall_len  = 1;
                   break;
-      case  5600: ((netntlm_t *)       esalt)->user_len      = 1;
-                  ((netntlm_t *)       esalt)->domain_len    = 1;
-                  ((netntlm_t *)       esalt)->srvchall_len  = 1;
-                  ((netntlm_t *)       esalt)->clichall_len  = 1;
+      case  5600: ((netntlm_t *)          esalt)->user_len      = 1;
+                  ((netntlm_t *)          esalt)->domain_len    = 1;
+                  ((netntlm_t *)          esalt)->srvchall_len  = 1;
+                  ((netntlm_t *)          esalt)->clichall_len  = 1;
                   break;
-      case  7300: ((rakp_t *)          esalt)->salt_len      = 32;
+      case  7300: ((rakp_t *)             esalt)->salt_len      = 32;
                   break;
-      case 10400: ((pdf_t *)           esalt)->id_len        = 16;
-                  ((pdf_t *)           esalt)->o_len         = 32;
-                  ((pdf_t *)           esalt)->u_len         = 32;
+      case 10400: ((pdf_t *)              esalt)->id_len        = 16;
+                  ((pdf_t *)              esalt)->o_len         = 32;
+                  ((pdf_t *)              esalt)->u_len         = 32;
                   break;
-      case 10410: ((pdf_t *)           esalt)->id_len        = 16;
-                  ((pdf_t *)           esalt)->o_len         = 32;
-                  ((pdf_t *)           esalt)->u_len         = 32;
+      case 10410: ((pdf_t *)              esalt)->id_len        = 16;
+                  ((pdf_t *)              esalt)->o_len         = 32;
+                  ((pdf_t *)              esalt)->u_len         = 32;
                   break;
-      case 10420: ((pdf_t *)           esalt)->id_len        = 16;
-                  ((pdf_t *)           esalt)->o_len         = 32;
-                  ((pdf_t *)           esalt)->u_len         = 32;
+      case 10420: ((pdf_t *)              esalt)->id_len        = 16;
+                  ((pdf_t *)              esalt)->o_len         = 32;
+                  ((pdf_t *)              esalt)->u_len         = 32;
                   break;
-      case 10500: ((pdf_t *)           esalt)->id_len        = 16;
-                  ((pdf_t *)           esalt)->o_len         = 32;
-                  ((pdf_t *)           esalt)->u_len         = 32;
+      case 10500: ((pdf_t *)              esalt)->id_len        = 16;
+                  ((pdf_t *)              esalt)->o_len         = 32;
+                  ((pdf_t *)              esalt)->u_len         = 32;
                   break;
-      case 10600: ((pdf_t *)           esalt)->id_len        = 16;
-                  ((pdf_t *)           esalt)->o_len         = 127;
-                  ((pdf_t *)           esalt)->u_len         = 127;
+      case 10600: ((pdf_t *)              esalt)->id_len        = 16;
+                  ((pdf_t *)              esalt)->o_len         = 127;
+                  ((pdf_t *)              esalt)->u_len         = 127;
                   break;
-      case 10700: ((pdf_t *)           esalt)->id_len        = 16;
-                  ((pdf_t *)           esalt)->o_len         = 127;
-                  ((pdf_t *)           esalt)->u_len         = 127;
+      case 10700: ((pdf_t *)              esalt)->id_len        = 16;
+                  ((pdf_t *)              esalt)->o_len         = 127;
+                  ((pdf_t *)              esalt)->u_len         = 127;
                   break;
-      case 11400: ((sip_t *)           esalt)->salt_len      = 2;
-                  ((sip_t *)           esalt)->esalt_len     = 39;
+      case 11400: ((sip_t *)              esalt)->salt_len      = 2;
+                  ((sip_t *)              esalt)->esalt_len     = 39;
                   break;
-      case 13400: ((keepass_t *)       esalt)->version       = 2;
+      case 13400: ((keepass_t *)          esalt)->version       = 2;
                   break;
-      case 13500: ((pstoken_t *)       esalt)->salt_len      = 113;
+      case 13500: ((pstoken_t *)          esalt)->salt_len      = 113;
                   break;
-      case 13600: ((zip2_t *)          esalt)->salt_len      = 16;
-                  ((zip2_t *)          esalt)->data_len      = 32;
-                  ((zip2_t *)          esalt)->mode          = 3;
+      case 13600: ((zip2_t *)             esalt)->salt_len      = 16;
+                  ((zip2_t *)             esalt)->data_len      = 32;
+                  ((zip2_t *)             esalt)->mode          = 3;
                   break;
-      case 14600: ((luks_t *)          esalt)->key_size      = HC_LUKS_KEY_SIZE_256;
-                  ((luks_t *)          esalt)->cipher_type   = HC_LUKS_CIPHER_TYPE_AES;
-                  ((luks_t *)          esalt)->cipher_mode   = HC_LUKS_CIPHER_MODE_XTS_PLAIN;
+      case 14600: ((luks_t *)             esalt)->key_size      = HC_LUKS_KEY_SIZE_256;
+                  ((luks_t *)             esalt)->cipher_type   = HC_LUKS_CIPHER_TYPE_AES;
+                  ((luks_t *)             esalt)->cipher_mode   = HC_LUKS_CIPHER_MODE_XTS_PLAIN;
+                  break;
+      case 16300: ((ethereum_presale_t *) esalt)->enc_seed_len = 608;
                   break;
     }
 
@@ -25886,6 +26238,10 @@ void hashconfig_benchmark_defaults (hashcat_ctx_t *hashcat_ctx, salt_t *salt, vo
     case 15700:  salt->salt_iter  = 1;
                  break;
     case 15900:  salt->salt_iter  = ROUNDS_DPAPIMK_V2;
+                 break;
+    case 16200:  salt->salt_iter  = ROUNDS_APPLE_SECURE_NOTES - 1;
+                 break;
+    case 16300:  salt->salt_iter  = ROUNDS_ETHEREUM_PRESALE;
                  break;
   }
 }

@@ -1467,6 +1467,14 @@ typedef struct ethereum_scrypt
 
 } ethereum_scrypt_t;
 
+typedef struct ethereum_presale
+{
+  u32 iv[4];
+  u32 enc_seed[152];
+  u32 enc_seed_len;
+
+} ethereum_presale_t;
+
 typedef struct tacacs_plus
 {
   u32 session_buf[16];
@@ -1477,6 +1485,15 @@ typedef struct tacacs_plus
   u32 sequence_buf[16];
 
 } tacacs_plus_t;
+
+typedef struct apple_secure_notes
+{
+  u32 Z_PK;
+  u32 ZCRYPTOITERATIONCOUNT;
+  u32 ZCRYPTOSALT[16];
+  u32 ZCRYPTOWRAPPEDKEY[16];
+
+} apple_secure_notes_t;
 
 typedef struct pdf14_tmp
 {
@@ -1865,6 +1882,16 @@ typedef struct dpapimk_tmp_v2
   u32 userKey[5];
 
 } dpapimk_tmp_v2_t;
+
+typedef struct apple_secure_notes_tmp
+{
+  u32 ipad[8];
+  u32 opad[8];
+
+  u32 dgst[8];
+  u32 out[8];
+
+} apple_secure_notes_tmp_t;
 
 typedef struct bsdicrypt_tmp
 {
