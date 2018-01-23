@@ -33,7 +33,8 @@ use Crypt::Mode::ECB;
 use Crypt::UnixCrypt_XS qw (crypt_rounds fold_password base64_to_int24 block_to_base64 int24_to_base64);
 use Crypt::Skip32;
 use Crypt::OpenSSH::ChachaPoly;
-use MIME::Base64;
+use JSON;
+use MIME::Base64 qw (encode_base64url decode_base64url);
 use Authen::Passphrase::NTHash;
 use Authen::Passphrase::MySQL323;
 use Authen::Passphrase::PHPass;
@@ -45,12 +46,13 @@ use Net::DNS::RR::NSEC3;
 use Convert::EBCDIC qw (ascii2ebcdic);
 use Digest::SipHash qw/siphash/;
 use Text::Iconv;
+use Digest::Perl::MD5;
 
 my $hashcat = "./hashcat";
 
 my $MAX_LEN = 55;
 
-my @modes = (0, 10, 11, 12, 20, 21, 22, 23, 30, 40, 50, 60, 100, 101, 110, 111, 112, 120, 121, 122, 125, 130, 131, 132, 133, 140, 141, 150, 160, 200, 300, 400, 500, 600, 900, 1000, 1100, 1300, 1400, 1410, 1411, 1420, 1430, 1440, 1441, 1450, 1460, 1500, 1600, 1700, 1710, 1711, 1720, 1730, 1740, 1722, 1731, 1750, 1760, 1800, 2100, 2400, 2410, 2500, 2600, 2611, 2612, 2711, 2811, 3000, 3100, 3200, 3710, 3711, 3300, 3500, 3610, 3720, 3800, 3910, 4010, 4110, 4210, 4300, 4400, 4500, 4520, 4521, 4522, 4600, 4700, 4800, 4900, 5000, 5100, 5300, 5400, 5500, 5600, 5700, 5800, 6000, 6100, 6300, 6400, 6500, 6600, 6700, 6800, 6900, 7000, 7100, 7200, 7300, 7400, 7500, 7700, 7800, 7900, 8000, 8100, 8200, 8300, 8400, 8500, 8600, 8700, 8900, 9100, 9200, 9300, 9400, 9500, 9600, 9700, 9800, 9900, 10000, 10100, 10200, 10300, 10400, 10500, 10600, 10700, 10800, 10900, 11000, 11100, 11200, 11300, 11400, 11500, 11600, 11900, 12000, 12001, 12100, 12200, 12300, 12400, 12600, 12700, 12800, 12900, 13000, 13100, 13200, 13300, 13400, 13500, 13600, 13800, 13900, 14000, 14100, 14400, 14700, 14800, 14900, 15000, 15100, 15200, 15300, 15400, 15500, 15600, 15700, 15900, 16000, 16100, 16200, 16300, 99999);
+my @modes = (0, 10, 11, 12, 20, 21, 22, 23, 30, 40, 50, 60, 100, 101, 110, 111, 112, 120, 121, 122, 125, 130, 131, 132, 133, 140, 141, 150, 160, 200, 300, 400, 500, 600, 900, 1000, 1100, 1300, 1400, 1410, 1411, 1420, 1430, 1440, 1441, 1450, 1460, 1500, 1600, 1700, 1710, 1711, 1720, 1730, 1740, 1722, 1731, 1750, 1760, 1800, 2100, 2400, 2410, 2500, 2600, 2611, 2612, 2711, 2811, 3000, 3100, 3200, 3710, 3711, 3300, 3500, 3610, 3720, 3800, 3910, 4010, 4110, 4210, 4300, 4400, 4500, 4520, 4521, 4522, 4600, 4700, 4800, 4900, 5000, 5100, 5300, 5400, 5500, 5600, 5700, 5800, 6000, 6100, 6300, 6400, 6500, 6600, 6700, 6800, 6900, 7000, 7100, 7200, 7300, 7400, 7500, 7700, 7800, 7900, 8000, 8100, 8200, 8300, 8400, 8500, 8600, 8700, 8900, 9100, 9200, 9300, 9400, 9500, 9600, 9700, 9800, 9900, 10000, 10100, 10200, 10300, 10400, 10500, 10600, 10700, 10800, 10900, 11000, 11100, 11200, 11300, 11400, 11500, 11600, 11900, 12000, 12001, 12100, 12200, 12300, 12400, 12600, 12700, 12800, 12900, 13000, 13100, 13200, 13300, 13400, 13500, 13600, 13800, 13900, 14000, 14100, 14400, 14700, 14800, 14900, 15000, 15100, 15200, 15300, 15400, 15500, 15600, 15700, 15900, 16000, 16100, 16200, 16300, 16400, 16500, 99999);
 
 my %is_utf16le      = map { $_ => 1 } qw (30 40 130 131 132 133 140 141 1000 1100 1430 1440 1441 1730 1740 1731 5500 5600 8000 9400 9500 9600 9700 9800 11600 13500 13800);
 my %less_fifteen    = map { $_ => 1 } qw (500 1600 1800 3200 6300 7400 10500 10700);
@@ -218,7 +220,7 @@ sub verify
     # remember always do "exists ($db->{$hash_in})" checks as soon as possible and don't forget it
 
     # unsalted
-    if ($mode == 0 || $mode == 100 || $mode == 101 || $mode == 133 || $mode == 200 || $mode == 300 || $mode == 600 || $mode == 900 || $mode == 1000 || $mode == 1300 || $mode == 1400 || $mode == 1700 || $mode == 2400 || $mode == 2600 || $mode == 3000 || $mode == 3500 || $mode == 4300 || $mode == 4400 || $mode == 4500 || $mode == 4600 || $mode == 4700 || $mode == 5000 || $mode == 5100 || $mode == 5700 || $mode == 6000 || $mode == 6100 || $mode == 6900 || $mode == 8600 || $mode == 9900 || $mode == 10800 || $mode == 11500 || $mode == 16000 || $mode == 99999)
+    if ($mode == 0 || $mode == 100 || $mode == 101 || $mode == 133 || $mode == 200 || $mode == 300 || $mode == 600 || $mode == 900 || $mode == 1000 || $mode == 1300 || $mode == 1400 || $mode == 1700 || $mode == 2400 || $mode == 2600 || $mode == 3000 || $mode == 3500 || $mode == 4300 || $mode == 4400 || $mode == 4500 || $mode == 4600 || $mode == 4700 || $mode == 5000 || $mode == 5100 || $mode == 5700 || $mode == 6000 || $mode == 6100 || $mode == 6900 || $mode == 8600 || $mode == 9900 || $mode == 10800 || $mode == 11500 || $mode == 16000 || $mode == 16400 || $mode == 99999)
     {
       my $index = index ($line, ":");
 
@@ -2869,6 +2871,24 @@ sub verify
 
       next unless (exists ($db->{$hash_in}) and (! defined ($db->{$hash_in})));
     }
+    # JWT
+    elsif ($mode == 16500)
+    {
+      ($hash_in, $word) = split ":", $line;
+
+      next unless defined $hash_in;
+      next unless defined $word;
+
+      my @data = split (/\./, $hash_in);
+
+      next unless scalar @data == 3;
+
+      my ($header, $payload, $signature) = @data;
+
+      $salt = $header . "." . $payload;
+
+      next unless (exists ($db->{$hash_in}) and (! defined ($db->{$hash_in})));
+    }
     else
     {
       print "ERROR: hash mode is not supported\n";
@@ -3387,7 +3407,7 @@ sub passthrough
 
     my $tmp_hash;
 
-    if ($mode == 0 || $mode == 100 || $mode == 101 || $mode == 133 || $mode == 200 || $mode == 300 || $mode == 600 || $mode == 900 || $mode == 1000 || $mode == 1300 || $mode == 1400 || $mode == 1700 || $mode == 2400 || $mode == 2600 || $mode == 3500 || $mode == 4300 || $mode == 4400 || $mode == 4500 || $mode == 4600 || $mode == 4700 || $mode == 5000 || $mode == 5100 || $mode == 6000 || $mode == 6100 || $mode == 6900 || $mode == 5700 || $mode == 9900 || $mode == 10800 || $mode == 11500 || $mode == 13300 || $mode == 99999)
+    if ($mode == 0 || $mode == 100 || $mode == 101 || $mode == 133 || $mode == 200 || $mode == 300 || $mode == 600 || $mode == 900 || $mode == 1000 || $mode == 1300 || $mode == 1400 || $mode == 1700 || $mode == 2400 || $mode == 2600 || $mode == 3500 || $mode == 4300 || $mode == 4400 || $mode == 4500 || $mode == 4600 || $mode == 4700 || $mode == 5000 || $mode == 5100 || $mode == 6000 || $mode == 6100 || $mode == 6900 || $mode == 5700 || $mode == 9900 || $mode == 10800 || $mode == 11500 || $mode == 13300 || $mode == 16400 || $mode == 99999)
     {
       $tmp_hash = gen_hash ($mode, $word_buf, "");
     }
@@ -3871,6 +3891,12 @@ sub passthrough
     {
       $tmp_hash = gen_hash ($mode, $word_buf, substr ($salt_buf, 0, 32));
     }
+    elsif ($mode == 16500)
+    {
+      $salt_buf = get_random_jwt_salt ();
+
+      $tmp_hash = gen_hash ($mode, $word_buf, $salt_buf);
+    }
     else
     {
       print "ERROR: Unsupported hash type\n";
@@ -3895,7 +3921,7 @@ sub single
   {
     my $mode = $modes[$j];
 
-    if ($mode == 0 || $mode == 100 || $mode == 101 || $mode == 133 || $mode == 200 || $mode == 300 || $mode == 600 || $mode == 900 || $mode == 1000 || $mode == 1300 || $mode == 1400 || $mode == 1700 || $mode == 2600 || $mode == 3500 || $mode == 4300 || $mode == 4400 || $mode == 4500 || $mode == 4600 || $mode == 4700 || $mode == 5000 || $mode == 5100 || $mode == 5300 || $mode == 5400 || $mode == 6000 || $mode == 6100 || $mode == 6600 || $mode == 6900 || $mode == 5700 || $mode == 8200 || $mode == 8300 || $mode == 9900 || $mode == 10800 || $mode == 11500 || $mode == 13300 || $mode == 99999)
+    if ($mode == 0 || $mode == 100 || $mode == 101 || $mode == 133 || $mode == 200 || $mode == 300 || $mode == 600 || $mode == 900 || $mode == 1000 || $mode == 1300 || $mode == 1400 || $mode == 1700 || $mode == 2600 || $mode == 3500 || $mode == 4300 || $mode == 4400 || $mode == 4500 || $mode == 4600 || $mode == 4700 || $mode == 5000 || $mode == 5100 || $mode == 5300 || $mode == 5400 || $mode == 6000 || $mode == 6100 || $mode == 6600 || $mode == 6900 || $mode == 5700 || $mode == 8200 || $mode == 8300 || $mode == 9900 || $mode == 10800 || $mode == 11500 || $mode == 13300 || $mode == 16400 || $mode == 99999)
     {
       for (my $i = 1; $i < 32; $i++)
       {
@@ -3909,7 +3935,7 @@ sub single
         }
       }
     }
-    elsif ($mode == 10 || $mode == 20 || $mode == 23 || $mode == 30 || $mode == 40 || $mode == 50 || $mode == 60 || $mode == 110 || $mode == 120 || $mode == 121 || $mode == 130 || $mode == 140 || $mode == 150 || $mode == 160 || $mode == 1410 || $mode == 1411 || $mode == 1420 || $mode == 1430 || $mode == 1440 || $mode == 1450 || $mode == 1460 || $mode == 1710 || $mode == 1711 || $mode == 1720 || $mode == 1730 || $mode == 1740 || $mode == 1750 || $mode == 1760 || $mode == 3610 || $mode == 3710 || $mode == 3711 || $mode == 3720 || $mode == 3910 || $mode == 4010 || $mode == 4110 || $mode == 4210 || $mode == 8900 || $mode == 10000 || $mode == 10200 || $mode == 10900 || $mode == 11900 || $mode == 12000 || $mode == 12100)
+    elsif ($mode == 10 || $mode == 20 || $mode == 23 || $mode == 30 || $mode == 40 || $mode == 50 || $mode == 60 || $mode == 110 || $mode == 120 || $mode == 121 || $mode == 130 || $mode == 140 || $mode == 150 || $mode == 160 || $mode == 1410 || $mode == 1411 || $mode == 1420 || $mode == 1430 || $mode == 1440 || $mode == 1450 || $mode == 1460 || $mode == 1710 || $mode == 1711 || $mode == 1720 || $mode == 1730 || $mode == 1740 || $mode == 1750 || $mode == 1760 || $mode == 3610 || $mode == 3710 || $mode == 3711 || $mode == 3720 || $mode == 3910 || $mode == 4010 || $mode == 4110 || $mode == 4210 || $mode == 8900 || $mode == 10000 || $mode == 10200 || $mode == 10900 || $mode == 11900 || $mode == 12000 || $mode == 12100 || $mode == 16500)
     {
       my $salt_len = get_random_num (1, 15);
 
@@ -9334,6 +9360,47 @@ END_CODE
 
     $tmp_hash = sprintf ("\$ethereum\$w*%s*%s*%s", unpack ("H*", $iv . $encseed), $ethaddr, substr ($hash_buf, 0, 32));
   }
+  elsif ($mode == 16400)
+  {
+    my $md5 = Digest::Perl::MD5->new;
+    my $length = length($word_buf);
+
+    $md5->{_data} = $word_buf ^ ("\x5c" x $length);
+    $md5->{_data} .= "\x5c" x (64 - $length);
+    $md5->add();
+
+    $hash_buf = unpack("H*", pack('V4', @{$md5->{_state}}));
+    $tmp_hash = sprintf ("{CRAM-MD5}%s00000000000000000000000000000000", $hash_buf);
+  }
+  elsif ($mode == 16500)
+  {
+    my ($header_base64) = split (/\./, $salt_buf);
+
+    my $header_jwt = decode_base64url ($header_base64);
+
+    my $header = decode_json ($header_jwt);
+
+    my $alg = $header->{"alg"};
+
+    if ($alg eq "HS256")
+    {
+      $hash_buf = hmac ($salt_buf, $word_buf, \&sha256, 64);
+    }
+    elsif ($alg eq "HS384")
+    {
+      $hash_buf = hmac ($salt_buf, $word_buf, \&sha384, 128);
+    }
+    elsif ($alg eq "HS512")
+    {
+      $hash_buf = hmac ($salt_buf, $word_buf, \&sha512, 128);
+    }
+    else
+    {
+      die "not supported hash\n";
+    }
+
+    $tmp_hash = sprintf ("%s.%s", $salt_buf, encode_base64url ($hash_buf, ""));
+  }
   elsif ($mode == 99999)
   {
     $tmp_hash = sprintf ("%s", $word_buf);
@@ -9484,6 +9551,10 @@ sub rnd
     }
 
     $salt_buf = get_random_dpapimk_salt ($version);
+  }
+  elsif ($mode == 16500)
+  {
+    $salt_buf = get_random_jwt_salt ();
   }
   else
   {
@@ -10981,6 +11052,50 @@ sub get_random_dpapimk_salt
               $cipher_len . '*';
 
   return $salt_buf;
+}
+
+sub get_random_jwt_salt
+{
+  my @hashes =
+  (
+    "HS256",
+    #"HS384", #this is support in hashcat, but commented out here to prevent mixed hash output files in single mode
+    #"HS512", #this is support in hashcat, but commented out here to prevent mixed hash output files in single mode
+    #"RS256", #not supported by hashcat
+    #"RS384",
+    #"RS512",
+    #"PS256",
+    #"PS384",
+    #"PS512",
+    #"ES256",
+    #"ES384",
+    #"ES512",
+  );
+
+  my $rnd = get_random_num (0, scalar @hashes);
+
+  my $hash = $hashes[$rnd];
+
+  my $header =
+  {
+    "alg" => $hash
+  };
+
+  my $random_key = get_random_num (1, 100000000);
+  my $random_val = get_random_num (1, 100000000);
+
+  my $payload =
+  {
+    $random_key => $random_val
+  };
+
+  my $header_json    = encode_json ($header);
+  my $payload_json   = encode_json ($payload);
+
+  my $header_base64  = encode_base64url ($header_json, "");
+  my $payload_base64 = encode_base64url ($payload_json, "");
+
+  return $header_base64 . "." . $payload_base64;
 }
 
 sub md5bit

@@ -16,6 +16,8 @@
 - Added hash-mode 16100 = TACACS+
 - Added hash-mode 16200 = Apple Secure Notes
 - Added hash-mode 16300 = Ethereum Pre-Sale Wallet, PBKDF2-SHA256
+- Added hash-mode 16400 = CRAM-MD5 Dovecot
+- Added hash-mode 16500 = JWT (JSON Web Token)
 
 ##
 ## Bugs
@@ -26,6 +28,7 @@
 - Fixed the output of --show if $HEX[] passwords are present within the potfile
 - Fixed a restore issue leading to "Restore value is greater than keyspace" in case mask-files or wordlist-folders were used
 - Fixed a mask-length check issue: Return -1 in case the mask-length is not within the password-length range
+- Fixed the maximum password length check in password reassembling function
 
 ##
 ## Improvements
@@ -39,8 +42,11 @@
 
 - Documents: Added docs/limits.txt
 - Files: Switched back to relative current working directory on windows to workaround problems with unicode characters
+- Files: Copy include/ folder and its content to case SHARED is set to 1 in Makefile
 - Hash Parser: Changed the way large strings are handled/truncated within the event buffer if they are too large to fit
 - Hash Parser: Fixed our use of strtok_r () calls
+- OpenCL Kernels: Replace variables from uXX to uXXa if used in __constant space
+- OpenCL Kernels: Use static declaraction for uXXa variables used in __constant space
 - Self Test: Skip self-test for mode 8900 user-configurable scrypt settings are incompatible to fixed settings in the self-test hash
 - Self Test: Skip self-test for mode 15700 because settings are too high and create a too long startup time
 - Terminal: Send clear line code to the same output stream as the next message following
