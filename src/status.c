@@ -46,7 +46,7 @@ static char *status_get_rules_file (const hashcat_ctx_t *hashcat_ctx)
 
   if (user_options->rp_files_cnt > 0)
   {
-    char *tmp_buf = (char *) malloc (HCBUFSIZ_TINY);
+    char *tmp_buf = (char *) hcmalloc (HCBUFSIZ_TINY);
 
     int tmp_len = 0;
 
@@ -294,7 +294,7 @@ const char *status_get_hash_target (const hashcat_ctx_t *hashcat_ctx)
     }
     else
     {
-      char *tmp_buf = (char *) malloc (HCBUFSIZ_LARGE);
+      char *tmp_buf = (char *) hcmalloc (HCBUFSIZ_LARGE);
 
       tmp_buf[0] = 0;
 
@@ -819,7 +819,7 @@ char *status_get_guess_candidates_dev (const hashcat_ctx_t *hashcat_ctx, const i
 
   hc_device_param_t *device_param = &opencl_ctx->devices_param[device_id];
 
-  char *display = (char *) malloc (HCBUFSIZ_TINY);
+  char *display = (char *) hcmalloc (HCBUFSIZ_TINY);
 
   if (user_options_extra->attack_kern == ATTACK_KERN_BF)
   {
@@ -834,8 +834,8 @@ char *status_get_guess_candidates_dev (const hashcat_ctx_t *hashcat_ctx, const i
 
   if ((device_param->outerloop_left == 0) || (device_param->innerloop_left == 0)) return display;
 
-  const u32 outerloop_first = 0;
-  const u32 outerloop_last  = device_param->outerloop_left - 1;
+  const u64 outerloop_first = 0;
+  const u64 outerloop_last  = device_param->outerloop_left - 1;
 
   const u32 innerloop_first = 0;
   const u32 innerloop_last  = device_param->innerloop_left - 1;
@@ -997,7 +997,7 @@ char *status_get_time_started_relative (const hashcat_ctx_t *hashcat_ctx)
 
   tmp = gmtime_r (&sec_run, &tm);
 
-  char *display_run = (char *) malloc (HCBUFSIZ_TINY);
+  char *display_run = (char *) hcmalloc (HCBUFSIZ_TINY);
 
   format_timer_display (tmp, display_run, HCBUFSIZ_TINY);
 
@@ -1073,7 +1073,7 @@ char *status_get_time_estimated_relative (const hashcat_ctx_t *hashcat_ctx)
 {
   const user_options_t *user_options = hashcat_ctx->user_options;
 
-  char *display = (char *) malloc (HCBUFSIZ_TINY);
+  char *display = (char *) hcmalloc (HCBUFSIZ_TINY);
 
   time_t sec_etc = status_get_sec_etc (hashcat_ctx);
 
@@ -1106,7 +1106,7 @@ char *status_get_time_estimated_relative (const hashcat_ctx_t *hashcat_ctx)
 
       tmp_left = gmtime_r (&sec_left, &tm_left);
 
-      char *display_left = (char *) malloc (HCBUFSIZ_TINY);
+      char *display_left = (char *) hcmalloc (HCBUFSIZ_TINY);
 
       format_timer_display (tmp_left, display_left, HCBUFSIZ_TINY);
 
@@ -1389,15 +1389,17 @@ double status_get_hashes_msec_dev (const hashcat_ctx_t *hashcat_ctx, const int d
 
   if (device_param->skipped == false)
   {
-    for (int i = 0; i < SPEED_CACHE; i++)
+    const u32 speed_pos = MAX (device_param->speed_pos, 1);
+
+    for (u32 i = 0; i < speed_pos; i++)
     {
       speed_cnt  += device_param->speed_cnt[i];
       speed_msec += device_param->speed_msec[i];
     }
-  }
 
-  speed_cnt  /= SPEED_CACHE;
-  speed_msec /= SPEED_CACHE;
+    speed_cnt  /= speed_pos;
+    speed_msec /= speed_pos;
+  }
 
   double hashes_dev_msec = 0;
 
@@ -1470,7 +1472,7 @@ char *status_get_speed_sec_all (const hashcat_ctx_t *hashcat_ctx)
 {
   const double hashes_msec_all = status_get_hashes_msec_all (hashcat_ctx);
 
-  char *display = (char *) malloc (HCBUFSIZ_TINY);
+  char *display = (char *) hcmalloc (HCBUFSIZ_TINY);
 
   format_speed_display (hashes_msec_all * 1000, display, HCBUFSIZ_TINY);
 
@@ -1481,7 +1483,7 @@ char *status_get_speed_sec_dev (const hashcat_ctx_t *hashcat_ctx, const int devi
 {
   const double hashes_msec_dev = status_get_hashes_msec_dev (hashcat_ctx, device_id);
 
-  char *display = (char *) malloc (HCBUFSIZ_TINY);
+  char *display = (char *) hcmalloc (HCBUFSIZ_TINY);
 
   format_speed_display (hashes_msec_dev * 1000, display, HCBUFSIZ_TINY);
 
@@ -1656,7 +1658,7 @@ char *status_get_hwmon_dev (const hashcat_ctx_t *hashcat_ctx, const int device_i
 
   hc_device_param_t *device_param = &opencl_ctx->devices_param[device_id];
 
-  char *output_buf = (char *) malloc (HCBUFSIZ_TINY);
+  char *output_buf = (char *) hcmalloc (HCBUFSIZ_TINY);
 
   snprintf (output_buf, HCBUFSIZ_TINY - 1, "N/A");
 
@@ -1759,7 +1761,7 @@ int status_get_memoryspeed_dev (const hashcat_ctx_t *hashcat_ctx, const int devi
   return num_memoryspeed;
 }
 
-int status_get_progress_dev (const hashcat_ctx_t *hashcat_ctx, const int device_id)
+u64 status_get_progress_dev (const hashcat_ctx_t *hashcat_ctx, const int device_id)
 {
   const opencl_ctx_t *opencl_ctx = hashcat_ctx->opencl_ctx;
 
@@ -1779,6 +1781,54 @@ double status_get_runtime_msec_dev (const hashcat_ctx_t *hashcat_ctx, const int 
   if (device_param->skipped == true) return 0;
 
   return device_param->outerloop_msec;
+}
+
+int status_get_kernel_accel_dev (const hashcat_ctx_t *hashcat_ctx, const int device_id)
+{
+  const opencl_ctx_t *opencl_ctx = hashcat_ctx->opencl_ctx;
+
+  hc_device_param_t *device_param = &opencl_ctx->devices_param[device_id];
+
+  if (device_param->skipped == true) return 0;
+
+  if (device_param->kernel_accel_prev) return device_param->kernel_accel_prev;
+
+  return device_param->kernel_accel;
+}
+
+int status_get_kernel_loops_dev (const hashcat_ctx_t *hashcat_ctx, const int device_id)
+{
+  const opencl_ctx_t *opencl_ctx = hashcat_ctx->opencl_ctx;
+
+  hc_device_param_t *device_param = &opencl_ctx->devices_param[device_id];
+
+  if (device_param->skipped == true) return 0;
+
+  if (device_param->kernel_loops_prev) return device_param->kernel_loops_prev;
+
+  return device_param->kernel_loops;
+}
+
+int status_get_kernel_threads_dev (const hashcat_ctx_t *hashcat_ctx, const int device_id)
+{
+  const opencl_ctx_t *opencl_ctx = hashcat_ctx->opencl_ctx;
+
+  hc_device_param_t *device_param = &opencl_ctx->devices_param[device_id];
+
+  if (device_param->skipped == true) return 0;
+
+  return device_param->kernel_threads;
+}
+
+int status_get_vector_width_dev (const hashcat_ctx_t *hashcat_ctx, const int device_id)
+{
+  const opencl_ctx_t *opencl_ctx = hashcat_ctx->opencl_ctx;
+
+  hc_device_param_t *device_param = &opencl_ctx->devices_param[device_id];
+
+  if (device_param->skipped == true) return 0;
+
+  return device_param->vector_width;
 }
 
 int status_progress_init (hashcat_ctx_t *hashcat_ctx)
@@ -1856,7 +1906,6 @@ void status_ctx_destroy (hashcat_ctx_t *hashcat_ctx)
 
   memset (status_ctx, 0, sizeof (status_ctx_t));
 }
-
 
 void status_status_destroy (hashcat_ctx_t *hashcat_ctx, hashcat_status_t *hashcat_status)
 {

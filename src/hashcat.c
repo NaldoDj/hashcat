@@ -194,6 +194,12 @@ static int inner2_loop (hashcat_ctx_t *hashcat_ctx)
   EVENT (EVENT_AUTOTUNE_FINISHED);
 
   /**
+   * find same opencl devices and equal results
+   */
+
+  opencl_ctx_devices_sync_tuning (hashcat_ctx);
+
+  /**
    * autotune modified kernel_accel, which modifies opencl_ctx->kernel_power_all
    */
 
@@ -266,6 +272,22 @@ static int inner2_loop (hashcat_ctx_t *hashcat_ctx)
    && (status_ctx->devices_status != STATUS_BYPASS))
   {
     status_ctx->devices_status = STATUS_EXHAUSTED;
+  }
+
+  if (status_ctx->devices_status == STATUS_EXHAUSTED)
+  {
+    // the options speed-only and progress-only cause hashcat to abort quickly.
+    // therefore, they will end up (if no other error occured) as STATUS_EXHAUSTED.
+    // however, that can create confusion in hashcats RC, because exhausted translates to RC = 1.
+    // but then having RC = 1 does not match our expection if we use for speed-only and progress-only.
+    // to get hashcat to return RC = 0 we have to set it to CRACKED or BYPASS
+    // note: other options like --show, --left, --benchmark, --keyspace, --opencl-info, etc.
+    // not not reach this section of the code, they've returned already with rc 0.
+
+    if ((user_options->speed_only == true) || (user_options->progress_only == true))
+    {
+      status_ctx->devices_status = STATUS_BYPASS;
+    }
   }
 
   // update some timer
@@ -879,6 +901,7 @@ void hashcat_destroy (hashcat_ctx_t *hashcat_ctx)
   hcfree (hashcat_ctx->dictstat_ctx);
   hcfree (hashcat_ctx->event_ctx);
   hcfree (hashcat_ctx->folder_config);
+  hcfree (hashcat_ctx->hashcat_user);
   hcfree (hashcat_ctx->hashconfig);
   hcfree (hashcat_ctx->hashes);
   hcfree (hashcat_ctx->hwmon_ctx);
@@ -1349,6 +1372,10 @@ int hashcat_get_status (hashcat_ctx_t *hashcat_ctx, hashcat_status_t *hashcat_st
     device_info->memoryspeed_dev            = status_get_memoryspeed_dev            (hashcat_ctx, device_id);
     device_info->progress_dev               = status_get_progress_dev               (hashcat_ctx, device_id);
     device_info->runtime_msec_dev           = status_get_runtime_msec_dev           (hashcat_ctx, device_id);
+    device_info->kernel_accel_dev           = status_get_kernel_accel_dev           (hashcat_ctx, device_id);
+    device_info->kernel_loops_dev           = status_get_kernel_loops_dev           (hashcat_ctx, device_id);
+    device_info->kernel_threads_dev         = status_get_kernel_threads_dev         (hashcat_ctx, device_id);
+    device_info->vector_width_dev           = status_get_vector_width_dev           (hashcat_ctx, device_id);
   }
 
   hashcat_status->hashes_msec_all = status_get_hashes_msec_all (hashcat_ctx);

@@ -13,7 +13,7 @@
 #define COMPARE_S "inc_comp_single.cl"
 #define COMPARE_M "inc_comp_multi.cl"
 
-__constant static u32a padding[8] =
+__constant u32a padding[8] =
 {
   0x5e4ebf28,
   0x418a754e,
@@ -33,7 +33,7 @@ typedef struct
 
 } RC4_KEY;
 
-void swap (__local RC4_KEY *rc4_key, const u8 i, const u8 j)
+DECLSPEC void swap (__local RC4_KEY *rc4_key, const u8 i, const u8 j)
 {
   u8 tmp;
 
@@ -42,7 +42,7 @@ void swap (__local RC4_KEY *rc4_key, const u8 i, const u8 j)
   rc4_key->S[j] = tmp;
 }
 
-void rc4_init_16 (__local RC4_KEY *rc4_key, const u32 data[4])
+DECLSPEC void rc4_init_16 (__local RC4_KEY *rc4_key, const u32 data[4])
 {
   u32 v = 0x03020100;
   u32 a = 0x04040404;
@@ -98,7 +98,7 @@ void rc4_init_16 (__local RC4_KEY *rc4_key, const u32 data[4])
   }
 }
 
-u8 rc4_next_16 (__local RC4_KEY *rc4_key, u8 i, u8 j, const u32 in[4], u32 out[4])
+DECLSPEC u8 rc4_next_16 (__local RC4_KEY *rc4_key, u8 i, u8 j, const u32 in[4], u32 out[4])
 {
   #ifdef _unroll
   #pragma unroll

@@ -52,7 +52,7 @@
   PERM_OP (l, r, tt,  4, 0x0f0f0f0f);  \
 }
 
-__constant static u32a c_ascii_to_ebcdic_pc[256] =
+__constant u32a c_ascii_to_ebcdic_pc[256] =
 {
   // little hack, can't crack 0-bytes in password, but who cares
   //    0xab, 0xa8, 0xae, 0xad, 0xc4, 0xf1, 0xf7, 0xf4, 0x86, 0xa1, 0xe0, 0xbc, 0xb3, 0xb0, 0xb6, 0xb5,
@@ -74,7 +74,7 @@ __constant static u32a c_ascii_to_ebcdic_pc[256] =
   0x13, 0x10, 0x16, 0x15, 0x7f, 0x7c, 0x73, 0x70, 0x76, 0x75, 0x5e, 0x5d, 0x52, 0x51, 0x57, 0x54,
 };
 
-__constant static u32a c_SPtrans[8][64] =
+__constant u32a c_SPtrans[8][64] =
 {
   {
     0x02080800, 0x00080000, 0x02000002, 0x02080802,
@@ -222,7 +222,7 @@ __constant static u32a c_SPtrans[8][64] =
   }
 };
 
-__constant static u32a c_skb[8][64] =
+__constant u32a c_skb[8][64] =
 {
   {
     0x00000000, 0x00000010, 0x20000000, 0x20000010,
@@ -394,7 +394,7 @@ __constant static u32a c_skb[8][64] =
 #define BOX1(i,S) (u32x) ((S)[(i).s0], (S)[(i).s1], (S)[(i).s2], (S)[(i).s3], (S)[(i).s4], (S)[(i).s5], (S)[(i).s6], (S)[(i).s7], (S)[(i).s8], (S)[(i).s9], (S)[(i).sa], (S)[(i).sb], (S)[(i).sc], (S)[(i).sd], (S)[(i).se], (S)[(i).sf])
 #endif
 
-void _des_crypt_encrypt (u32 iv[2], u32x data[2], u32x Kc[16], u32x Kd[16], __local u32 (*s_SPtrans)[64])
+DECLSPEC void _des_crypt_encrypt (u32 iv[2], u32x data[2], u32x Kc[16], u32x Kd[16], __local u32 (*s_SPtrans)[64])
 {
   u32 r = data[0];
   u32 l = data[1];
@@ -436,7 +436,7 @@ void _des_crypt_encrypt (u32 iv[2], u32x data[2], u32x Kc[16], u32x Kd[16], __lo
   iv[1] = r;
 }
 
-void _des_crypt_keysetup (u32 c, u32x d, u32x Kc[16], u32x Kd[16], __local u32 (*s_skb)[64])
+DECLSPEC void _des_crypt_keysetup (u32 c, u32x d, u32x Kc[16], u32x Kd[16], __local u32 (*s_skb)[64])
 {
   u32 tt;
 
@@ -508,7 +508,7 @@ void _des_crypt_keysetup (u32 c, u32x d, u32x Kc[16], u32x Kd[16], __local u32 (
   }
 }
 
-void transform_racf_key (const u32 w0, const u32x w1, u32x key[2])
+DECLSPEC void transform_racf_key (const u32 w0, const u32x w1, u32x key[2])
 {
   key[0] = BOX1 (((w0 >>  0) & 0xff), c_ascii_to_ebcdic_pc) <<  0
          | BOX1 (((w0 >>  8) & 0xff), c_ascii_to_ebcdic_pc) <<  8

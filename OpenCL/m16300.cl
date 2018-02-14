@@ -17,7 +17,7 @@
 #define COMPARE_S "inc_comp_single.cl"
 #define COMPARE_M "inc_comp_multi.cl"
 
-__constant static u64a keccakf_rndc[24] =
+__constant u64a keccakf_rndc[24] =
 {
   0x0000000000000001, 0x0000000000008082, 0x800000000000808a,
   0x8000000080008000, 0x000000000000808b, 0x0000000080000001,
@@ -67,7 +67,7 @@ __constant static u64a keccakf_rndc[24] =
   st[4 + s] ^= ~bc0 & bc1;      \
 }
 
-void keccak_transform_S (u64 st[25])
+DECLSPEC void keccak_transform_S (u64 st[25])
 {
   const u8 keccakf_rotc[24] =
   {
@@ -148,7 +148,7 @@ void keccak_transform_S (u64 st[25])
   }
 }
 
-void hmac_sha256_run_V (u32x w0[4], u32x w1[4], u32x w2[4], u32x w3[4], u32x ipad[8], u32x opad[8], u32x digest[8])
+DECLSPEC void hmac_sha256_run_V (u32x w0[4], u32x w1[4], u32x w2[4], u32x w3[4], u32x ipad[8], u32x opad[8], u32x digest[8])
 {
   digest[0] = ipad[0];
   digest[1] = ipad[1];

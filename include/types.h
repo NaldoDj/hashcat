@@ -138,11 +138,6 @@ typedef enum amplifier_count
   KERNEL_BFS                        = 1024,
   KERNEL_COMBS                      = 1024,
   KERNEL_RULES                      = 256,
-  KERNEL_THREADS_MAX_CPU            = 1,
-  KERNEL_THREADS_MAX_GPU            = 8,  // ex: intel integrated
-  KERNEL_THREADS_MAX_GPU_NV         = 32, // optimized NV  size: warps
-  KERNEL_THREADS_MAX_GPU_AMD        = 64, // optimized AMD size: wavefronts
-  KERNEL_THREADS_MAX_OTHER          = 8,  // ex: intel MIC
 
 } amplifier_count_t;
 
@@ -225,14 +220,18 @@ typedef enum combinator_mode
 
 typedef enum kern_run
 {
-  KERN_RUN_1     = 1000,
-  KERN_RUN_12    = 1500,
-  KERN_RUN_2     = 2000,
-  KERN_RUN_23    = 2500,
-  KERN_RUN_3     = 3000,
-  KERN_RUN_4     = 4000,
-  KERN_RUN_INIT2 = 5000,
-  KERN_RUN_LOOP2 = 6000
+  KERN_RUN_1      = 1000,
+  KERN_RUN_12     = 1500,
+  KERN_RUN_2      = 2000,
+  KERN_RUN_23     = 2500,
+  KERN_RUN_3      = 3000,
+  KERN_RUN_4      = 4000,
+  KERN_RUN_INIT2  = 5000,
+  KERN_RUN_LOOP2  = 6000,
+  KERN_RUN_AUX1   = 7001,
+  KERN_RUN_AUX2   = 7002,
+  KERN_RUN_AUX3   = 7003,
+  KERN_RUN_AUX4   = 7004,
 
 } kern_run_t;
 
@@ -381,7 +380,12 @@ typedef enum opts_type
   OPTS_TYPE_HOOK23            = (1ULL << 31),
   OPTS_TYPE_INIT2             = (1ULL << 32),
   OPTS_TYPE_LOOP2             = (1ULL << 33),
-  OPTS_TYPE_BINARY_HASHFILE   = (1ULL << 34),
+  OPTS_TYPE_AUX1              = (1ULL << 34),
+  OPTS_TYPE_AUX2              = (1ULL << 35),
+  OPTS_TYPE_AUX3              = (1ULL << 36),
+  OPTS_TYPE_AUX4              = (1ULL << 37),
+  OPTS_TYPE_BINARY_HASHFILE   = (1ULL << 38),
+  OPTS_TYPE_PREFERED_THREAD   = (1ULL << 39), // some algorithms (complicated ones with many branches) benefit from this
 
 } opts_type_t;
 
@@ -860,6 +864,14 @@ typedef struct pw
 
 } pw_t;
 
+typedef struct pw_idx
+{
+  u32 off;
+  u32 cnt;
+  u32 len;
+
+} pw_idx_t;
+
 typedef struct bf
 {
   u32  i;
@@ -884,7 +896,7 @@ typedef struct plain
   u32  salt_pos;
   u32  digest_pos;
   u32  hash_pos;
-  u32  gidvid;
+  u64  gidvid;
   u32  il_pos;
 
 } plain_t;
@@ -915,39 +927,93 @@ typedef struct hc_device_param
   u64     device_global_mem;
   u32     device_maxclock_frequency;
   size_t  device_maxworkgroup_size;
+  u64     device_local_mem_size;
 
   u32     vector_width;
 
-  u32     kernel_threads_by_user;
+  u32     kernel_wgs1;
+  u32     kernel_wgs12;
+  u32     kernel_wgs2;
+  u32     kernel_wgs23;
+  u32     kernel_wgs3;
+  u32     kernel_wgs4;
+  u32     kernel_wgs_init2;
+  u32     kernel_wgs_loop2;
+  u32     kernel_wgs_mp;
+  u32     kernel_wgs_mp_l;
+  u32     kernel_wgs_mp_r;
+  u32     kernel_wgs_amp;
+  u32     kernel_wgs_tm;
+  u32     kernel_wgs_memset;
+  u32     kernel_wgs_atinit;
+  u32     kernel_wgs_decompress;
+  u32     kernel_wgs_aux1;
+  u32     kernel_wgs_aux2;
+  u32     kernel_wgs_aux3;
+  u32     kernel_wgs_aux4;
 
-  u32     kernel_threads_by_wgs_kernel1;
-  u32     kernel_threads_by_wgs_kernel12;
-  u32     kernel_threads_by_wgs_kernel2;
-  u32     kernel_threads_by_wgs_kernel23;
-  u32     kernel_threads_by_wgs_kernel3;
-  u32     kernel_threads_by_wgs_kernel4;
-  u32     kernel_threads_by_wgs_kernel_init2;
-  u32     kernel_threads_by_wgs_kernel_loop2;
-  u32     kernel_threads_by_wgs_kernel_mp;
-  u32     kernel_threads_by_wgs_kernel_mp_l;
-  u32     kernel_threads_by_wgs_kernel_mp_r;
-  u32     kernel_threads_by_wgs_kernel_amp;
-  u32     kernel_threads_by_wgs_kernel_tm;
-  u32     kernel_threads_by_wgs_kernel_memset;
+  u32     kernel_preferred_wgs_multiple1;
+  u32     kernel_preferred_wgs_multiple12;
+  u32     kernel_preferred_wgs_multiple2;
+  u32     kernel_preferred_wgs_multiple23;
+  u32     kernel_preferred_wgs_multiple3;
+  u32     kernel_preferred_wgs_multiple4;
+  u32     kernel_preferred_wgs_multiple_init2;
+  u32     kernel_preferred_wgs_multiple_loop2;
+  u32     kernel_preferred_wgs_multiple_mp;
+  u32     kernel_preferred_wgs_multiple_mp_l;
+  u32     kernel_preferred_wgs_multiple_mp_r;
+  u32     kernel_preferred_wgs_multiple_amp;
+  u32     kernel_preferred_wgs_multiple_tm;
+  u32     kernel_preferred_wgs_multiple_memset;
+  u32     kernel_preferred_wgs_multiple_atinit;
+  u32     kernel_preferred_wgs_multiple_decompress;
+  u32     kernel_preferred_wgs_multiple_aux1;
+  u32     kernel_preferred_wgs_multiple_aux2;
+  u32     kernel_preferred_wgs_multiple_aux3;
+  u32     kernel_preferred_wgs_multiple_aux4;
 
-  u32     kernel_loops;
+  u64     kernel_local_mem_size1;
+  u64     kernel_local_mem_size12;
+  u64     kernel_local_mem_size2;
+  u64     kernel_local_mem_size23;
+  u64     kernel_local_mem_size3;
+  u64     kernel_local_mem_size4;
+  u64     kernel_local_mem_size_init2;
+  u64     kernel_local_mem_size_loop2;
+  u64     kernel_local_mem_size_mp;
+  u64     kernel_local_mem_size_mp_l;
+  u64     kernel_local_mem_size_mp_r;
+  u64     kernel_local_mem_size_amp;
+  u64     kernel_local_mem_size_tm;
+  u64     kernel_local_mem_size_memset;
+  u64     kernel_local_mem_size_atinit;
+  u64     kernel_local_mem_size_decompress;
+  u64     kernel_local_mem_size_aux1;
+  u64     kernel_local_mem_size_aux2;
+  u64     kernel_local_mem_size_aux3;
+  u64     kernel_local_mem_size_aux4;
+
+  u32     kernel_threads;
+
   u32     kernel_accel;
+  u32     kernel_accel_prev;
+  u32     kernel_accel_min;
+  u32     kernel_accel_max;
+  u32     kernel_loops;
+  u32     kernel_loops_prev;
   u32     kernel_loops_min;
   u32     kernel_loops_max;
   u32     kernel_loops_min_sav; // the _sav are required because each -i iteration
   u32     kernel_loops_max_sav; // needs to recalculate the kernel_loops_min/max based on the current amplifier count
-  u32     kernel_accel_min;
-  u32     kernel_accel_max;
-  u32     kernel_power;
-  u32     hardware_power;
+
+  u64     kernel_power;
+  u64     hardware_power;
 
   size_t  size_pws;
   size_t  size_pws_amp;
+  size_t  size_pws_comp;
+  size_t  size_pws_idx;
   size_t  size_tmps;
   size_t  size_hooks;
   size_t  size_bfs;
@@ -965,23 +1031,26 @@ typedef struct hc_device_param
   size_t  size_st_salts;
   size_t  size_st_esalts;
 
+  char   *scratch_buf;
+
   FILE   *combs_fp;
   pw_t   *combs_buf;
 
   void   *hooks_buf;
 
-  pw_t   *pws_buf;
-  u32     pws_cnt;
+  pw_idx_t *pws_idx;
+  u32      *pws_comp;
+  u64       pws_cnt;
 
   u64     words_off;
   u64     words_done;
 
-  u32     outerloop_pos;
-  u32     outerloop_left;
+  u64     outerloop_pos;
+  u64     outerloop_left;
   double  outerloop_msec;
 
-  u64     innerloop_pos;
-  u64     innerloop_left;
+  u32     innerloop_pos;
+  u32     innerloop_left;
 
   u32     exec_pos;
   double  exec_msec[EXEC_CACHE];
@@ -994,12 +1063,17 @@ typedef struct hc_device_param
   double  exec_us_prev4[EXPECTED_ITERATIONS];
   double  exec_us_prev_init2[EXPECTED_ITERATIONS];
   double  exec_us_prev_loop2[EXPECTED_ITERATIONS];
+  double  exec_us_prev_aux1[EXPECTED_ITERATIONS];
+  double  exec_us_prev_aux2[EXPECTED_ITERATIONS];
+  double  exec_us_prev_aux3[EXPECTED_ITERATIONS];
+  double  exec_us_prev_aux4[EXPECTED_ITERATIONS];
 
   // this is "current" speed
 
   u32     speed_pos;
   u64     speed_cnt[SPEED_CACHE];
   double  speed_msec[SPEED_CACHE];
+  bool    speed_only_finish;
 
   hc_timer_t timer_speed;
 
@@ -1034,6 +1108,12 @@ typedef struct hc_device_param
   cl_kernel  kernel_amp;
   cl_kernel  kernel_tm;
   cl_kernel  kernel_memset;
+  cl_kernel  kernel_atinit;
+  cl_kernel  kernel_decompress;
+  cl_kernel  kernel_aux1;
+  cl_kernel  kernel_aux2;
+  cl_kernel  kernel_aux3;
+  cl_kernel  kernel_aux4;
 
   cl_context context;
 
@@ -1045,6 +1125,8 @@ typedef struct hc_device_param
 
   cl_mem  d_pws_buf;
   cl_mem  d_pws_amp_buf;
+  cl_mem  d_pws_comp_buf;
+  cl_mem  d_pws_idx;
   cl_mem  d_words_buf_l;
   cl_mem  d_words_buf_r;
   cl_mem  d_rules;
@@ -1087,6 +1169,8 @@ typedef struct hc_device_param
   void   *kernel_params_amp[PARAMCNT];
   void   *kernel_params_tm[PARAMCNT];
   void   *kernel_params_memset[PARAMCNT];
+  void   *kernel_params_atinit[PARAMCNT];
+  void   *kernel_params_decompress[PARAMCNT];
 
   u32     kernel_params_buf32[PARAMCNT];
   u64     kernel_params_buf64[PARAMCNT];
@@ -1105,6 +1189,12 @@ typedef struct hc_device_param
 
   u32     kernel_params_memset_buf32[PARAMCNT];
   u64     kernel_params_memset_buf64[PARAMCNT];
+
+  u32     kernel_params_atinit_buf32[PARAMCNT];
+  u64     kernel_params_atinit_buf64[PARAMCNT];
+
+  u32     kernel_params_decompress_buf32[PARAMCNT];
+  u64     kernel_params_decompress_buf64[PARAMCNT];
 
 } hc_device_param_t;
 
@@ -1131,7 +1221,7 @@ typedef struct opencl_ctx
 
   u32                 hardware_power_all;
 
-  u32                 kernel_power_all;
+  u64                 kernel_power_all;
   u64                 kernel_power_final; // we save that so that all divisions are done from the same base
 
   u32                 opencl_platforms_filter;
@@ -1666,8 +1756,6 @@ typedef struct combinator_ctx
 {
   bool enabled;
 
-  char *scratch_buf;
-
   char *dict1;
   char *dict2;
 
@@ -1730,7 +1818,11 @@ typedef struct device_info
   int     corespeed_dev;
   int     memoryspeed_dev;
   double  runtime_msec_dev;
-  int     progress_dev;
+  u64     progress_dev;
+  int     kernel_accel_dev;
+  int     kernel_loops_dev;
+  int     kernel_threads_dev;
+  int     vector_width_dev;
 
 } device_info_t;
 
@@ -1903,8 +1995,8 @@ typedef struct cache_generate
 
 typedef struct hashlist_parse
 {
-  u32 hashes_cnt;
-  u32 hashes_avail;
+  u64 hashes_cnt;
+  u64 hashes_avail;
 
 } hashlist_parse_t;
 
@@ -1912,15 +2004,15 @@ typedef struct hashlist_parse
 
 typedef struct event_ctx
 {
-  char old_buf[MAX_OLD_EVENTS][HCBUFSIZ_TINY];
-  int  old_len[MAX_OLD_EVENTS];
-  int  old_cnt;
+  char   old_buf[MAX_OLD_EVENTS][HCBUFSIZ_TINY];
+  size_t old_len[MAX_OLD_EVENTS];
+  int    old_cnt;
 
-  char msg_buf[HCBUFSIZ_TINY];
-  int  msg_len;
-  bool msg_newline;
+  char   msg_buf[HCBUFSIZ_TINY];
+  size_t msg_len;
+  bool   msg_newline;
 
-  int  prev_len;
+  size_t prev_len;
 
   hc_thread_mutex_t mux_event;
 

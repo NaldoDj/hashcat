@@ -13,7 +13,7 @@
 #define COMPARE_S "inc_comp_single.cl"
 #define COMPARE_M "inc_comp_multi.cl"
 
-__constant static u32a c_pc_dec[1024] =
+__constant u32a c_pc_dec[1024] =
 {
   0x00000030,
   0x00000031,
@@ -1041,7 +1041,7 @@ __constant static u32a c_pc_dec[1024] =
   0x33323031,
 };
 
-__constant static u32a c_pc_len[1024] =
+__constant u32a c_pc_len[1024] =
 {
   1,
   1,
@@ -2069,7 +2069,7 @@ __constant static u32a c_pc_len[1024] =
   4
 };
 
-void append_word (u32 w0[4], u32 w1[4], const u32 append[4], const u32 offset)
+DECLSPEC void append_word (u32 w0[4], u32 w1[4], const u32 append[4], const u32 offset)
 {
   switch (offset)
   {
@@ -2103,7 +2103,7 @@ void append_word (u32 w0[4], u32 w1[4], const u32 append[4], const u32 offset)
   }
 }
 
-void append_salt (u32 w0[4], u32 w1[4], u32 w2[4], const u32 append[5], const u32 offset)
+DECLSPEC void append_salt (u32 w0[4], u32 w1[4], u32 w2[4], const u32 append[5], const u32 offset)
 {
   u32 tmp0;
   u32 tmp1;
