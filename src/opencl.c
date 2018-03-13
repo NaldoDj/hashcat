@@ -1602,8 +1602,8 @@ int run_kernel (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, con
 
   if ((hashconfig->opts_type & OPTS_TYPE_PT_BITSLICE) && (user_options->attack_mode == ATTACK_MODE_BF))
   {
-    const size_t global_work_size[3] = { num_elements,        32, 1 };
-    const size_t local_work_size[3]  = { kernel_threads / 32, 32, 1 };
+    const size_t global_work_size[3] = { num_elements,  32, 1 };
+    const size_t local_work_size[3]  = { kernel_threads, 1, 1 };
 
     CL_rc = hc_clEnqueueNDRangeKernel (hashcat_ctx, device_param->command_queue, kernel, 2, NULL, global_work_size, local_work_size, 0, NULL, &event);
 
@@ -1814,7 +1814,7 @@ int run_kernel_tm (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param)
 {
   const u64 num_elements = 1024; // fixed
 
-  const u64 kernel_threads = device_param->kernel_wgs_tm;
+  const u64 kernel_threads = MIN (num_elements, device_param->kernel_wgs_tm);
 
   cl_kernel kernel = device_param->kernel_tm;
 
@@ -2047,9 +2047,12 @@ int run_copy (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, const
 
     const u32 off = pw_idx->off;
 
-    CL_rc = hc_clEnqueueWriteBuffer (hashcat_ctx, device_param->command_queue, device_param->d_pws_comp_buf, CL_TRUE, 0, off * sizeof (u32), device_param->pws_comp, 0, NULL, NULL);
+    if (off)
+    {
+      CL_rc = hc_clEnqueueWriteBuffer (hashcat_ctx, device_param->command_queue, device_param->d_pws_comp_buf, CL_TRUE, 0, off * sizeof (u32), device_param->pws_comp, 0, NULL, NULL);
 
-    if (CL_rc == -1) return -1;
+      if (CL_rc == -1) return -1;
+    }
 
     CL_rc = run_kernel_decompress (hashcat_ctx, device_param, pws_cnt);
 
@@ -2095,9 +2098,12 @@ int run_copy (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, const
 
       const u32 off = pw_idx->off;
 
-      CL_rc = hc_clEnqueueWriteBuffer (hashcat_ctx, device_param->command_queue, device_param->d_pws_comp_buf, CL_TRUE, 0, off * sizeof (u32), device_param->pws_comp, 0, NULL, NULL);
+      if (off)
+      {
+        CL_rc = hc_clEnqueueWriteBuffer (hashcat_ctx, device_param->command_queue, device_param->d_pws_comp_buf, CL_TRUE, 0, off * sizeof (u32), device_param->pws_comp, 0, NULL, NULL);
 
-      if (CL_rc == -1) return -1;
+        if (CL_rc == -1) return -1;
+      }
 
       CL_rc = run_kernel_decompress (hashcat_ctx, device_param, pws_cnt);
 
@@ -2117,9 +2123,12 @@ int run_copy (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, const
 
         const u32 off = pw_idx->off;
 
-        CL_rc = hc_clEnqueueWriteBuffer (hashcat_ctx, device_param->command_queue, device_param->d_pws_comp_buf, CL_TRUE, 0, off * sizeof (u32), device_param->pws_comp, 0, NULL, NULL);
+        if (off)
+        {
+          CL_rc = hc_clEnqueueWriteBuffer (hashcat_ctx, device_param->command_queue, device_param->d_pws_comp_buf, CL_TRUE, 0, off * sizeof (u32), device_param->pws_comp, 0, NULL, NULL);
 
-        if (CL_rc == -1) return -1;
+          if (CL_rc == -1) return -1;
+        }
 
         CL_rc = run_kernel_decompress (hashcat_ctx, device_param, pws_cnt);
 
@@ -2137,9 +2146,12 @@ int run_copy (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device_param, const
 
         const u32 off = pw_idx->off;
 
-        CL_rc = hc_clEnqueueWriteBuffer (hashcat_ctx, device_param->command_queue, device_param->d_pws_comp_buf, CL_TRUE, 0, off * sizeof (u32), device_param->pws_comp, 0, NULL, NULL);
+        if (off)
+        {
+          CL_rc = hc_clEnqueueWriteBuffer (hashcat_ctx, device_param->command_queue, device_param->d_pws_comp_buf, CL_TRUE, 0, off * sizeof (u32), device_param->pws_comp, 0, NULL, NULL);
 
-        if (CL_rc == -1) return -1;
+          if (CL_rc == -1) return -1;
+        }
 
         CL_rc = run_kernel_decompress (hashcat_ctx, device_param, pws_cnt);
 
@@ -3935,9 +3947,11 @@ static int get_kernel_wgs (hashcat_ctx_t *hashcat_ctx, hc_device_param_t *device
 
   if (CL_rc == -1) return -1;
 
-  if (compile_work_group_size[0] > 0)
+  const size_t cwgs_total = compile_work_group_size[0] * compile_work_group_size[1] * compile_work_group_size[2];
+
+  if (cwgs_total > 0)
   {
-    kernel_threads = MIN (kernel_threads, (u32) compile_work_group_size[0]);
+    kernel_threads = MIN (kernel_threads, (u32) cwgs_total);
   }
 
   *result = kernel_threads;
@@ -4534,6 +4548,7 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
     snprintf (build_opts_new, sizeof (build_opts_new) - 1, "%s -D VENDOR_ID=%u -D CUDA_ARCH=%u -D AMD_ROCM=%u -D VECT_SIZE=%u -D DEVICE_TYPE=%u -D DGST_R0=%u -D DGST_R1=%u -D DGST_R2=%u -D DGST_R3=%u -D DGST_ELEM=%u -D KERN_TYPE=%u -D _unroll -w", build_opts, device_param->platform_vendor_id, (device_param->sm_major * 100) + device_param->sm_minor, device_param->is_rocm, device_param->vector_width, (u32) device_param->device_type, hashconfig->dgst_pos0, hashconfig->dgst_pos1, hashconfig->dgst_pos2, hashconfig->dgst_pos3, hashconfig->dgst_size / 4, hashconfig->kern_type);
     #endif
 
+    /*
     if (device_param->device_type & CL_DEVICE_TYPE_CPU)
     {
       if (device_param->platform_vendor_id == VENDOR_ID_INTEL_SDK)
@@ -4541,6 +4556,7 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
         strncat (build_opts_new, " -cl-opt-disable", 16);
       }
     }
+    */
 
     strncpy (build_opts, build_opts_new, sizeof (build_opts) - 1);
 

@@ -82,7 +82,7 @@
  */
 
 #if defined IS_CPU
-#define DECLSPEC static
+#define DECLSPEC inline
 #elif defined IS_GPU
 #if defined IS_AMD
 #define DECLSPEC inline
@@ -191,16 +191,6 @@
 
 #ifdef IS_NV
 #ifdef IS_GPU
-
-#if KERN_TYPE == 1500
-#undef _unroll
-#endif
-#if KERN_TYPE == 3000
-#undef _unroll
-#endif
-#if KERN_TYPE == 14000
-#undef _unroll
-#endif
 
 #endif
 #endif
