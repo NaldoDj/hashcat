@@ -3225,6 +3225,8 @@ int opencl_ctx_devices_init (hashcat_ctx_t *hashcat_ctx, const int comptime)
 
       device_param->device_global_mem = device_global_mem;
 
+      device_param->device_available_mem = 0;
+
       // device_maxmem_alloc
 
       cl_ulong device_maxmem_alloc;
@@ -4259,6 +4261,88 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
 
     if (CL_rc == -1) return -1;
 
+    // device_available_mem
+
+    #define MAX_ALLOC_CHECKS_CNT  8192
+    #define MAX_ALLOC_CHECKS_SIZE (64 * 1024 * 1024)
+
+    device_param->device_available_mem = device_param->device_global_mem - MAX_ALLOC_CHECKS_SIZE;
+
+    if (device_param->platform_vendor_id == VENDOR_ID_NV)
+    {
+      // OK, so the problem here is the following:
+      // There's just CL_DEVICE_GLOBAL_MEM_SIZE to ask OpenCL about the total memory on the device,
+      // but there's no way to ask for available memory on the device.
+      // In combination, most OpenCL runtimes implementation of clCreateBuffer()
+      // are doing so called lazy memory allocation on the device.
+      // Now, if the user has X11 (or a game or anything that takes a lot of GPU memory)
+      // running on the host we end up with an error type of this:
+      // clEnqueueNDRangeKernel(): CL_MEM_OBJECT_ALLOCATION_FAILURE
+      // The clEnqueueNDRangeKernel() is because of the lazy allocation
+      // The best way to workaround this problem is if we would be able to ask for available memory,
+      // The idea here is to try to evaluate available memory by allocating it till it errors
+
+      cl_mem *tmp_device = (cl_mem *) hccalloc (MAX_ALLOC_CHECKS_CNT, sizeof (cl_mem));
+
+      u64 c;
+
+      for (c = 0; c < MAX_ALLOC_CHECKS_CNT; c++)
+      {
+        if (((c + 1 + 1) * MAX_ALLOC_CHECKS_SIZE) >= device_param->device_global_mem) break;
+
+        cl_int CL_err;
+
+        OCL_PTR *ocl = opencl_ctx->ocl;
+
+        tmp_device[c] = ocl->clCreateBuffer (device_param->context, CL_MEM_READ_WRITE, MAX_ALLOC_CHECKS_SIZE, NULL, &CL_err);
+
+        if (CL_err != CL_SUCCESS)
+        {
+          c--;
+
+          break;
+        }
+
+        // transfer only a few byte should be enough to force the runtime to actually allocate the memory
+
+        u8 tmp_host[8];
+
+        CL_err = ocl->clEnqueueReadBuffer  (device_param->command_queue, tmp_device[c], CL_TRUE, 0, sizeof (tmp_host), tmp_host, 0, NULL, NULL);
+
+        if (CL_err != CL_SUCCESS) break;
+
+        CL_err = ocl->clEnqueueWriteBuffer (device_param->command_queue, tmp_device[c], CL_TRUE, 0, sizeof (tmp_host), tmp_host, 0, NULL, NULL);
+
+        if (CL_err != CL_SUCCESS) break;
+
+        CL_err = ocl->clEnqueueReadBuffer  (device_param->command_queue, tmp_device[c], CL_TRUE, MAX_ALLOC_CHECKS_SIZE - sizeof (tmp_host), sizeof (tmp_host), tmp_host, 0, NULL, NULL);
+
+        if (CL_err != CL_SUCCESS) break;
+
+        CL_err = ocl->clEnqueueWriteBuffer (device_param->command_queue, tmp_device[c], CL_TRUE, MAX_ALLOC_CHECKS_SIZE - sizeof (tmp_host), sizeof (tmp_host), tmp_host, 0, NULL, NULL);
+
+        if (CL_err != CL_SUCCESS) break;
+      }
+
+      device_param->device_available_mem = c * MAX_ALLOC_CHECKS_SIZE;
+
+      // clean up
+
+      for (c = 0; c < MAX_ALLOC_CHECKS_CNT; c++)
+      {
+        if (((c + 1 + 1) * MAX_ALLOC_CHECKS_SIZE) >= device_param->device_global_mem) break;
+
+        if (tmp_device[c] != NULL)
+        {
+          CL_rc = hc_clReleaseMemObject (hashcat_ctx, tmp_device[c]);
+
+          if (CL_rc == -1) return -1;
+        }
+      }
+
+      hcfree (tmp_device);
+    }
+
     /**
      * create input buffers on device : calculate size of fixed memory buffers
      */
@@ -4436,7 +4520,7 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
           continue;
         }
 
-        if ((size_scrypt + scrypt_extra_space) > device_param->device_global_mem)
+        if ((size_scrypt + scrypt_extra_space) > device_param->device_available_mem)
         {
           if (user_options->quiet == false) event_log_warning (hashcat_ctx, "Increasing total device memory allocatable for --scrypt-tmto %u.", tmto);
 
@@ -6093,9 +6177,9 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
     // this value should represent a reasonable amount of memory a host system has per GPU.
     // note we're allocating 3 blocks of that size.
 
-    #define PWS_SPACE (512 * 1024 * 1024)
+    #define PWS_SPACE (1024 * 1024 * 1024)
 
-    // sometimes device_global_mem and device_maxmem_alloc reported back from the opencl runtime are a bit inaccurate.
+    // sometimes device_available_mem and device_maxmem_alloc reported back from the opencl runtime are a bit inaccurate.
     // let's add some extra space just to be sure.
 
     #define EXTRA_SPACE (64 * 1024 * 1024)
@@ -6173,7 +6257,7 @@ int opencl_session_begin (hashcat_ctx_t *hashcat_ctx)
         + size_st_salts
         + size_st_esalts;
 
-      if ((size_total + EXTRA_SPACE) > device_param->device_global_mem) memory_limit_hit = 1;
+      if ((size_total + EXTRA_SPACE) > device_param->device_available_mem) memory_limit_hit = 1;
 
       if (memory_limit_hit == 1)
       {
