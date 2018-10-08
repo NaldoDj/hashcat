@@ -280,7 +280,7 @@ typedef struct krb5tgs
 {
   u32 account_info[512];
   u32 checksum[4];
-  u32 edata2[2560];
+  u32 edata2[5120];
   u32 edata2_len;
 
 } krb5tgs_t;
@@ -533,6 +533,8 @@ typedef struct electrum_wallet
 
 typedef struct ansible_vault
 {
+  u32 cipher;
+  u32 version;
   u32 ct_data_buf[4096];
   u32 ct_data_len;
 } ansible_vault_t;

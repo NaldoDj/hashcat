@@ -2506,7 +2506,7 @@ static int input_tokenizer (u8 *input_buf, int input_len, token_t *token)
     {
       if (token->attr[token_idx] & TOKEN_ATTR_OPTIONAL_ROUNDS)
       {
-        const int len = rounds_count_length ((char *)token->buf[token_idx], len_left);
+        const int len = rounds_count_length ((char *) token->buf[token_idx], len_left);
 
         token->opt_buf = token->buf[token_idx];
 
@@ -12401,8 +12401,8 @@ int bitcoin_wallet_parse_hash (u8 *input_buf, u32 input_len, hash_t *hash_buf, M
                    | TOKEN_ATTR_VERIFY_DIGIT;
 
   token.sep[2]     = '$';
-  token.len_min[2] = 96;
-  token.len_max[2] = 96;
+  token.len_min[2] = 16;
+  token.len_max[2] = 256;
   token.attr[2]    = TOKEN_ATTR_VERIFY_LENGTH
                    | TOKEN_ATTR_VERIFY_HEX;
 
@@ -12478,6 +12478,8 @@ int bitcoin_wallet_parse_hash (u8 *input_buf, u32 input_len, hash_t *hash_buf, M
   if (cry_salt_buf_len   != cry_salt_len)   return (PARSER_SALT_VALUE);
   if (ckey_buf_len       != ckey_len)       return (PARSER_SALT_VALUE);
   if (public_key_buf_len != public_key_len) return (PARSER_SALT_VALUE);
+
+  if (cry_master_len % 16) return (PARSER_SALT_VALUE);
 
   // esalt
 
@@ -13959,7 +13961,7 @@ int krb5tgs_parse_hash (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UN
 
     token.sep[3]     = '$';
     token.len_min[3] = 64;
-    token.len_max[3] = 20480;
+    token.len_max[3] = 40960;
     token.attr[3]    = TOKEN_ATTR_VERIFY_LENGTH
                      | TOKEN_ATTR_VERIFY_HEX;
   }
@@ -13975,7 +13977,7 @@ int krb5tgs_parse_hash (u8 *input_buf, u32 input_len, hash_t *hash_buf, MAYBE_UN
 
     token.sep[2]     = '$';
     token.len_min[2] = 64;
-    token.len_max[2] = 20480;
+    token.len_max[2] = 40960;
     token.attr[2]    = TOKEN_ATTR_VERIFY_LENGTH
                      | TOKEN_ATTR_VERIFY_HEX;
   }
@@ -17645,16 +17647,10 @@ int wpa_pmkid_pbkdf2_parse_hash (u8 *input_buf, u32 input_len, hash_t *hash_buf,
 
   // salt
 
-  salt->salt_buf[0] = wpa_pmkid->pmkid_data[0];
-  salt->salt_buf[1] = wpa_pmkid->pmkid_data[1];
-  salt->salt_buf[2] = wpa_pmkid->pmkid_data[2];
-  salt->salt_buf[3] = wpa_pmkid->pmkid_data[3];
-  salt->salt_buf[4] = wpa_pmkid->pmkid_data[4];
-  salt->salt_buf[5] = wpa_pmkid->pmkid_data[5];
-  salt->salt_buf[6] = wpa_pmkid->pmkid_data[6];
-  salt->salt_buf[7] = wpa_pmkid->pmkid_data[7];
+  memcpy (salt->salt_buf, wpa_pmkid->essid_buf, wpa_pmkid->essid_len);
 
-  salt->salt_len  = 32;
+  salt->salt_len = wpa_pmkid->essid_len;
+
   salt->salt_iter = ROUNDS_WPA_PBKDF2 - 1;
 
   // hash
@@ -17682,6 +17678,8 @@ int wpa_pmkid_pmk_parse_hash (u8 *input_buf, u32 input_len, hash_t *hash_buf, MA
 
   token_t token;
 
+  // real 16801 pmkid hash-lines
+
   token.token_cnt  = 3;
 
   token.sep[0]     = '*';
@@ -17704,7 +17702,40 @@ int wpa_pmkid_pmk_parse_hash (u8 *input_buf, u32 input_len, hash_t *hash_buf, MA
 
   const int rc_tokenizer = input_tokenizer (input_buf, input_len, &token);
 
-  if (rc_tokenizer != PARSER_OK) return (rc_tokenizer);
+  if (rc_tokenizer != PARSER_OK)
+  {
+    // we'll accept normal 16800 pmkid hash-lines, too
+
+    token.token_cnt  = 4;
+
+    token.sep[0]     = '*';
+    token.len_min[0] = 32;
+    token.len_max[0] = 32;
+    token.attr[0]    = TOKEN_ATTR_VERIFY_LENGTH
+                     | TOKEN_ATTR_VERIFY_HEX;
+
+    token.sep[1]     = '*';
+    token.len_min[1] = 12;
+    token.len_max[1] = 12;
+    token.attr[1]    = TOKEN_ATTR_VERIFY_LENGTH
+                     | TOKEN_ATTR_VERIFY_HEX;
+
+    token.sep[2]     = '*';
+    token.len_min[2] = 12;
+    token.len_max[2] = 12;
+    token.attr[2]    = TOKEN_ATTR_VERIFY_LENGTH
+                     | TOKEN_ATTR_VERIFY_HEX;
+
+    token.sep[3]     = '*';
+    token.len_min[3] = 0;
+    token.len_max[3] = 64;
+    token.attr[3]    = TOKEN_ATTR_VERIFY_LENGTH
+                     | TOKEN_ATTR_VERIFY_HEX;
+
+    const int rc_tokenizer2 = input_tokenizer (input_buf, input_len, &token);
+
+    if (rc_tokenizer2 != PARSER_OK) return (rc_tokenizer);
+  }
 
   // pmkid
 
@@ -17802,15 +17833,11 @@ int ansible_vault_parse_hash (u8 *input_buf, u32 input_len, hash_t *hash_buf, MA
   token.attr[0]    = TOKEN_ATTR_FIXED_LENGTH
                    | TOKEN_ATTR_VERIFY_SIGNATURE;
 
-  // version (unused)
-
   token.sep[1]     = '*';
   token.len_min[1] = 1;
   token.len_max[1] = 1;
   token.attr[1]    = TOKEN_ATTR_VERIFY_LENGTH
                    | TOKEN_ATTR_VERIFY_DIGIT;
-
-  // cipher (unused)
 
   token.sep[2]     = '*';
   token.len_min[2] = 1;
@@ -17826,7 +17853,7 @@ int ansible_vault_parse_hash (u8 *input_buf, u32 input_len, hash_t *hash_buf, MA
 
   token.sep[4]     = '*';
   token.len_min[4] = 32;
-  token.len_max[4] = 8192;
+  token.len_max[4] = 32768;
   token.attr[4]    = TOKEN_ATTR_VERIFY_LENGTH
                    | TOKEN_ATTR_VERIFY_HEX;
 
@@ -17839,6 +17866,18 @@ int ansible_vault_parse_hash (u8 *input_buf, u32 input_len, hash_t *hash_buf, MA
   const int rc_tokenizer = input_tokenizer (input_buf, input_len, &token);
 
   if (rc_tokenizer != PARSER_OK) return (rc_tokenizer);
+
+  // cipher (unused)
+
+  u8 *cipher_pos = token.buf[1];
+
+  ansible_vault->cipher = hc_strtoul ((const char *) cipher_pos, NULL, 10);
+
+  // version (unused)
+
+  u8 *version_pos = token.buf[2];
+
+  ansible_vault->version = hc_strtoul ((const char *) version_pos, NULL, 10);
 
   // salt
 
@@ -21035,7 +21074,7 @@ int ascii_digest (hashcat_ctx_t *hashcat_ctx, char *out_buf, const size_t out_le
 
     krb5tgs_t *krb5tgs = &krb5tgss[digest_cur];
 
-    char data[2560 * 4 * 2] = { 0 };
+    char data[5120 * 4 * 2] = { 0 };
 
     for (u32 i = 0, j = 0; i < krb5tgs->edata2_len; i += 1, j += 2)
     {
@@ -22028,10 +22067,40 @@ int ascii_digest (hashcat_ctx_t *hashcat_ctx, char *out_buf, const size_t out_le
   }
   else if (hash_mode == 16900)
   {
-    hashinfo_t **hashinfo_ptr = hash_info;
-    char        *hash_buf     = hashinfo_ptr[digest_cur]->orighash;
+    ansible_vault_t *ansible_vaults = (ansible_vault_t *) esalts_buf;
 
-    snprintf (out_buf, out_len - 1, "%s", hash_buf);
+    ansible_vault_t *ansible_vault = &ansible_vaults[digest_cur];
+
+    u8 ct_data[16384 + 1] = { 0 };
+
+    u32 *ct_data_ptr = ansible_vault->ct_data_buf;
+
+    for (u32 i = 0, j = 0; i < ansible_vault->ct_data_len / 4; i++, j += 8)
+    {
+      u32_to_hex_lower (ct_data_ptr[i], ct_data + j);
+    }
+
+    snprintf (out_buf, out_len - 1, "%s%u*%u*%08x%08x%08x%08x%08x%08x%08x%08x*%s*%08x%08x%08x%08x%08x%08x%08x%08x",
+      SIGNATURE_ANSIBLE_VAULT,
+      ansible_vault->cipher,
+      ansible_vault->version,
+      salt.salt_buf[0],
+      salt.salt_buf[1],
+      salt.salt_buf[2],
+      salt.salt_buf[3],
+      salt.salt_buf[4],
+      salt.salt_buf[5],
+      salt.salt_buf[6],
+      salt.salt_buf[7],
+      ct_data,
+      byte_swap_32 (digest_buf[0]),
+      byte_swap_32 (digest_buf[1]),
+      byte_swap_32 (digest_buf[2]),
+      byte_swap_32 (digest_buf[3]),
+      byte_swap_32 (digest_buf[4]),
+      byte_swap_32 (digest_buf[5]),
+      byte_swap_32 (digest_buf[6]),
+      byte_swap_32 (digest_buf[7]));
   }
   else if (hash_mode == 99999)
   {
@@ -27180,7 +27249,8 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
     case 16800:  hashconfig->hash_type      = HASH_TYPE_WPA_PMKID_PBKDF2;
                  hashconfig->salt_type      = SALT_TYPE_EMBEDDED;
                  hashconfig->attack_exec    = ATTACK_EXEC_OUTSIDE_KERNEL;
-                 hashconfig->opts_type      = OPTS_TYPE_PT_GENERATE_LE;
+                 hashconfig->opts_type      = OPTS_TYPE_PT_GENERATE_LE
+                                            | OPTS_TYPE_AUX1;
                  hashconfig->kern_type      = KERN_TYPE_WPA_PMKID_PBKDF2;
                  hashconfig->dgst_size      = DGST_SIZE_4_4;
                  hashconfig->parse_func     = wpa_pmkid_pbkdf2_parse_hash;
@@ -27197,7 +27267,8 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
     case 16801:  hashconfig->hash_type      = HASH_TYPE_WPA_PMKID_PMK;
                  hashconfig->salt_type      = SALT_TYPE_EMBEDDED;
                  hashconfig->attack_exec    = ATTACK_EXEC_OUTSIDE_KERNEL;
-                 hashconfig->opts_type      = OPTS_TYPE_PT_GENERATE_LE;
+                 hashconfig->opts_type      = OPTS_TYPE_PT_GENERATE_LE
+                                            | OPTS_TYPE_AUX1;
                  hashconfig->kern_type      = KERN_TYPE_WPA_PMKID_PMK;
                  hashconfig->dgst_size      = DGST_SIZE_4_4;
                  hashconfig->parse_func     = wpa_pmkid_pmk_parse_hash;
@@ -27214,8 +27285,7 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
     case 16900:  hashconfig->hash_type      = HASH_TYPE_ANSIBLE_VAULT;
                  hashconfig->salt_type      = SALT_TYPE_EMBEDDED;
                  hashconfig->attack_exec    = ATTACK_EXEC_OUTSIDE_KERNEL;
-                 hashconfig->opts_type      = OPTS_TYPE_PT_GENERATE_LE
-                                            | OPTS_TYPE_HASH_COPY;
+                 hashconfig->opts_type      = OPTS_TYPE_PT_GENERATE_LE;
                  hashconfig->kern_type      = KERN_TYPE_ANSIBLE_VAULT;
                  hashconfig->dgst_size      = DGST_SIZE_4_8;
                  hashconfig->parse_func     = ansible_vault_parse_hash;
@@ -27287,11 +27357,11 @@ int hashconfig_init (hashcat_ctx_t *hashcat_ctx)
 
     char source_file[256] = { 0 };
 
-    generate_source_kernel_filename (hashconfig->attack_exec, user_options_extra->attack_kern, hashconfig->kern_type, false, folder_config->shared_dir, source_file);
+    generate_source_kernel_filename (user_options->slow_candidates, hashconfig->attack_exec, user_options_extra->attack_kern, hashconfig->kern_type, false, folder_config->shared_dir, source_file);
 
     hashconfig->has_pure_kernel = hc_path_read (source_file);
 
-    generate_source_kernel_filename (hashconfig->attack_exec, user_options_extra->attack_kern, hashconfig->kern_type, true, folder_config->shared_dir, source_file);
+    generate_source_kernel_filename (user_options->slow_candidates, hashconfig->attack_exec, user_options_extra->attack_kern, hashconfig->kern_type, true, folder_config->shared_dir, source_file);
 
     hashconfig->has_optimized_kernel = hc_path_read (source_file);
 
@@ -27695,14 +27765,30 @@ u32 hashconfig_get_kernel_loops (hashcat_ctx_t *hashcat_ctx)
 
   u32 kernel_loops_fixed = 0;
 
-  if (hashconfig->hash_mode == 1500 && user_options->attack_mode == ATTACK_MODE_BF)
+  if (user_options->slow_candidates == true)
   {
-    kernel_loops_fixed = 1024;
   }
-
-  if (hashconfig->hash_mode == 3000 && user_options->attack_mode == ATTACK_MODE_BF)
+  else
   {
-    kernel_loops_fixed = 1024;
+    if (hashconfig->hash_mode == 1500 && user_options->attack_mode == ATTACK_MODE_BF)
+    {
+      kernel_loops_fixed = 1024;
+    }
+
+    if (hashconfig->hash_mode == 3000 && user_options->attack_mode == ATTACK_MODE_BF)
+    {
+      kernel_loops_fixed = 1024;
+    }
+
+    if (hashconfig->hash_mode == 14000 && user_options->attack_mode == ATTACK_MODE_BF)
+    {
+      kernel_loops_fixed = 1024;
+    }
+
+    if (hashconfig->hash_mode == 14100 && user_options->attack_mode == ATTACK_MODE_BF)
+    {
+      kernel_loops_fixed = 1024;
+    }
   }
 
   if (hashconfig->hash_mode == 8900)
@@ -27718,16 +27804,6 @@ u32 hashconfig_get_kernel_loops (hashcat_ctx_t *hashcat_ctx)
   if (hashconfig->hash_mode == 12500)
   {
     kernel_loops_fixed = ROUNDS_RAR3 / 16;
-  }
-
-  if (hashconfig->hash_mode == 14000 && user_options->attack_mode == ATTACK_MODE_BF)
-  {
-    kernel_loops_fixed = 1024;
-  }
-
-  if (hashconfig->hash_mode == 14100 && user_options->attack_mode == ATTACK_MODE_BF)
-  {
-    kernel_loops_fixed = 1024;
   }
 
   if (hashconfig->hash_mode == 15700)
@@ -27793,17 +27869,11 @@ int hashconfig_get_pw_max (hashcat_ctx_t *hashcat_ctx, const bool optimized_kern
 
     if ((user_options->rp_files_cnt > 0) || (user_options->rp_gen > 0))
     {
-      switch (user_options_extra->attack_kern)
+      if (user_options->slow_candidates == true)
       {
-        case ATTACK_KERN_STRAIGHT:  pw_max = MIN (pw_max, PW_DICTMAX);
-                                    break;
-        case ATTACK_KERN_COMBI:     pw_max = MIN (pw_max, PW_DICTMAX);
-                                    break;
+        pw_max = MIN (pw_max, PW_DICTMAX);
       }
-    }
-    else
-    {
-      if (hashconfig->attack_exec == ATTACK_EXEC_INSIDE_KERNEL)
+      else
       {
         switch (user_options_extra->attack_kern)
         {
@@ -27813,9 +27883,36 @@ int hashconfig_get_pw_max (hashcat_ctx_t *hashcat_ctx, const bool optimized_kern
                                       break;
         }
       }
+    }
+    else
+    {
+      if (user_options->slow_candidates == true)
+      {
+        if (hashconfig->attack_exec == ATTACK_EXEC_INSIDE_KERNEL)
+        {
+          pw_max = MIN (pw_max, PW_DICTMAX);
+        }
+        else
+        {
+          // If we have a NOOP rule then we can process words from wordlists > PW_DICTMAX for slow hashes
+        }
+      }
       else
       {
-        // If we have a NOOP rule then we can process words from wordlists > PW_DICTMAX for slow hashes
+        if (hashconfig->attack_exec == ATTACK_EXEC_INSIDE_KERNEL)
+        {
+          switch (user_options_extra->attack_kern)
+          {
+            case ATTACK_KERN_STRAIGHT:  pw_max = MIN (pw_max, PW_DICTMAX);
+                                        break;
+            case ATTACK_KERN_COMBI:     pw_max = MIN (pw_max, PW_DICTMAX);
+                                        break;
+          }
+        }
+        else
+        {
+          // If we have a NOOP rule then we can process words from wordlists > PW_DICTMAX for slow hashes
+        }
       }
     }
 
